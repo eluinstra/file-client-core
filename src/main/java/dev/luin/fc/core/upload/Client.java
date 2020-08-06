@@ -43,7 +43,7 @@ public class Client extends TusClient
 	public static void main(String[] args) throws GeneralSecurityException, IOException, Exception
 	{
 		if (args.length == 0)
-			System.out.println("Usage: TusClient <file>");
+			System.out.println("Usage: Client <file>");
 		val sslFactoryManager = SSLFactoryManager.builder()
 				.keyStore(KeyStore.of(KeyStoreType.PKCS12,"dev/luin/fc/core/keystore.p12","password","password"))
 				.trustStore(TrustStore.of(KeyStoreType.PKCS12,"dev/luin/fc/core/keystore.p12","password"))
@@ -56,6 +56,7 @@ public class Client extends TusClient
 		client.enableResuming(new TusURLMemoryStore());
 		val file = new File(args[0]);
 		val upload = new TusUpload(file);
+		upload.setFingerprint("test");
 		System.out.println("Starting uploading " + args[0] + "...");
 		TusExecutor executor = new TusExecutor()
 		{

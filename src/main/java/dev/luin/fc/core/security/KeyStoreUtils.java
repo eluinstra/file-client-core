@@ -20,9 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.security.KeyPair;
 import java.security.KeyStore;
-import java.security.PrivateKey;
 
 import lombok.val;
 import lombok.var;
