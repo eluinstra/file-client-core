@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.fc.core.service.model;
+package dev.luin.fc.core.service;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import dev.luin.fc.core.file.FSFile;
+import dev.luin.fc.core.file.FileSystem;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
-@Mapper
-public interface FileInfoMapper
+@Configuration
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ServiceConfig
 {
-	public FileInfoMapper INSTANCE = Mappers.getMapper(FileInfoMapper.class);
+	@Autowired
+	FileSystem fs;
 
-	FileInfo toFileInfo(FSFile file);
+	@Bean
+	public FileService fileService()
+	{
+		return new FileServiceImpl(fs);
+	}
 }

@@ -17,14 +17,15 @@ package dev.luin.fc.core.file;
 
 import java.util.List;
 
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.NonNull;
 
 interface FSFileDAO
 {
 	Option<FSFile> findFile(long id);
-	List<String> selectFiles();
-	long insertFile(@NonNull FSFile fsFile);
+	Seq<FSFile> selectFiles();
+	Long insertFile(@NonNull FSFile fsFile);
 	long updateFile(@NonNull FSFile fsFile);
 	long deleteFile(long id);
 }

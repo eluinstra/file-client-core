@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.List;
 
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -36,6 +35,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import io.vavr.Function1;
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
@@ -70,7 +70,7 @@ public class FileSystem
 		return new FileDataSource(fsFile.getFile());
 	}
 
-	public List<String> getFiles()
+	public Seq<FSFile> getFiles()
 	{
 		return fsFileDAO.selectFiles();
 	}
@@ -82,7 +82,6 @@ public class FileSystem
 			final String sha256checksum,
 			final Instant startDate,
 			final Instant endDate,
-			@NonNull final Long userId,
 			@NonNull final InputStream content) throws IOException
 	{
 		val realPath = createRandomFile().get();

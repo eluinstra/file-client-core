@@ -42,10 +42,10 @@ public class FileInfo
 	Long id;
 	@NonNull
 	@XmlElement(required=true)
-	String path;
+	String url;
 	@NonNull
 	@XmlElement(required=true)
-	String filename;
+	String name;
 	@NonNull
 	@XmlElement(required=true)
 	String contentType;

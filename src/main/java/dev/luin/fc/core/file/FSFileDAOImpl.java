@@ -15,8 +15,6 @@
  */
 package dev.luin.fc.core.file;
 
-import java.util.List;
-
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.ConstructorExpression;
@@ -25,6 +23,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
 import dev.luin.fc.core.querydsl.model.QFile;
+import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -52,15 +52,15 @@ class FSFileDAOImpl implements FSFileDAO
 	}
 
 	@Override
-	public List<String> selectFiles()
+	public Seq<FSFile> selectFiles()
 	{
-		return queryFactory.select(table.url)
+		return List.ofAll(queryFactory.select(fsFileProjection)
 				.from(table)
-				.fetch();
+				.fetch());
 	}
 
 	@Override
-	public long insertFile(@NonNull final FSFile fsFile)
+	public Long insertFile(@NonNull final FSFile fsFile)
 	{
 		return queryFactory.insert(table)
 				.set(table.url,fsFile.getUrl())
