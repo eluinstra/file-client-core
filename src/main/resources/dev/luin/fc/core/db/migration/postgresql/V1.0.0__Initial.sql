@@ -18,14 +18,33 @@ CREATE TABLE fs_file
 (
 	id								SERIAL					PRIMARY KEY,
 	url								VARCHAR(256)		NULL,
-	real_path					VARCHAR(256)		NOT NULL,
+	path							VARCHAR(256)		NOT NULL,
 	name							VARCHAR(256)		NULL,
 	content_type			VARCHAR(256)		NOT NULL,
 	md5_checksum			VARCHAR(32)			NULL,
 	sha256_checksum		VARCHAR(64)			NULL,
 	timestamp					TIMESTAMP				NOT NULL DEFAULT NOW(),
+	length						BIGINT					NULL
+);
+
+CREATE TABLE upload_task
+(
+	file_id						INTEGER					NOT NULL UNIQUE,
+	creation_url			VARCHAR(256)		NOT NULL,
+	timestamp					TIMESTAMP				DEFAULT NOW NOT NULL,
+	schedule_time			TIMESTAMP				DEFAULT NOW NOT NULL,
+	retries						TINYINT					DEFAULT 0 NOT NULL,
+	FOREIGN KEY (file_id) REFERENCES file(id)
+);
+
+CREATE TABLE download_task
+(
+	url								VARCHAR(256)		NOT NULL UNIQUE,
 	start_date				TIMESTAMP				NULL,
 	end_date					TIMESTAMP				NULL,
-	file_length				BIGINT					NULL,
-	file_type					SMALLINT				NULL
+	timestamp					TIMESTAMP				DEFAULT NOW NOT NULL,
+	file_id						INTEGER					UNIQUE,
+	schedule_time			TIMESTAMP				DEFAULT NOW NOT NULL,
+	retries						TINYINT					DEFAULT 0 NOT NULL,
+	FOREIGN KEY (file_id) REFERENCES file(id)
 );

@@ -65,6 +65,7 @@ public class QueryDSLConfig
 		val templates = getSQLTemplates();
 		val result = new com.querydsl.sql.Configuration(templates);
 		result.register(new InstantType(Types.TIMESTAMP));
+		result.register(new UrlType(Types.VARCHAR));
 		result.setExceptionTranslator(new SpringExceptionTranslator());
 		return result;
 	}

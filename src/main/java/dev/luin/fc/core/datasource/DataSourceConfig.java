@@ -15,8 +15,12 @@
  */
 package dev.luin.fc.core.datasource;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import javax.sql.DataSource;
 
+import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +28,10 @@ import org.springframework.context.annotation.Configuration;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import dev.luin.fc.core.transaction.DataSourceTransactionTemplate;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 
@@ -32,6 +39,34 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {
+	public static final String BASEPATH = "classpath:/dev/luin/fc/core/db/migration/";
+
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	@Getter
+	public enum Location
+	{
+		DB2("jdbc:db2:",BASEPATH + "db2"),
+		H2("jdbc:h2:",BASEPATH + "h2"),
+		HSQLDB("jdbc:hsqldb:",BASEPATH + "hsqldb"),
+		MARIADB("jdbc:mariadb:",BASEPATH + "mysql"),
+		MSSQL("jdbc:sqlserver:",BASEPATH + "mssql"),
+		MYSQL("jdbc:mysql:",BASEPATH + "mysql"),
+		ORACLE("jdbc:oracle:",BASEPATH + "oracle"),
+		POSTGRES("jdbc:postgresql:",BASEPATH + "postgresql");
+		
+		String jdbcUrl;
+		String location;
+		
+		public static Optional<String> getLocation(String jdbcUrl)
+		{
+			return Arrays.stream(values())
+					.filter(l -> jdbcUrl.startsWith(l.jdbcUrl))
+					.map(l -> l.location)
+					.findFirst();
+		}
+	}
+
 	@Value("${fc.jdbc.driverClassName}")
 	String driverClassName;
 	@Value("${fc.jdbc.url}")
@@ -54,7 +89,13 @@ public class DataSourceConfig
 	int minPoolSize;
 	@Value("${fc.pool.maxPoolSize}")
 	int maxPoolSize;
-	
+
+	@Bean
+	public DataSourceTransactionTemplate dataSourceTransactionTemplate()
+	{
+		return new DataSourceTransactionTemplate();
+	}
+
 	@Bean(destroyMethod = "close")
 	public DataSource hikariDataSource()
 	{
@@ -71,5 +112,19 @@ public class DataSourceConfig
 		config.setMinimumIdle(minPoolSize);
 		config.setMaximumPoolSize(maxPoolSize);
 		return new HikariDataSource(config);
+	}
+
+	@Bean
+	public void flyway()
+	{
+		val locations = Location.getLocation(jdbcUrl);
+		locations.ifPresent(l ->
+		{
+			val config = Flyway.configure()
+					.dataSource(jdbcUrl,username,password)
+					.locations(l)
+					.ignoreMissingMigrations(true);
+			config.load().migrate();
+		});
 	}
 }

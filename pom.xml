@@ -167,6 +167,12 @@
 			<version>1.14</version>
 		</dependency>
 		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>6.5.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
 			<version>3.4.5</version>
@@ -284,7 +290,7 @@
 				</executions>
 				<configuration>
 					<jdbcDriver>org.hsqldb.jdbcDriver</jdbcDriver>
-					<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/ebms</jdbcUrl>
+					<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/fc</jdbcUrl>
 					<packageName>dev.luin.fc.core.querydsl.model</packageName>
 					<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
 				</configuration>

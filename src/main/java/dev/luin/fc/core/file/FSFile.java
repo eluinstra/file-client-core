@@ -16,6 +16,7 @@
 package dev.luin.fc.core.file;
 
 import java.io.File;
+import java.net.URL;
 import java.time.Instant;
 
 import lombok.AccessLevel;
@@ -32,11 +33,11 @@ import lombok.With;
 public class FSFile
 {
 	Long id;
-	@NonNull
-	String url;
+	@With
+	URL url;
 	@NonNull
 	@Getter(value=AccessLevel.PACKAGE)
-	String realPath;
+	String path;
 	String name;
 	@NonNull
 	String contentType;
@@ -44,18 +45,15 @@ public class FSFile
 	String md5Checksum;
 	@With
 	String sha256Checksum;
-	Instant startDate;
-	Instant endDate;
 	@With
-	Long fileLength;
-	FileType fileType;
+	Long length;
 
-	File getFile()
+	public File getFile()
 	{
-		return FileSystem.getFile.apply(realPath);
+		return FileSystem.getFile.apply(path);
 	}
 
-	public long getLength()
+	public long getFileLength()
 	{
 		return getFile().length();
 	}
@@ -67,6 +65,6 @@ public class FSFile
 
 	public boolean isCompleted()
 	{
-		return fileLength != null && fileLength == getLength();
+		return length != null && length == getFileLength();
 	}
 }

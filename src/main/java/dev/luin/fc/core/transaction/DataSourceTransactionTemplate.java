@@ -13,9 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.fc.core.file;
+package dev.luin.fc.core.transaction;
 
-public enum FileType
+import org.springframework.transaction.annotation.Transactional;
+
+import io.vavr.CheckedRunnable;
+
+public class DataSourceTransactionTemplate implements TransactionTemplate
 {
-	FINAL, PARTIAL;
+	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public void executeTransaction(CheckedRunnable runnable)
+	{
+		runnable.unchecked();
+	}
 }

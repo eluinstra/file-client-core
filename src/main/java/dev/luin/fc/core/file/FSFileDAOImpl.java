@@ -39,7 +39,7 @@ class FSFileDAOImpl implements FSFileDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QFile table = QFile.file;
-	Expression<?>[] fsFileColumns = {table.id,table.url,table.realPath,table.name,table.contentType,table.md5Checksum,table.sha256Checksum,table.startDate,table.endDate,table.fileLength,table.fileType};
+	Expression<?>[] fsFileColumns = {table.id,table.url,table.path,table.name,table.contentType,table.md5Checksum,table.sha256Checksum,table.length};
 	ConstructorExpression<FSFile> fsFileProjection = Projections.constructor(FSFile.class,fsFileColumns);
 
 	@Override
@@ -64,15 +64,11 @@ class FSFileDAOImpl implements FSFileDAO
 	{
 		return queryFactory.insert(table)
 				.set(table.url,fsFile.getUrl())
-				.set(table.realPath,fsFile.getRealPath())
+				.set(table.path,fsFile.getPath())
 				.set(table.name,fsFile.getName())
 				.set(table.contentType,fsFile.getContentType())
 				.set(table.md5Checksum,fsFile.getMd5Checksum())
 				.set(table.sha256Checksum,fsFile.getSha256Checksum())
-				.set(table.startDate,fsFile.getStartDate())
-				.set(table.endDate,fsFile.getEndDate())
-				.set(table.fileLength,fsFile.getFileLength())
-				.set(table.fileType,fsFile.getFileType())
 				.executeWithKey(Long.class);
 	}
 
@@ -83,7 +79,7 @@ class FSFileDAOImpl implements FSFileDAO
 				.set(table.url,fsFile.getUrl())
 				.set(table.md5Checksum,fsFile.getMd5Checksum())
 				.set(table.sha256Checksum,fsFile.getSha256Checksum())
-				.set(table.fileLength,fsFile.getFileLength())
+				.set(table.length,fsFile.getLength())
 				.where(table.id.eq(fsFile.getId()))
 				.execute();
 	}

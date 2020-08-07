@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -84,23 +85,21 @@ public class FileSystem
 			final Instant endDate,
 			@NonNull final InputStream content) throws IOException
 	{
-		val realPath = createRandomFile().get();
-		val file = getFile.apply(realPath);
-		Try.of(() -> write(content,file)).getOrElseThrow(e -> new IOException("Error writing to file " + realPath,e));
+		val path = createRandomFile().get();
+		val file = getFile.apply(path);
+		Try.of(() -> write(content,file)).getOrElseThrow(e -> new IOException("Error writing to file " + path,e));
 		val calculatedSha256Checksum = calculateSha256Checksum(file);
 		if (validateChecksum(sha256checksum,calculatedSha256Checksum))
 		{
 			val md5Checksum = calculateMd5Checksum(file);
 			val result = FSFile.builder()
-					.url(url)
-					.realPath(realPath)
+					.url(new URL(url))
+					.path(path)
 					.name(filename)
 					.contentType(contentType)
 					.md5Checksum(md5Checksum)
 					.sha256Checksum(calculatedSha256Checksum)
-					.startDate(startDate)
-					.endDate(endDate)
-					.fileLength(file.length())
+					.length(file.length())
 					.build();
 			fsFileDAO.insertFile(result);
 			return result;
@@ -113,28 +112,31 @@ public class FileSystem
 			@NonNull final String url,
 			final String filename,
 			@NonNull final String contentType,
-			final FileType fileType,
 			final Long fileLength,
 			@NonNull final Long userId) throws IOException
 	{
-		val realPath = createRandomFile().get();
+		val path = createRandomFile().get();
 		val result = FSFile.builder()
-				.url(url)
-				.realPath(realPath)
+				.url(new URL(url))
+				.path(path)
 				.name(filename)
 				.contentType(contentType)
-				.fileLength(fileLength)
-				.fileType(fileType)
+				.length(fileLength)
 				.build();
 		fsFileDAO.insertFile(result);
 		return result;
+	}
+
+	public boolean updateFile(FSFile file)
+	{
+		return fsFileDAO.updateFile(file) > 0;
 	}
 
 	public FSFile append(@NonNull final FSFile fsFile, @NonNull final InputStream input, final Long length) throws IOException
 	{
 		val file = fsFile.getFile();
 		if (!file.exists() || fsFile.isCompleted())
-			throw new FileNotFoundException(fsFile.getUrl());
+			throw new FileNotFoundException(fsFile.getUrl().toString());
 		try (val output = new FileOutputStream(file,true))
 		{
 			if (length != null)
@@ -152,7 +154,7 @@ public class FileSystem
 	{
 		val file = fsFile.getFile();
 		if (!file.exists() || !fsFile.isCompleted())
-			throw new FileNotFoundException(fsFile.getUrl());
+			throw new FileNotFoundException(fsFile.getUrl().toString());
 		try (val input = new FileInputStream(file))
 		{
 			return IOUtils.copyLarge(input,output);
@@ -163,7 +165,7 @@ public class FileSystem
 	{
 		val file = fsFile.getFile();
 		if (!file.exists() || !fsFile.isCompleted())
-			throw new FileNotFoundException(fsFile.getUrl());
+			throw new FileNotFoundException(fsFile.getUrl().toString());
 		try (val input = new FileInputStream(file))
 		{
 			return IOUtils.copyLarge(input,output,first,length);
@@ -230,7 +232,7 @@ public class FileSystem
 	{
 		val file = fsFile.getFile();
 		if (!file.exists())// || !fsFile.isCompleted())
-			throw new FileNotFoundException(fsFile.getUrl());
+			throw new FileNotFoundException(fsFile.getUrl().toString());
 		val result = fsFile
 				.withSha256Checksum(calculateSha256Checksum(file))
 				.withMd5Checksum(calculateMd5Checksum(file));

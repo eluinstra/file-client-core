@@ -13,24 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.fc.core.service.model;
+package dev.luin.fc.core.transaction;
 
-import java.net.URL;
+import io.vavr.CheckedRunnable;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-
-import dev.luin.fc.core.file.FSFile;
-
-@Mapper
-public interface FileInfoMapper
+public interface TransactionTemplate
 {
-	public FileInfoMapper INSTANCE = Mappers.getMapper(FileInfoMapper.class);
-
-	FileInfo toFileInfo(FSFile file);
-	
-	default String map(URL value)
-	{
-		return value.toString();
-	}
+	void executeTransaction(CheckedRunnable runnable);
 }

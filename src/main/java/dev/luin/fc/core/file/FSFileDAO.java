@@ -15,8 +15,6 @@
  */
 package dev.luin.fc.core.file;
 
-import java.util.List;
-
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.NonNull;
