@@ -17,6 +17,8 @@ package dev.luin.fc.core.file;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
@@ -31,12 +33,13 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@Transactional(transactionManager = "dataSourceTransactionManager")
 class FSFileDAOImpl implements FSFileDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QFile table = QFile.file;
-	Expression<?>[] fsFileColumns = {table.id,table.url,table.realPath,table.filename,table.contentType,table.md5Checksum,table.sha256Checksum,table.startDate,table.endDate,table.fileLength,table.fileType};
+	Expression<?>[] fsFileColumns = {table.id,table.url,table.realPath,table.name,table.contentType,table.md5Checksum,table.sha256Checksum,table.startDate,table.endDate,table.fileLength,table.fileType};
 	ConstructorExpression<FSFile> fsFileProjection = Projections.constructor(FSFile.class,fsFileColumns);
 
 	@Override
@@ -62,7 +65,7 @@ class FSFileDAOImpl implements FSFileDAO
 		return queryFactory.insert(table)
 				.set(table.url,fsFile.getUrl())
 				.set(table.realPath,fsFile.getRealPath())
-				.set(table.filename,fsFile.getName())
+				.set(table.name,fsFile.getName())
 				.set(table.contentType,fsFile.getContentType())
 				.set(table.md5Checksum,fsFile.getMd5Checksum())
 				.set(table.sha256Checksum,fsFile.getSha256Checksum())

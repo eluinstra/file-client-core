@@ -19,7 +19,7 @@ CREATE TABLE fs_file
 	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
 	url								VARCHAR(256)		NULL,
 	real_path					VARCHAR(256)		NOT NULL,
-	filename					VARCHAR(256)		NULL,
+	name							VARCHAR(256)		NULL,
 	content_type			VARCHAR(256)		NOT NULL,
 	md5_checksum			VARCHAR(32)			NULL,
 	sha256_checksum		VARCHAR(64)			NULL,

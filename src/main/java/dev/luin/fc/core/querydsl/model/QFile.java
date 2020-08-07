@@ -48,8 +48,6 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile> {
 
     public final DateTimePath<java.time.Instant> endDate = createDateTime("endDate", java.time.Instant.class);
 
-    public final StringPath filename = createString("filename");
-
     public final NumberPath<Long> fileLength = createNumber("fileLength", Long.class);
 
     public final EnumPath<FileType> fileType = createEnum("fileType", FileType.class);
@@ -57,6 +55,8 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile> {
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath md5Checksum = createString("md5Checksum");
+
+    public final StringPath name = createString("name");
 
     public final StringPath realPath = createString("realPath");
 
@@ -98,11 +98,11 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile> {
     public void addMetadata() {
         addMetadata(contentType, ColumnMetadata.named("content_type").withIndex(4).ofType(Types.VARCHAR).withSize(256).notNull());
         addMetadata(endDate, ColumnMetadata.named("end_date").withIndex(9).ofType(Types.TIMESTAMP).withSize(26).notNull());
-        addMetadata(filename, ColumnMetadata.named("filename").withIndex(3).ofType(Types.VARCHAR).withSize(256).notNull());
         addMetadata(fileLength, ColumnMetadata.named("file_length").withIndex(11).ofType(Types.BIGINT).withSize(32).notNull());
         addMetadata(fileType, ColumnMetadata.named("file_type").withIndex(12).ofType(Types.SMALLINT).withSize(8).notNull());
         addMetadata(id, ColumnMetadata.named("id").withIndex(10).ofType(Types.BIGINT).withSize(32).notNull());
         addMetadata(md5Checksum, ColumnMetadata.named("md5_checksum").withIndex(5).ofType(Types.VARCHAR).withSize(32).notNull());
+        addMetadata(name, ColumnMetadata.named("name").withIndex(3).ofType(Types.VARCHAR).withSize(256).notNull());
         addMetadata(realPath, ColumnMetadata.named("real_path").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
         addMetadata(sha256Checksum, ColumnMetadata.named("sha256_checksum").withIndex(6).ofType(Types.VARCHAR).withSize(64).notNull());
         addMetadata(startDate, ColumnMetadata.named("start_date").withIndex(8).ofType(Types.TIMESTAMP).withSize(26).notNull());
