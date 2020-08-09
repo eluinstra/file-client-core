@@ -26,14 +26,13 @@ public class DataSourceTransactionTemplate implements TransactionTemplate
 	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void executeTransaction(CheckedRunnable runnable)
 	{
-		runnable.unchecked();
+		runnable.unchecked().run();
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public <T> T executeTransactionWithResult(CheckedFunction0<T> producer)
 	{
-		return (T)producer.unchecked();
+		return (T)producer.unchecked().get();
 	}
 }

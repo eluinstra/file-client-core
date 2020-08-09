@@ -15,10 +15,14 @@ import dev.luin.fc.core.security.KeyStore;
 import dev.luin.fc.core.security.KeyStoreType;
 import dev.luin.fc.core.security.TrustStore;
 import dev.luin.fc.core.transaction.TransactionTemplate;
+import io.tus.java.client.TusURLStore;
+import lombok.AccessLevel;
 import lombok.val;
+import lombok.experimental.FieldDefaults;
 
 @Configuration
 @EnableScheduling
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadClientConfig
 {
 	@Autowired
@@ -47,13 +51,14 @@ public class UploadClientConfig
 		return new UploadTaskManager(uploadTaskDAO(),tusDAO());
 	}
 
-	private UploadTaskDAO uploadTaskDAO()
+	@Bean
+	public UploadTaskDAO uploadTaskDAO()
 	{
 		return new UploadTaskDAOImpl(queryFactory);
 	}
 
 	@Bean
-	public TusUrlDAO tusDAO()
+	public TusURLStore tusDAO()
 	{
 		return new TusUrlDAO(queryFactory);
 	}

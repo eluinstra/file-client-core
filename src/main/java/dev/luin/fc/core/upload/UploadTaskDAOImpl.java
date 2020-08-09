@@ -1,5 +1,7 @@
 package dev.luin.fc.core.upload;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
@@ -15,7 +17,8 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class UploadTaskDAOImpl implements UploadTaskDAO
+@Transactional(transactionManager = "dataSourceTransactionManager")
+class UploadTaskDAOImpl implements UploadTaskDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;

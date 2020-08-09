@@ -16,7 +16,7 @@ public class UploadTaskManager implements TusURLStore
 	@NonNull
 	UploadTaskDAO uploadTaskDAO;
 	@NonNull
-	TusUrlDAO tusDAO;
+	TusURLStore tusDAO;
 
 	public Option<UploadTask> getNextTask()
 	{

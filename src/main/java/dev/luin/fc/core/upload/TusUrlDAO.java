@@ -2,6 +2,8 @@ package dev.luin.fc.core.upload;
 
 import java.net.URL;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.querydsl.sql.SQLQueryFactory;
 
 import dev.luin.fc.core.querydsl.model.QFile;
@@ -12,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class TusUrlDAO implements TusURLStore
 {
 	SQLQueryFactory queryFactory;

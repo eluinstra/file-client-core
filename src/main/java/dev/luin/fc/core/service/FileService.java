@@ -27,7 +27,7 @@ import dev.luin.fc.core.service.model.File;
 import dev.luin.fc.core.service.model.FileInfo;
 
 @MTOM(enabled=true)
-@WebService(targetNamespace="http://luin.dev/fs/core/1.0")
+@WebService(targetNamespace="http://luin.dev/fc/core/1.0")
 public interface FileService
 {
 	@WebResult(name="id")

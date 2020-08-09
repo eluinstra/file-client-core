@@ -54,7 +54,7 @@ public class UploadTaskHandler
 		client.enableResuming(uploadTaskManager);
 		val upload = Try.of(() -> new TusUpload(file.getFile())).get();
 		upload.setFingerprint(file.getId().toString());
-		log.info("Start uploading %i",file.getId());
+		log.info("Start uploading {}",file.getId());
 		TusExecutor executor = new TusExecutor()
 		{
 			@Override
@@ -65,7 +65,7 @@ public class UploadTaskHandler
 				do
 				{
 					if (log.isDebugEnabled())
-						log.debug("Upload %i at %06.2f%%",file.getId(),getProgress(upload,uploader));
+						log.debug("Upload {} at {}%",file.getId(),getProgress(upload,uploader));
 				} while (uploader.uploadChunk() > -1);
 				file.withUrl(uploader.getUploadURL());
 				CheckedRunnable runnable = () ->
@@ -75,8 +75,8 @@ public class UploadTaskHandler
 					uploader.finish();
 				};
 				transactionTemplate.executeTransaction(runnable);
-				log.info("Upload %i finished",file.getId());
-				log.debug("Upload available at: %s",uploader.getUploadURL().toString());
+				log.info("Upload {} finished",file.getId());
+				log.debug("Upload available at: {}",uploader.getUploadURL().toString());
 			}
 		};
 		try

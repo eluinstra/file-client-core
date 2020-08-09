@@ -30,23 +30,25 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@WebFault(targetNamespace="http://luin.dev/fs/core/1.0")
+@WebFault(targetNamespace="http://luin.dev/fc/core/1.0")
 @NoArgsConstructor
 public class ServiceException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 	public static Function<? super Throwable,ServiceException> defaultExceptionProvider = e -> 
-	Match(e).of(
-			Case($(instanceOf(ServiceException.class)),o -> {
-				return o;
-			}),
-			Case($(instanceOf(DataAccessException.class)),o -> {
-				log.error("",o);
-				return new ServiceException("A DataAccessException occurred!");
-			}),
-			Case($(),o -> {
-				return new ServiceException(o);
-			}));
+	{
+		log.error("",e);
+		return Match(e).of(
+				Case($(instanceOf(ServiceException.class)),o -> {
+					return o;
+				}),
+				Case($(instanceOf(DataAccessException.class)),o -> {
+					return new ServiceException("A unexpected error occurred!");
+				}),
+				Case($(),o -> {
+					return new ServiceException(o);
+				}));
+	};
 
 	public ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
 	{
