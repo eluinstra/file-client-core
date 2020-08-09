@@ -18,22 +18,22 @@ public class UploadTaskManager implements TusURLStore
 	@NonNull
 	TusUrlDAO tusDAO;
 
-	Option<UploadTask> getNextTask()
+	public Option<UploadTask> getNextTask()
 	{
 		return uploadTaskDAO.getNextTask();
 	}
 
-	Long createTask(UploadTask task)
+	public UploadTask createTask(UploadTask task)
 	{
 		return uploadTaskDAO.insert(task);
 	}
 
-	long updateTask(UploadTask task)
+	public long updateTask(UploadTask task)
 	{
 		return uploadTaskDAO.update(task);
 	}
 
-	long deleteTask(long fileId)
+	public long deleteTask(long fileId)
 	{
 		return uploadTaskDAO.delete(fileId);
 	}

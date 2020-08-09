@@ -23,7 +23,7 @@ interface FSFileDAO
 {
 	Option<FSFile> findFile(long id);
 	Seq<FSFile> selectFiles();
-	Long insertFile(@NonNull FSFile fsFile);
+	FSFile insertFile(@NonNull FSFile fsFile);
 	long updateFile(@NonNull FSFile fsFile);
 	long deleteFile(long id);
 }

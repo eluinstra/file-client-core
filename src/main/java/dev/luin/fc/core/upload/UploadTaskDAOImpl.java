@@ -10,6 +10,7 @@ import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -31,14 +32,15 @@ public class UploadTaskDAOImpl implements UploadTaskDAO
 	}
 
 	@Override
-	public Long insert(UploadTask task)
+	public UploadTask insert(UploadTask task)
 	{
-		return queryFactory.insert(table)
+		val id = queryFactory.insert(table)
 				.set(table.fileId,task.getFileId())
 				.set(table.creationUrl,task.getCreationUrl())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.executeWithKey(Long.class);
+		return task.withFileId(id);
 	}
 
 	@Override

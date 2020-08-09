@@ -11,6 +11,7 @@ import lombok.With;
 @Value
 public class UploadTask
 {
+	@With
 	Long fileId;
 	@NonNull
 	URL creationUrl;

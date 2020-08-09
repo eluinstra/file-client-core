@@ -32,6 +32,7 @@ import lombok.With;
 @AllArgsConstructor
 public class FSFile
 {
+	@With
 	Long id;
 	@With
 	URL url;

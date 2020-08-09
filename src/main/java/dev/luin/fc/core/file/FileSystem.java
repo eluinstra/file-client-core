@@ -77,7 +77,6 @@ public class FileSystem
 	}
 
 	public FSFile createFile(
-			@NonNull final String url,
 			final String filename,
 			@NonNull final String contentType,
 			final String sha256checksum,
@@ -93,7 +92,6 @@ public class FileSystem
 		{
 			val md5Checksum = calculateMd5Checksum(file);
 			val result = FSFile.builder()
-					.url(new URL(url))
 					.path(path)
 					.name(filename)
 					.contentType(contentType)
@@ -101,8 +99,7 @@ public class FileSystem
 					.sha256Checksum(calculatedSha256Checksum)
 					.length(file.length())
 					.build();
-			fsFileDAO.insertFile(result);
-			return result;
+			return fsFileDAO.insertFile(result);
 		}
 		else
 			throw new IOException("Checksum error for file " + filename + ". Checksum of the file uploaded (" + calculatedSha256Checksum + ") is not equal to the provided checksum (" + sha256checksum + ")");
@@ -123,8 +120,7 @@ public class FileSystem
 				.contentType(contentType)
 				.length(fileLength)
 				.build();
-		fsFileDAO.insertFile(result);
-		return result;
+		return fsFileDAO.insertFile(result);
 	}
 
 	public boolean updateFile(FSFile file)

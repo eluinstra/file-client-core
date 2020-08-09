@@ -15,9 +15,12 @@
  */
 package dev.luin.fc.core.transaction;
 
+import io.vavr.CheckedFunction0;
 import io.vavr.CheckedRunnable;
 
 public interface TransactionTemplate
 {
 	void executeTransaction(CheckedRunnable runnable);
+	
+	<T> T executeTransactionWithResult(CheckedFunction0<T> consumer);
 }

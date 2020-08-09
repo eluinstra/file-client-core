@@ -20,6 +20,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import dev.luin.fc.core.file.FileSystem;
+import dev.luin.fc.core.transaction.TransactionTemplate;
+import dev.luin.fc.core.upload.UploadTaskManager;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
@@ -28,11 +30,15 @@ import lombok.experimental.FieldDefaults;
 public class ServiceConfig
 {
 	@Autowired
+	TransactionTemplate transactionTemplate;
+	@Autowired
 	FileSystem fs;
+	 @Autowired
+	 UploadTaskManager taskManager;
 
 	@Bean
 	public FileService fileService()
 	{
-		return new FileServiceImpl(fs);
+		return new FileServiceImpl(transactionTemplate,fs,taskManager);
 	}
 }

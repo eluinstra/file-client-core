@@ -29,6 +29,7 @@ import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
@@ -60,9 +61,9 @@ class FSFileDAOImpl implements FSFileDAO
 	}
 
 	@Override
-	public Long insertFile(@NonNull final FSFile fsFile)
+	public FSFile insertFile(@NonNull final FSFile fsFile)
 	{
-		return queryFactory.insert(table)
+		val id = queryFactory.insert(table)
 				.set(table.url,fsFile.getUrl())
 				.set(table.path,fsFile.getPath())
 				.set(table.name,fsFile.getName())
@@ -70,6 +71,7 @@ class FSFileDAOImpl implements FSFileDAO
 				.set(table.md5Checksum,fsFile.getMd5Checksum())
 				.set(table.sha256Checksum,fsFile.getSha256Checksum())
 				.executeWithKey(Long.class);
+		return fsFile.withId(id);
 	}
 
 	@Override
