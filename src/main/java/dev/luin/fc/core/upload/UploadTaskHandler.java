@@ -67,16 +67,16 @@ public class UploadTaskHandler
 					if (log.isDebugEnabled())
 						log.debug("Upload {} at {}%",file.getId(),getProgress(upload,uploader));
 				} while (uploader.uploadChunk() > -1);
-				file.withUrl(uploader.getUploadURL());
+				val newFile = file.withUrl(uploader.getUploadURL());
 				CheckedRunnable runnable = () ->
 				{
-					fs.updateFile(file);
+					fs.updateFile(newFile);
 					uploadTaskManager.deleteTask(task.getFileId());
 					uploader.finish();
 				};
 				transactionTemplate.executeTransaction(runnable);
-				log.info("Upload {} finished",file.getId());
-				log.debug("Upload available at: {}",uploader.getUploadURL().toString());
+				log.info("Upload {} finished",newFile.getId());
+				log.debug("Upload available at: {}",newFile.getUrl().toString());
 			}
 		};
 		try

@@ -1,5 +1,7 @@
 package dev.luin.fc.core.upload;
 
+import java.time.Instant;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.ConstructorExpression;
@@ -31,6 +33,8 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	{
 		return Option.of(queryFactory.select(uploadTaskProjection)
 				.from(table)
+				.where(table.scheduleTime.before(Instant.now()))
+				.orderBy(table.scheduleTime.asc())
 				.fetchFirst());
 	}
 
