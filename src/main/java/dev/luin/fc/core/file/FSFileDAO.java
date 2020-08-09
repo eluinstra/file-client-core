@@ -15,6 +15,8 @@
  */
 package dev.luin.fc.core.file;
 
+import java.net.URL;
+
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.NonNull;
@@ -22,6 +24,7 @@ import lombok.NonNull;
 interface FSFileDAO
 {
 	Option<FSFile> findFile(long id);
+	Option<FSFile> findFile(URL url);
 	Seq<FSFile> selectFiles();
 	FSFile insertFile(@NonNull FSFile fsFile);
 	long updateFile(@NonNull FSFile fsFile);

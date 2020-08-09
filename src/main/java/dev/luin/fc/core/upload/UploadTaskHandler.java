@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UploadTaskHandler
 {
 	private static final int chunkSize = 1024 * 1024 * 100;
-	private static int maxRetries = Integer.MAX_VALUE;
+	private static int maxRetries = 5;
 	@NonNull
 	SSLFactoryManager sslFactoryManager;
 	@NonNull
@@ -47,20 +47,20 @@ public class UploadTaskHandler
 
 	public Future<Void> run(UploadTask task) throws ProtocolException, IOException
 	{
-		log.info("Start task " + task);
-		val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found!"));
+		log.info("Start task {}",task);
+		val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
 		val client = new Client(sslFactoryManager.getSslSocketFactory());
 		client.setUploadCreationURL(task.getCreationUrl());
 		client.enableResuming(uploadTaskManager);
 		val upload = Try.of(() -> new TusUpload(file.getFile())).get();
 		upload.setFingerprint(file.getId().toString());
-		log.info("Start uploading {}",file.getId());
-		TusExecutor executor = new TusExecutor()
+		log.info("Uploading {}",file);
+		val executor = new TusExecutor()
 		{
 			@Override
 			protected void makeAttempt() throws ProtocolException, IOException
 			{
-				TusUploader uploader = client.resumeOrCreateUpload(upload);
+				val uploader = client.resumeOrCreateUpload(upload);
 				uploader.setChunkSize(chunkSize);
 				do
 				{
@@ -75,8 +75,7 @@ public class UploadTaskHandler
 					uploader.finish();
 				};
 				transactionTemplate.executeTransaction(runnable);
-				log.info("Upload {} finished",newFile.getId());
-				log.debug("Upload available at: {}",newFile.getUrl().toString());
+				log.info("Uploaded {}",newFile);
 			}
 		};
 		try
@@ -93,14 +92,14 @@ public class UploadTaskHandler
 		{
 			uploadTaskManager.updateTask(createNextTask(task));
 		}
-		log.info("End task " + task);
+		log.info("Finished task {}",task);
 		return new AsyncResult<Void>(null);
 	}
 
 	private double getProgress(final TusUpload upload, TusUploader uploader)
 	{
-		long totalBytes = upload.getSize();
-		long bytesUploaded = uploader.getOffset();
+		val totalBytes = upload.getSize();
+		val bytesUploaded = uploader.getOffset();
 		return (double)bytesUploaded / totalBytes * 100;
 	}
 

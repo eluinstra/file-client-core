@@ -90,7 +90,7 @@ public class DataSourceConfig
 	@Value("${fc.pool.maxPoolSize}")
 	int maxPoolSize;
 
-	@Bean
+	@Bean("dataSourceTransactionTemplate")
 	public DataSourceTransactionTemplate dataSourceTransactionTemplate()
 	{
 		return new DataSourceTransactionTemplate();

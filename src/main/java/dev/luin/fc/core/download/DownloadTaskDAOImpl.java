@@ -1,4 +1,4 @@
-package dev.luin.fc.core.upload;
+package dev.luin.fc.core.download;
 
 import java.time.Instant;
 
@@ -9,7 +9,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
-import dev.luin.fc.core.querydsl.model.QUploadTask;
+import dev.luin.fc.core.querydsl.model.QDownloadTask;
 import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,18 +19,18 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Transactional(transactionManager = "dataSourceTransactionManager")
-class UploadTaskDAOImpl implements UploadTaskDAO
+public class DownloadTaskDAOImpl implements DownloadTaskDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;
-	QUploadTask table = QUploadTask.uploadTask;
-	Expression<?>[] uploadTaskColumns = {table.fileId,table.creationUrl,table.scheduleTime,table.retries};
-	ConstructorExpression<UploadTask> uploadTaskProjection = Projections.constructor(UploadTask.class,uploadTaskColumns);
+	QDownloadTask table = QDownloadTask.downloadTask;
+	Expression<?>[] downloadTaskColumns = {table.url,table.startDate,table.endDate,table.fileId,table.scheduleTime,table.retries};
+	ConstructorExpression<DownloadTask> downloadTaskProjection = Projections.constructor(DownloadTask.class,downloadTaskColumns);
 
 	@Override
-	public Option<UploadTask> getNextTask()
+	public Option<DownloadTask> getNextTask()
 	{
-		return Option.of(queryFactory.select(uploadTaskProjection)
+		return Option.of(queryFactory.select(downloadTaskProjection)
 				.from(table)
 				.where(table.scheduleTime.before(Instant.now()))
 				.orderBy(table.scheduleTime.asc())
@@ -38,11 +38,13 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	}
 
 	@Override
-	public UploadTask insert(UploadTask task)
+	public DownloadTask insert(DownloadTask task)
 	{
 		queryFactory.insert(table)
+				.set(table.url,task.getUrl())
+				.set(table.startDate,task.getStartDate())
+				.set(table.endDate,task.getEndDate())
 				.set(table.fileId,task.getFileId())
-				.set(table.creationUrl,task.getCreationUrl())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.execute();
@@ -50,13 +52,12 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	}
 
 	@Override
-	public long update(UploadTask task)
+	public long update(DownloadTask task)
 	{
 		return queryFactory.update(table)
-				.set(table.creationUrl,task.getCreationUrl())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
-				.where(table.fileId.eq(task.getFileId()))
+				.where(table.url.eq(task.getUrl()))
 				.execute();
 	}
 

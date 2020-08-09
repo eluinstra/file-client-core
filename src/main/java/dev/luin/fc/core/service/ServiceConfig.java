@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import dev.luin.fc.core.download.DownloadTaskManager;
 import dev.luin.fc.core.file.FileSystem;
 import dev.luin.fc.core.transaction.TransactionTemplate;
 import dev.luin.fc.core.upload.UploadTaskManager;
@@ -33,12 +34,14 @@ public class ServiceConfig
 	TransactionTemplate transactionTemplate;
 	@Autowired
 	FileSystem fs;
-	 @Autowired
-	 UploadTaskManager taskManager;
+	@Autowired
+	UploadTaskManager uploadTaskManager;
+	@Autowired
+	DownloadTaskManager downloadTaskManager;
 
 	@Bean
 	public FileService fileService()
 	{
-		return new FileServiceImpl(transactionTemplate,fs,taskManager);
+		return new FileServiceImpl(transactionTemplate,fs,uploadTaskManager,downloadTaskManager);
 	}
 }

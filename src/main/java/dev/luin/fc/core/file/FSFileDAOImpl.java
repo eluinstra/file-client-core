@@ -15,6 +15,8 @@
  */
 package dev.luin.fc.core.file;
 
+import java.net.URL;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.ConstructorExpression;
@@ -49,6 +51,15 @@ class FSFileDAOImpl implements FSFileDAO
 		return Option.of(queryFactory.select(fsFileProjection)
 				.from(table)
 				.where(table.id.eq(id))
+				.fetchOne());
+	}
+
+	@Override
+	public Option<FSFile> findFile(final URL url)
+	{
+		return Option.of(queryFactory.select(fsFileProjection)
+				.from(table)
+				.where(table.url.eq(url))
 				.fetchOne());
 	}
 

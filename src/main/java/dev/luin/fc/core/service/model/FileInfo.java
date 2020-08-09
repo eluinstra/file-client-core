@@ -43,16 +43,16 @@ public class FileInfo
 	@NonNull
 	@XmlElement(required=true)
 	String url;
-	@NonNull
+	//@NonNull
 	@XmlElement(required=true)
 	String name;
-	@NonNull
+	//@NonNull
 	@XmlElement(required=true)
 	String contentType;
-	@NonNull
+	//@NonNull
 	@XmlElement(required=true)
 	String md5Checksum;
-	@NonNull
+	//@NonNull
 	@XmlElement(required=true)
 	String sha256Checksum;
 	@XmlElement
@@ -63,8 +63,6 @@ public class FileInfo
 	@XmlJavaTypeAdapter(InstantAdapter.class)
 	@XmlSchemaType(name="dateTime")
 	Instant endDate;
-	@XmlElement(required=true)
-	long userId;
 	@XmlElement(required=true)
 	long length;
 	@NonNull

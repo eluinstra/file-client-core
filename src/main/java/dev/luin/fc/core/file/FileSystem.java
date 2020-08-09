@@ -105,20 +105,12 @@ public class FileSystem
 			throw new IOException("Checksum error for file " + filename + ". Checksum of the file uploaded (" + calculatedSha256Checksum + ") is not equal to the provided checksum (" + sha256checksum + ")");
 	}
 	
-	public FSFile createEmptyFile(
-			@NonNull final String url,
-			final String filename,
-			@NonNull final String contentType,
-			final Long fileLength,
-			@NonNull final Long userId) throws IOException
+	public FSFile createEmptyFile(@NonNull final String url) throws IOException
 	{
 		val path = createRandomFile().get();
 		val result = FSFile.builder()
 				.url(new URL(url))
 				.path(path)
-				.name(filename)
-				.contentType(contentType)
-				.length(fileLength)
 				.build();
 		return fsFileDAO.insertFile(result);
 	}

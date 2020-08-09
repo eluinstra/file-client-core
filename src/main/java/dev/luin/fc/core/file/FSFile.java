@@ -40,7 +40,7 @@ public class FSFile
 	@Getter(value=AccessLevel.PACKAGE)
 	String path;
 	String name;
-	@NonNull
+	//@NonNull
 	String contentType;
 	@With
 	String md5Checksum;

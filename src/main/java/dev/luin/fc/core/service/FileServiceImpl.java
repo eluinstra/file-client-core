@@ -22,6 +22,9 @@ import java.util.List;
 
 import javax.activation.DataHandler;
 
+import dev.luin.fc.core.download.DownloadTask;
+import dev.luin.fc.core.download.DownloadTaskManager;
+import dev.luin.fc.core.file.FSFile;
 import dev.luin.fc.core.file.FileSystem;
 import dev.luin.fc.core.service.model.File;
 import dev.luin.fc.core.service.model.FileInfo;
@@ -47,20 +50,22 @@ class FileServiceImpl implements FileService
 	@NonNull
 	FileSystem fs;
 	@NonNull
-	UploadTaskManager taskManager;
+	UploadTaskManager uploadTaskManager;
+	@NonNull
+	DownloadTaskManager downloadTaskManager;
 
 	@Override
-	public Long uploadFile(@NonNull final File file, final String url) throws ServiceException
+	public FileInfo uploadFile(@NonNull final File file, final String url) throws ServiceException
 	{
 			return Try.of(() -> 
 					{
-						CheckedFunction0<Long> producer = () ->
+						CheckedFunction0<FileInfo> producer = () ->
 						{
 							val creationUrl = new URL(url);
 							val result = createFile(file);
-							val task = new UploadTask(result,creationUrl,Instant.now(),0);
-							taskManager.createTask(task);
-							return result;
+							val task = new UploadTask(result.getId(),creationUrl,Instant.now(),0);
+							uploadTaskManager.createTask(task);
+							return FileInfoMapper.INSTANCE.toFileInfo(result);
 						};
 						return transactionTemplate.executeTransactionWithResult(producer);
 					})
@@ -68,18 +73,32 @@ class FileServiceImpl implements FileService
 	}
 
 	@Override
-	public File downloadFile(final Long id) throws ServiceException
+	public FileInfo downloadFile(final String url) throws ServiceException
 	{
 		return Try.of(() -> 
 				{
-					val fsFile = fs.findFile(id);
-					val dataSource = fsFile.map(f -> fs.createDataSource(f));
-					return fsFile.filter(f -> f.isCompleted())
-							.flatMap(f -> 
-									dataSource.map(d -> FileMapper.INSTANCE.toFile(f,new DataHandler(d))))
-							.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
+					val u = new URL(url);
+					val result = fs.createEmptyFile(url);
+					val task = new DownloadTask(u,null,null,result.getId(),Instant.now(),0);
+					downloadTaskManager.createTask(task);
+					return FileInfoMapper.INSTANCE.toFileInfo(result);
 				})
 				.getOrElseThrow(ServiceException.defaultExceptionProvider);
+	}
+
+	@Override
+	public File getFile(Long id) throws ServiceException
+	{
+		return Try.of(() -> 
+		{
+			val fsFile = fs.findFile(id);
+			val dataSource = fsFile.map(f -> fs.createDataSource(f));
+			return fsFile.filter(f -> f.isCompleted())
+					.flatMap(f -> 
+							dataSource.map(d -> FileMapper.INSTANCE.toFile(f,new DataHandler(d))))
+					.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
+		})
+		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
 	@Override
@@ -109,9 +128,8 @@ class FileServiceImpl implements FileService
 				.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
-	private Long createFile(final File file) throws IOException
+	private FSFile createFile(final File file) throws IOException
 	{
-		return fs.createFile(file.getName(),file.getContentType(),file.getSha256Checksum(),file.getStartDate(),file.getEndDate(),file.getContent().getInputStream())
-				.getId();
+		return fs.createFile(file.getName(),file.getContentType(),file.getSha256Checksum(),file.getStartDate(),file.getEndDate(),file.getContent().getInputStream());
 	}
 }

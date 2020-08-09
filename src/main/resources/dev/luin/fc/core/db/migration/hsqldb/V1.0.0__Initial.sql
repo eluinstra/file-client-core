@@ -20,7 +20,7 @@ CREATE TABLE file
 	url								VARCHAR(256)		NULL,
 	path							VARCHAR(256)		NOT NULL,
 	name							VARCHAR(256)		NULL,
-	content_type			VARCHAR(256)		NOT NULL,
+	content_type			VARCHAR(256)		NULL,
 	md5_checksum			VARCHAR(32)			NULL,
 	sha256_checksum		VARCHAR(64)			NULL,
 	timestamp					TIMESTAMP				DEFAULT NOW NOT NULL,

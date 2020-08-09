@@ -31,9 +31,11 @@ import dev.luin.fc.core.service.model.FileInfo;
 public interface FileService
 {
 	@WebResult(name="id")
-	Long uploadFile(@WebParam(name="file") @XmlElement(required=true) File file, @WebParam(name="uploadUrl") @XmlElement(required=true) String uploadUrl) throws ServiceException;
+	FileInfo uploadFile(@WebParam(name="file") @XmlElement(required=true) File file, @WebParam(name="uploadUrl") @XmlElement(required=true) String uploadUrl) throws ServiceException;
 	@WebResult(name="file")
-	File downloadFile(@WebParam(name="id") @XmlElement(required=true) Long id) throws ServiceException;
+	FileInfo downloadFile(@WebParam(name="url") @XmlElement(required=true) String url) throws ServiceException;
+	@WebResult(name="file")
+	File getFile(@WebParam(name="id") @XmlElement(required=true) Long id) throws ServiceException;
 	@WebResult(name="fileInfo")
 	List<FileInfo> getFileInfo() throws ServiceException;
 	void deleteFile(@WebParam(name="id") @XmlElement(required=true) Long id, @WebParam(name="force") Boolean force) throws ServiceException;

@@ -6,6 +6,7 @@ import java.time.Instant;
 
 import lombok.NonNull;
 import lombok.Value;
+import lombok.With;
 
 @Value
 public class DownloadTask
@@ -16,7 +17,9 @@ public class DownloadTask
 	Instant endDate;
 	Long fileId;
 	@NonNull
+	@With
 	Instant scheduleTime;
+	@With
 	int retries;
 
 	public static DownloadTask of(long fileId, String createUrl)
