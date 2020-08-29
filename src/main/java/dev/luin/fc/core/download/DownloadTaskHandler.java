@@ -4,7 +4,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.Duration;
 import java.util.concurrent.Future;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -73,6 +72,8 @@ public class DownloadTaskHandler
 					}
 					fileLength = file.getFile().length();
 				}
+				if (fileLength == contentLength)
+					downloadTaskManager.createSucceededTask(task);
 				log.info("Downloaded {}",file);
 			}
 		};
@@ -81,14 +82,14 @@ public class DownloadTaskHandler
 			if (!executor.makeAttempts())
 			{
 				if (task.getRetries() < maxRetries)
-					downloadTaskManager.updateTask(createNextTask(task));
+					downloadTaskManager.createNextTask(task);
 				else
-					downloadTaskManager.deleteTask(task.getFileId());
+					downloadTaskManager.createFailedTask(task);
 			}
 		}
 		catch (Exception e)
 		{
-			downloadTaskManager.updateTask(createNextTask(task));
+			downloadTaskManager.createNextTask(task);
 		}
 		log.info("Finished task {}",task);
 		return new AsyncResult<Void>(null);
@@ -103,12 +104,5 @@ public class DownloadTaskHandler
 			secureConnection.setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 	  }
 		return connection;
-	}
-
-	private DownloadTask createNextTask(DownloadTask task)
-	{
-		return task
-				.withScheduleTime(task.getScheduleTime().plus(Duration.ofSeconds((task.getRetries() + 1) * 1800)))
-				.withRetries(task.getRetries() + 1);
 	}
 }

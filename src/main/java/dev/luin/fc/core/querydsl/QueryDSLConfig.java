@@ -66,6 +66,8 @@ public class QueryDSLConfig
 		val result = new com.querydsl.sql.Configuration(templates);
 		result.register(new InstantType(Types.TIMESTAMP));
 		result.register(new UrlType(Types.VARCHAR));
+		result.register(new UploadStatusType(Types.TINYINT));
+		result.register(new DownloadStatusType(Types.TINYINT));
 		result.setExceptionTranslator(new SpringExceptionTranslator());
 		return result;
 	}

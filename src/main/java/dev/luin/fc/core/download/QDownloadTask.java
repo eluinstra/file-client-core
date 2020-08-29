@@ -1,4 +1,4 @@
-package dev.luin.fc.core.querydsl.model;
+package dev.luin.fc.core.download;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -9,6 +9,9 @@ import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 
 import com.querydsl.sql.ColumnMetadata;
+
+import dev.luin.fc.core.file.QFile;
+
 import java.sql.Types;
 
 
@@ -33,6 +36,8 @@ public class QDownloadTask extends com.querydsl.sql.RelationalPathBase<QDownload
     public final DateTimePath<java.time.Instant> scheduleTime = createDateTime("scheduleTime", java.time.Instant.class);
 
     public final DateTimePath<java.time.Instant> startDate = createDateTime("startDate", java.time.Instant.class);
+
+    public final EnumPath<dev.luin.fc.core.download.DownloadStatus> status = createEnum("status", dev.luin.fc.core.download.DownloadStatus.class);
 
     public final DateTimePath<java.time.Instant> timestamp = createDateTime("timestamp", java.time.Instant.class);
 
@@ -66,13 +71,14 @@ public class QDownloadTask extends com.querydsl.sql.RelationalPathBase<QDownload
     }
 
     public void addMetadata() {
-        addMetadata(endDate, ColumnMetadata.named("end_date").withIndex(3).ofType(Types.TIMESTAMP).withSize(26));
-        addMetadata(fileId, ColumnMetadata.named("file_id").withIndex(5).ofType(Types.INTEGER).withSize(32));
-        addMetadata(retries, ColumnMetadata.named("retries").withIndex(7).ofType(Types.TINYINT).withSize(8).notNull());
-        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(6).ofType(Types.TIMESTAMP).withSize(26).notNull());
-        addMetadata(startDate, ColumnMetadata.named("start_date").withIndex(2).ofType(Types.TIMESTAMP).withSize(26));
-        addMetadata(timestamp, ColumnMetadata.named("timestamp").withIndex(4).ofType(Types.TIMESTAMP).withSize(26).notNull());
-        addMetadata(url, ColumnMetadata.named("url").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(endDate, ColumnMetadata.named("end_date").withIndex(4).ofType(Types.TIMESTAMP).withSize(26));
+        addMetadata(fileId, ColumnMetadata.named("file_id").withIndex(1).ofType(Types.INTEGER).withSize(32));
+        addMetadata(retries, ColumnMetadata.named("retries").withIndex(8).ofType(Types.TINYINT).withSize(8).notNull());
+        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(7).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(startDate, ColumnMetadata.named("start_date").withIndex(3).ofType(Types.TIMESTAMP).withSize(26));
+        addMetadata(status, ColumnMetadata.named("status").withIndex(6).ofType(Types.TINYINT).withSize(8));
+        addMetadata(timestamp, ColumnMetadata.named("timestamp").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(url, ColumnMetadata.named("url").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
     }
 
 }

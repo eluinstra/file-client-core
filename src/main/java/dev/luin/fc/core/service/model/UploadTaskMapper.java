@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.fc.core.transaction;
+package dev.luin.fc.core.service.model;
 
-import io.vavr.Function0;
+import java.net.URL;
 
-public interface TransactionTemplate
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
+@Mapper
+public interface UploadTaskMapper
 {
-	void executeTransaction(Runnable runnable);
+	public UploadTaskMapper INSTANCE = Mappers.getMapper(UploadTaskMapper.class);
+
+	UploadTask toUploadTask(dev.luin.fc.core.upload.UploadTask file);
 	
-	<T> T executeTransactionWithResult(Function0<T> transaction);
+	default String map(URL value)
+	{
+		return value.toString();
+	}
 }

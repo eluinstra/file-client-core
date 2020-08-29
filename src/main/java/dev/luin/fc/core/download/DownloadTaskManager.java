@@ -1,9 +1,14 @@
 package dev.luin.fc.core.download;
 
+import java.time.Duration;
+
+import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -18,18 +23,42 @@ public class DownloadTaskManager
 		return downloadTaskDAO.getNextTask();
 	}
 
-	public DownloadTask createTask(DownloadTask task)
+	public Seq<DownloadTask> getTasks(List<DownloadStatus> statuses)
 	{
+		return statuses.length() == 0 ? downloadTaskDAO.getTasks() : downloadTaskDAO.getTasks(statuses);
+	}
+
+	public DownloadTask createTask(long fileId, String createUrl)
+	{
+		val task = DownloadTask.of(fileId,createUrl);
 		return downloadTaskDAO.insert(task);
 	}
 
-	public long updateTask(DownloadTask task)
+	public DownloadTask createNextTask(DownloadTask task)
 	{
-		return downloadTaskDAO.update(task);
+		DownloadTask result = task
+				.withScheduleTime(task.getScheduleTime().plus(Duration.ofSeconds((task.getRetries() + 1) * 1800)))
+				.withRetries(task.getRetries() + 1);
+		downloadTaskDAO.update(result);
+		return result;
 	}
 
-	public long deleteTask(long fileId)
+	public DownloadTask createSucceededTask(DownloadTask task)
 	{
-		return downloadTaskDAO.delete(fileId);
+		val result = task.withStatus(DownloadStatus.SUCCEEDED);
+		downloadTaskDAO.update(result);
+		return result;
+	}
+
+	public DownloadTask createFailedTask(DownloadTask task)
+	{
+		DownloadTask result = task.withStatus(DownloadStatus.FAILED);
+		downloadTaskDAO.update(result);
+		return result;
+	}
+
+	public boolean deleteTask(long fileId)
+	{
+		return downloadTaskDAO.delete(fileId) > 0;
 	}
 }

@@ -1,12 +1,16 @@
 package dev.luin.fc.core.upload;
 
 import java.net.URL;
+import java.time.Duration;
 
 import io.tus.java.client.TusURLStore;
+import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,19 +27,43 @@ public class UploadTaskManager implements TusURLStore
 		return uploadTaskDAO.getNextTask();
 	}
 
-	public UploadTask createTask(UploadTask task)
+	public Seq<UploadTask> getTasks(List<UploadStatus> statuses)
 	{
+		return statuses.length() == 0 ? uploadTaskDAO.getTasks() : uploadTaskDAO.getTasks(statuses);
+	}
+
+	public UploadTask createTask(Long fileId, String creationUrl)
+	{
+		val task = UploadTask.of(fileId,creationUrl);
 		return uploadTaskDAO.insert(task);
 	}
 
-	public long updateTask(UploadTask task)
+	public UploadTask createNextTask(UploadTask task)
 	{
-		return uploadTaskDAO.update(task);
+		val result = task
+				.withScheduleTime(task.getScheduleTime().plus(Duration.ofSeconds((task.getRetries() + 1) * 1800)))
+				.withRetries(task.getRetries() + 1);
+		uploadTaskDAO.update(result);
+		return result;
 	}
 
-	public long deleteTask(long fileId)
+	public UploadTask createSucceededTask(UploadTask task)
 	{
-		return uploadTaskDAO.delete(fileId);
+		val result = task.withStatus(UploadStatus.SUCCEEDED);
+		uploadTaskDAO.update(result);
+		return result;
+	}
+
+	public UploadTask createFailedTask(UploadTask task)
+	{
+		val result = task.withStatus(UploadStatus.FAILED);
+		uploadTaskDAO.update(result);
+		return result;
+	}
+
+	public boolean deleteTask(long fileId)
+	{
+		return uploadTaskDAO.delete(fileId) > 0;
 	}
 
 	@Override

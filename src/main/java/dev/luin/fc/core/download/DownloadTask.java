@@ -4,33 +4,39 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
 
 @Value
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class DownloadTask
 {
+	long fileId;
 	@NonNull
 	URL url;
 	Instant startDate;
 	Instant endDate;
-	Long fileId;
+	@NonNull
+	@With
+	DownloadStatus status;
 	@NonNull
 	@With
 	Instant scheduleTime;
 	@With
 	int retries;
 
-	public static DownloadTask of(long fileId, String createUrl)
+	static DownloadTask of(long fileId, String url)
 	{
 		try
 		{
-			return new DownloadTask(new URL(createUrl),null,null,fileId,Instant.now(),0);
+			return new DownloadTask(fileId,new URL(url),null,null,DownloadStatus.CREATED,Instant.now(),0);
 		}
 		catch (MalformedURLException e)
 		{
-			throw new IllegalArgumentException("CreateUrl " + createUrl + " is not a valid URL");
+			throw new IllegalArgumentException("CreateUrl " + url + " is not a valid URL");
 		}
 	}
 }

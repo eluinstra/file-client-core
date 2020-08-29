@@ -9,7 +9,8 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
-import dev.luin.fc.core.querydsl.model.QDownloadTask;
+import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QDownloadTask table = QDownloadTask.downloadTask;
-	Expression<?>[] downloadTaskColumns = {table.url,table.startDate,table.endDate,table.fileId,table.scheduleTime,table.retries};
+	Expression<?>[] downloadTaskColumns = {table.fileId,table.url,table.startDate,table.endDate,table.status,table.scheduleTime,table.retries};
 	ConstructorExpression<DownloadTask> downloadTaskProjection = Projections.constructor(DownloadTask.class,downloadTaskColumns);
 
 	@Override
@@ -32,9 +33,29 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	{
 		return Option.of(queryFactory.select(downloadTaskProjection)
 				.from(table)
-				.where(table.scheduleTime.before(Instant.now()))
+				.where(table.scheduleTime.before(Instant.now())
+						.and(table.status.eq(DownloadStatus.CREATED)))
 				.orderBy(table.scheduleTime.asc())
 				.fetchFirst());
+	}
+
+	@Override
+	public Seq<DownloadTask> getTasks()
+	{
+		return List.ofAll(queryFactory.select(downloadTaskProjection)
+				.from(table)
+				.orderBy(table.scheduleTime.desc())
+				.fetch());
+	}
+
+	@Override
+	public Seq<DownloadTask> getTasks(List<DownloadStatus> statuses)
+	{
+		return List.ofAll(queryFactory.select(downloadTaskProjection)
+				.from(table)
+				.where(table.status.in(statuses.asJava()))
+				.orderBy(table.scheduleTime.asc())
+				.fetch());
 	}
 
 	@Override
@@ -55,9 +76,10 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	public long update(DownloadTask task)
 	{
 		return queryFactory.update(table)
+				.set(table.status,task.getStatus())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
-				.where(table.url.eq(task.getUrl()))
+				.where(table.fileId.eq(task.getFileId()))
 				.execute();
 	}
 

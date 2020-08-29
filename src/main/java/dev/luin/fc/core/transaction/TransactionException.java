@@ -15,11 +15,27 @@
  */
 package dev.luin.fc.core.transaction;
 
-import io.vavr.Function0;
-
-public interface TransactionTemplate
+public class TransactionException extends RuntimeException
 {
-	void executeTransaction(Runnable runnable);
-	
-	<T> T executeTransactionWithResult(Function0<T> transaction);
+	private static final long serialVersionUID = 1L;
+
+	public TransactionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+	{
+		super(message,cause,enableSuppression,writableStackTrace);
+	}
+
+	public TransactionException(String message, Throwable cause)
+	{
+		super(message,cause);
+	}
+
+	public TransactionException(String message)
+	{
+		super(message);
+	}
+
+	public TransactionException(Throwable cause)
+	{
+		super(cause);
+	}
 }

@@ -9,7 +9,8 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
-import dev.luin.fc.core.querydsl.model.QUploadTask;
+import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QUploadTask table = QUploadTask.uploadTask;
-	Expression<?>[] uploadTaskColumns = {table.fileId,table.creationUrl,table.scheduleTime,table.retries};
+	Expression<?>[] uploadTaskColumns = {table.fileId,table.creationUrl,table.status,table.scheduleTime,table.retries};
 	ConstructorExpression<UploadTask> uploadTaskProjection = Projections.constructor(UploadTask.class,uploadTaskColumns);
 
 	@Override
@@ -32,9 +33,29 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	{
 		return Option.of(queryFactory.select(uploadTaskProjection)
 				.from(table)
-				.where(table.scheduleTime.before(Instant.now()))
+				.where(table.scheduleTime.before(Instant.now())
+						.and(table.status.eq(UploadStatus.CREATED)))
 				.orderBy(table.scheduleTime.asc())
 				.fetchFirst());
+	}
+
+	@Override
+	public Seq<UploadTask> getTasks()
+	{
+		return List.ofAll(queryFactory.select(uploadTaskProjection)
+				.from(table)
+				.orderBy(table.scheduleTime.desc())
+				.fetch());
+	}
+
+	@Override
+	public Seq<UploadTask> getTasks(List<UploadStatus> statuses)
+	{
+		return List.ofAll(queryFactory.select(uploadTaskProjection)
+				.from(table)
+				.where(table.status.in(statuses.asJava()))
+				.orderBy(table.scheduleTime.asc())
+				.fetch());
 	}
 
 	@Override
@@ -53,7 +74,7 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	public long update(UploadTask task)
 	{
 		return queryFactory.update(table)
-				.set(table.creationUrl,task.getCreationUrl())
+				.set(table.status,task.getStatus())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.where(table.fileId.eq(task.getFileId()))

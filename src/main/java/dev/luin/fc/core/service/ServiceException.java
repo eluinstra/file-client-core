@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @WebFault(targetNamespace="http://luin.dev/fc/core/1.0")
 @NoArgsConstructor
-public class ServiceException extends Exception
+public class ServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 	public static Function<? super Throwable,ServiceException> defaultExceptionProvider = e -> 

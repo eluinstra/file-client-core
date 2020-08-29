@@ -1,19 +1,18 @@
 package dev.luin.fc.core.upload;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import dev.luin.fc.core.file.FileSystem;
+import dev.luin.fc.core.transaction.TransactionException;
 import dev.luin.fc.core.transaction.TransactionTemplate;
 import io.tus.java.client.ProtocolException;
 import io.tus.java.client.TusExecutor;
 import io.tus.java.client.TusUpload;
 import io.tus.java.client.TusUploader;
-import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,7 +52,7 @@ public class UploadTaskHandler
 		client.setUploadCreationURL(task.getCreationUrl());
 		client.enableResuming(uploadTaskManager);
 		val upload = Try.of(() -> new TusUpload(file.getFile())).get();
-		upload.setFingerprint(file.getId().toString());
+		upload.setFingerprint(task.getFileId().toString());
 		log.info("Uploading {}",file);
 		val executor = new TusExecutor()
 		{
@@ -68,11 +67,18 @@ public class UploadTaskHandler
 						log.debug("Upload {} at {}%",file.getId(),getProgress(upload,uploader));
 				} while (uploader.uploadChunk() > -1);
 				val newFile = file.withUrl(uploader.getUploadURL());
-				CheckedRunnable runnable = () ->
+				Runnable runnable = () ->
 				{
-					fs.updateFile(newFile);
-					uploadTaskManager.deleteTask(task.getFileId());
-					uploader.finish();
+					try
+					{
+						fs.updateFile(newFile);
+						uploadTaskManager.createSucceededTask(task);
+						uploader.finish();
+					}
+					catch (ProtocolException | IOException e)
+					{
+						throw new TransactionException(e);
+					}
 				};
 				transactionTemplate.executeTransaction(runnable);
 				log.info("Uploaded {}",newFile);
@@ -83,14 +89,14 @@ public class UploadTaskHandler
 			if (!executor.makeAttempts())
 			{
 				if (task.getRetries() < maxRetries)
-					uploadTaskManager.updateTask(createNextTask(task));
+					uploadTaskManager.createNextTask(task);
 				else
-					uploadTaskManager.deleteTask(task.getFileId());
+					uploadTaskManager.createFailedTask(task);
 			}
 		}
 		catch (Exception e)
 		{
-			uploadTaskManager.updateTask(createNextTask(task));
+			uploadTaskManager.createNextTask(task);
 		}
 		log.info("Finished task {}",task);
 		return new AsyncResult<Void>(null);
@@ -101,12 +107,5 @@ public class UploadTaskHandler
 		val totalBytes = upload.getSize();
 		val bytesUploaded = uploader.getOffset();
 		return (double)bytesUploaded / totalBytes * 100;
-	}
-
-	private UploadTask createNextTask(UploadTask task)
-	{
-		return task
-				.withScheduleTime(task.getScheduleTime().plus(Duration.ofSeconds((task.getRetries() + 1) * 1800)))
-				.withRetries(task.getRetries() + 1);
 	}
 }

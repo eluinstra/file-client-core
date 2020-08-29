@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
 
-import dev.luin.fc.core.querydsl.model.QFile;
+import dev.luin.fc.core.file.QFile;
 import io.tus.java.client.TusURLStore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,7 +40,8 @@ public class TusUrlDAO implements TusURLStore
 	@Override
 	public void remove(String id)
 	{
-		queryFactory.delete(table)
-				.where(table.id.eq(Long.parseLong(id)));
+		//TODO: replace?
+//		queryFactory.delete(table)
+//				.where(table.id.eq(Long.parseLong(id)));
 	}
 }

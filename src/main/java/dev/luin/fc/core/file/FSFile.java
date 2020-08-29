@@ -29,7 +29,7 @@ import lombok.With;
 
 @Builder(access = AccessLevel.PACKAGE)
 @Value
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class FSFile
 {
 	@With

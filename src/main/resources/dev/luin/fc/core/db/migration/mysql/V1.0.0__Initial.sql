@@ -32,6 +32,7 @@ CREATE TABLE upload_task
 	file_id						INTEGER					NOT NULL UNIQUE,
 	creation_url			VARCHAR(256)		NOT NULL,
 	timestamp					TIMESTAMP				DEFAULT NOW NOT NULL,
+	status						TINYINT					DEFAULT 0 NOT NULL,
 	schedule_time			TIMESTAMP				DEFAULT NOW NOT NULL,
 	retries						TINYINT					DEFAULT 0 NOT NULL,
 	FOREIGN KEY (file_id) REFERENCES file(id)
@@ -39,11 +40,12 @@ CREATE TABLE upload_task
 
 CREATE TABLE download_task
 (
-	url								VARCHAR(256)		NOT NULL UNIQUE,
+	file_id						INTEGER					UNIQUE,
+	url								VARCHAR(256)		NOT NULL,
 	start_date				TIMESTAMP				NULL,
 	end_date					TIMESTAMP				NULL,
 	timestamp					TIMESTAMP				DEFAULT NOW NOT NULL,
-	file_id						INTEGER					UNIQUE,
+	status						TINYINT					DEFAULT 0 NOT NULL,
 	schedule_time			TIMESTAMP				DEFAULT NOW NOT NULL,
 	retries						TINYINT					DEFAULT 0 NOT NULL,
 	FOREIGN KEY (file_id) REFERENCES file(id)

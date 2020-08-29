@@ -1,4 +1,4 @@
-package dev.luin.fc.core.querydsl.model;
+package dev.luin.fc.core.file;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -9,6 +9,10 @@ import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 
 import com.querydsl.sql.ColumnMetadata;
+
+import dev.luin.fc.core.download.QDownloadTask;
+import dev.luin.fc.core.upload.QUploadTask;
+
 import java.sql.Types;
 
 /**

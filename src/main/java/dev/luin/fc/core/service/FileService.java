@@ -23,20 +23,29 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.ws.soap.MTOM;
 
+import dev.luin.fc.core.download.DownloadStatus;
+import dev.luin.fc.core.service.model.DownloadTask;
 import dev.luin.fc.core.service.model.File;
 import dev.luin.fc.core.service.model.FileInfo;
+import dev.luin.fc.core.service.model.UploadTask;
+import dev.luin.fc.core.upload.UploadStatus;
 
 @MTOM(enabled=true)
 @WebService(targetNamespace="http://luin.dev/fc/core/1.0")
 public interface FileService
 {
 	@WebResult(name="id")
-	FileInfo uploadFile(@WebParam(name="file") @XmlElement(required=true) File file, @WebParam(name="uploadUrl") @XmlElement(required=true) String uploadUrl) throws ServiceException;
+	UploadTask uploadFile(@WebParam(name="file") @XmlElement(required=true) File file, @WebParam(name="uploadUrl") @XmlElement(required=true) String uploadUrl) throws ServiceException;
 	@WebResult(name="file")
-	FileInfo downloadFile(@WebParam(name="url") @XmlElement(required=true) String url) throws ServiceException;
+	DownloadTask downloadFile(@WebParam(name="url") @XmlElement(required=true) String url) throws ServiceException;
 	@WebResult(name="file")
 	File getFile(@WebParam(name="id") @XmlElement(required=true) Long id) throws ServiceException;
+	@WebResult(name="uploadTask")
+	List<UploadTask> getUploadTasks(@WebParam(name="status") List<UploadStatus> status) throws ServiceException;
+	void deleteUploadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
+	@WebResult(name="downloadTask")
+	List<DownloadTask> getDownloadTasks(@WebParam(name="status") List<DownloadStatus> status) throws ServiceException;
+	void deleteDownloadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
 	@WebResult(name="fileInfo")
-	List<FileInfo> getFileInfo() throws ServiceException;
-	void deleteFile(@WebParam(name="id") @XmlElement(required=true) Long id, @WebParam(name="force") Boolean force) throws ServiceException;
+	List<FileInfo> getFiles() throws ServiceException;
 }

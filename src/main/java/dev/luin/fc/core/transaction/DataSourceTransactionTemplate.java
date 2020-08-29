@@ -17,22 +17,21 @@ package dev.luin.fc.core.transaction;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import io.vavr.CheckedFunction0;
-import io.vavr.CheckedRunnable;
+import io.vavr.Function0;
 
 public class DataSourceTransactionTemplate implements TransactionTemplate
 {
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void executeTransaction(CheckedRunnable runnable)
+	public void executeTransaction(Runnable runnable)
 	{
-		runnable.unchecked().run();
+		runnable.run();
 	}
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public <T> T executeTransactionWithResult(CheckedFunction0<T> producer)
+	public <T> T executeTransactionWithResult(Function0<T> function)
 	{
-		return (T)producer.unchecked().get();
+		return (T)function.apply();
 	}
 }

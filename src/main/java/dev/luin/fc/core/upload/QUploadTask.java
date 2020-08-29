@@ -1,4 +1,4 @@
-package dev.luin.fc.core.querydsl.model;
+package dev.luin.fc.core.upload;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -9,6 +9,9 @@ import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 
 import com.querydsl.sql.ColumnMetadata;
+
+import dev.luin.fc.core.file.QFile;
+
 import java.sql.Types;
 
 
@@ -31,6 +34,8 @@ public class QUploadTask extends com.querydsl.sql.RelationalPathBase<QUploadTask
     public final NumberPath<Integer> retries = createNumber("retries", Integer.class);
 
     public final DateTimePath<java.time.Instant> scheduleTime = createDateTime("scheduleTime", java.time.Instant.class);
+
+    public final EnumPath<dev.luin.fc.core.upload.UploadStatus> status = createEnum("status", dev.luin.fc.core.upload.UploadStatus.class);
 
     public final DateTimePath<java.time.Instant> timestamp = createDateTime("timestamp", java.time.Instant.class);
 
@@ -64,8 +69,9 @@ public class QUploadTask extends com.querydsl.sql.RelationalPathBase<QUploadTask
     public void addMetadata() {
         addMetadata(creationUrl, ColumnMetadata.named("creation_url").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
         addMetadata(fileId, ColumnMetadata.named("file_id").withIndex(1).ofType(Types.INTEGER).withSize(32).notNull());
-        addMetadata(retries, ColumnMetadata.named("retries").withIndex(5).ofType(Types.TINYINT).withSize(8).notNull());
-        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(4).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(retries, ColumnMetadata.named("retries").withIndex(6).ofType(Types.TINYINT).withSize(8).notNull());
+        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(status, ColumnMetadata.named("status").withIndex(4).ofType(Types.TINYINT).withSize(8));
         addMetadata(timestamp, ColumnMetadata.named("timestamp").withIndex(3).ofType(Types.TIMESTAMP).withSize(26).notNull());
     }
 
