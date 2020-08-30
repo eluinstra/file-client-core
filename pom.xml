@@ -18,13 +18,13 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dev.luin.fc</groupId>
-	<artifactId>fc-core</artifactId>
+	<groupId>dev.luin.file.client</groupId>
+	<artifactId>file-client-core</artifactId>
 	<packaging>jar</packaging>
 	<name>File Client Core</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<description>This library implements a HTTP file up and download client</description>
-	<url>https://bitbucket.org/eluinstra/fc-core</url>
+	<url>https://bitbucket.org/eluinstra/file-client-core</url>
 	<developers>
 		<developer>
 			<id>eluinstra</id>
@@ -291,7 +291,7 @@
 				<configuration>
 					<jdbcDriver>org.hsqldb.jdbcDriver</jdbcDriver>
 					<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/fc</jdbcUrl>
-					<packageName>dev.luin.fc.core.querydsl.model</packageName>
+					<packageName>dev.luin.file.client.core.querydsl.model</packageName>
 					<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
 				</configuration>
 				<dependencies>
@@ -429,7 +429,7 @@
 				<configuration>
 					<instrumentation>
 						<ignores>
-							<ignore>dev.luin.fc.core.dao.*</ignore>
+							<ignore>dev.luin.file.client.core.dao.*</ignore>
 						</ignores>
 					</instrumentation>
 					<systemProperties>
