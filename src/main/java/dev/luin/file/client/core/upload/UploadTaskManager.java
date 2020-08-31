@@ -17,6 +17,7 @@ package dev.luin.file.client.core.upload;
 
 import java.net.URL;
 import java.time.Duration;
+import java.time.Instant;
 
 import io.tus.java.client.TusURLStore;
 import io.vavr.collection.List;
@@ -72,14 +73,16 @@ public class UploadTaskManager implements TusURLStore
 
 	public UploadTask createSucceededTask(UploadTask task)
 	{
-		val result = task.withStatus(UploadStatus.SUCCEEDED);
+		val result = task.withStatus(UploadStatus.SUCCEEDED)
+				.withStatusTime(Instant.now());
 		uploadTaskDAO.update(result);
 		return result;
 	}
 
 	public UploadTask createFailedTask(UploadTask task)
 	{
-		val result = task.withStatus(UploadStatus.FAILED);
+		val result = task.withStatus(UploadStatus.FAILED)
+				.withStatusTime(Instant.now());
 		uploadTaskDAO.update(result);
 		return result;
 	}

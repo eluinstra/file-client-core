@@ -69,7 +69,8 @@ public class DownloadTaskManager
 		val result = nextScheduleTime.map(t -> task
 				.withScheduleTime(t)
 				.withRetries(retries))
-				.getOrElse(task.withStatus(DownloadStatus.FAILED));
+				.getOrElse(task.withStatus(DownloadStatus.FAILED)
+						.withStatusTime(Instant.now()));
 		downloadTaskDAO.update(result);
 		return result;
 	}
@@ -82,14 +83,16 @@ public class DownloadTaskManager
 
 	public DownloadTask createSucceededTask(DownloadTask task)
 	{
-		val result = task.withStatus(DownloadStatus.SUCCEEDED);
+		val result = task.withStatus(DownloadStatus.SUCCEEDED)
+				.withStatusTime(Instant.now());
 		downloadTaskDAO.update(result);
 		return result;
 	}
 
 	public DownloadTask createFailedTask(DownloadTask task)
 	{
-		val result = task.withStatus(DownloadStatus.FAILED);
+		val result = task.withStatus(DownloadStatus.FAILED)
+				.withStatusTime(Instant.now());
 		downloadTaskDAO.update(result);
 		return result;
 	}
