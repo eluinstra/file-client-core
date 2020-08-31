@@ -40,7 +40,7 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QUploadTask table = QUploadTask.uploadTask;
-	Expression<?>[] uploadTaskColumns = {table.fileId,table.creationUrl,table.status,table.scheduleTime,table.retries};
+	Expression<?>[] uploadTaskColumns = {table.fileId,table.creationUrl,table.timestamp,table.status,table.statusTime,table.scheduleTime,table.retries};
 	ConstructorExpression<UploadTask> uploadTaskProjection = Projections.constructor(UploadTask.class,uploadTaskColumns);
 
 	@Override
@@ -88,6 +88,9 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 		queryFactory.insert(table)
 				.set(table.fileId,task.getFileId())
 				.set(table.creationUrl,task.getCreationUrl())
+				.set(table.timestamp,task.getTimestamp())
+				.set(table.status,task.getStatus())
+				.set(table.statusTime,task.getStatusTime())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.execute();

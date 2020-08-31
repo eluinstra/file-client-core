@@ -55,6 +55,11 @@ public class FileInfo
 	@XmlElement(required = true)
 	//@NonNull
 	String sha256Checksum;
+	@XmlElement(required = true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
+	@NonNull
+	Instant timestamp;
 	@XmlElement
 	@XmlJavaTypeAdapter(InstantAdapter.class)
 	@XmlSchemaType(name = "dateTime")
@@ -70,4 +75,6 @@ public class FileInfo
 	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant lastModified;
+	@XmlElement(required = true)
+	boolean completed;
 }

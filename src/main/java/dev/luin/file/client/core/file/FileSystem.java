@@ -80,8 +80,6 @@ public class FileSystem
 			final String filename,
 			@NonNull final String contentType,
 			final String sha256checksum,
-			final Instant startDate,
-			final Instant endDate,
 			@NonNull final InputStream content) throws IOException
 	{
 		val path = createRandomFile().get();
@@ -97,6 +95,7 @@ public class FileSystem
 					.contentType(contentType)
 					.md5Checksum(md5Checksum)
 					.sha256Checksum(calculatedSha256Checksum)
+					.timestamp(Instant.now())
 					.length(file.length())
 					.build();
 			return fsFileDAO.insertFile(result);
@@ -111,6 +110,7 @@ public class FileSystem
 		val result = FSFile.builder()
 				.url(new URL(url))
 				.path(path)
+				.timestamp(Instant.now())
 				.build();
 		return fsFileDAO.insertFile(result);
 	}

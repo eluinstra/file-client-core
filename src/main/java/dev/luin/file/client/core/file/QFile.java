@@ -54,7 +54,7 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile>
 
 	public final StringPath sha256Checksum = createString("sha256Checksum");
 
-	public final DateTimePath<java.time.Instant> timestamp = createDateTime("timestamp",java.time.Instant.class);
+	public final DateTimePath<java.time.Instant> timestamp = createDateTime("time_stamp",java.time.Instant.class);
 
 	public final SimplePath<java.net.URL> url = createSimple("url",java.net.URL.class);
 
@@ -103,7 +103,7 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile>
 		addMetadata(name,ColumnMetadata.named("name").withIndex(4).ofType(Types.VARCHAR).withSize(256));
 		addMetadata(path,ColumnMetadata.named("path").withIndex(3).ofType(Types.VARCHAR).withSize(256).notNull());
 		addMetadata(sha256Checksum,ColumnMetadata.named("sha256_checksum").withIndex(7).ofType(Types.VARCHAR).withSize(64));
-		addMetadata(timestamp,ColumnMetadata.named("timestamp").withIndex(8).ofType(Types.TIMESTAMP).withSize(26).notNull());
+		addMetadata(timestamp,ColumnMetadata.named("time_stamp").withIndex(8).ofType(Types.TIMESTAMP).withSize(26).notNull());
 		addMetadata(url,ColumnMetadata.named("url").withIndex(2).ofType(Types.VARCHAR).withSize(256));
 	}
 }

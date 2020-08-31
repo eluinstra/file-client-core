@@ -15,15 +15,18 @@
  */
 package dev.luin.file.client.core.service;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.ws.soap.MTOM;
 
 import dev.luin.file.client.core.download.DownloadStatus;
+import dev.luin.file.client.core.jaxb.InstantAdapter;
 import dev.luin.file.client.core.service.model.DownloadTask;
 import dev.luin.file.client.core.service.model.File;
 import dev.luin.file.client.core.service.model.FileInfo;
@@ -35,23 +38,25 @@ import dev.luin.file.client.core.upload.UploadStatus;
 public interface FileService
 {
 	@WebResult(name="file")
-	UploadTask uploadFile(@WebParam(name="file") @XmlElement(required=true) File file, @WebParam(name="uploadUrl") @XmlElement(required=true) String uploadUrl) throws ServiceException;
+	UploadTask uploadFile(@WebParam(name="file") @XmlElement(required=true) File file, @WebParam(name="creationUrl") @XmlElement(required=true) String creationUrl) throws ServiceException;
 	@WebResult(name="uploadTask")
 	UploadTask getUploadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
 	@WebResult(name="uploadTask")
 	List<UploadTask> getUploadTasks(@WebParam(name="status") List<UploadStatus> status) throws ServiceException;
 	void deleteUploadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
-
 	@WebResult(name="file")
-	DownloadTask downloadFile(@WebParam(name="url") @XmlElement(required=true) String url) throws ServiceException;
+	DownloadTask downloadFile(@WebParam(name="url") @XmlElement(required=true) String url,
+			@WebParam(name="startDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant startDate,
+			@WebParam(name="endDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant endDate) throws ServiceException;
 	@WebResult(name="downloadTask")
 	DownloadTask getDownloadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
 	@WebResult(name="downloadTask")
 	List<DownloadTask> getDownloadTasks(@WebParam(name="status") List<DownloadStatus> status) throws ServiceException;
 	void deleteDownloadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
-
 	@WebResult(name="file")
 	File getFile(@WebParam(name="id") @XmlElement(required=true) Long id) throws ServiceException;
+	@WebResult(name="file")
+	FileInfo getFileInfo(@WebParam(name="id") @XmlElement(required=true) Long id) throws ServiceException;
 	@WebResult(name="fileInfo")
 	List<FileInfo> getFiles() throws ServiceException;
 }

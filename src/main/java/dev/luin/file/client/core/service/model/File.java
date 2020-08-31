@@ -15,17 +15,12 @@
  */
 package dev.luin.file.client.core.service.model;
 
-import java.time.Instant;
-
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import dev.luin.file.client.core.jaxb.InstantAdapter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,14 +47,6 @@ public class File
 	String contentType;
 	@XmlElement
 	String sha256Checksum;
-	@XmlElement
-	@XmlJavaTypeAdapter(InstantAdapter.class)
-	@XmlSchemaType(name = "dateTime")
-	Instant startDate;
-	@XmlElement
-	@XmlJavaTypeAdapter(InstantAdapter.class)
-	@XmlSchemaType(name = "dateTime")
-	Instant endDate;
 	@XmlElement(required = true)
 	@NonNull
 	DataHandler content;

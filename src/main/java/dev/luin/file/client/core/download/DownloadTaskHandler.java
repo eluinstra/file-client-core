@@ -62,30 +62,31 @@ public class DownloadTaskHandler
 	public Future<Void> run(DownloadTask task) throws IOException
 	{
 		log.info("Start task {}",task);
+		val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
+		log.info("Downloading {}",file);
+		val connection = createConnection(task.getUrl());
+		connection.setRequestMethod("HEAD");
+		val conentLength = getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found"));
+		val contentType = connection.getContentType();
+		val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
+				.flatMap(h -> h.getParams().get("filename"))
+				.getOrNull();
 		val executor = new TusExecutor()
 		{
 			@Override
 			protected void makeAttempt() throws ProtocolException, IOException
 			{
-				var file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
-				log.info("Downloading {}",file);
-				var connection = createConnection(task.getUrl());
-				connection.setRequestMethod("HEAD");
-				val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
-						.flatMap(h -> h.getParams().get("filename"))
-						.getOrNull();
-				file = file.withLength(getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found")))
-						.withContentType(connection.getContentType())
+				var f = file.withLength(conentLength)
+						.withContentType(contentType)
 						.withName(filename);
-				while (!file.isCompleted())
+				while (!f.isCompleted())
 				{
-					connection = createConnection(task.getUrl());
-				  connection.setRequestProperty("Range","bytes=" + file.getFileLength() + "-" + file.getLength());
-				  file = fs.append(file,connection.getInputStream());
+					val connection = createConnection(task.getUrl());
+				  connection.setRequestProperty("Range","bytes=" + f.getFileLength() + "-" + f.getLength());
+				  f = fs.append(f,connection.getInputStream());
 				}
-				if (file.isCompleted())
+				if (f.isCompleted())
 					downloadTaskManager.createSucceededTask(task);
-				log.info("Downloaded {}",file);
 			}
 		};
 		try
@@ -97,6 +98,8 @@ public class DownloadTaskHandler
 				else
 					downloadTaskManager.createFailedTask(task);
 			}
+			else
+				log.info("Downloaded {}",file);
 		}
 		catch (Exception e)
 		{

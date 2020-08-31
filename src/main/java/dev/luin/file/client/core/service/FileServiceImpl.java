@@ -17,6 +17,7 @@ package dev.luin.file.client.core.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
 import javax.activation.DataHandler;
@@ -57,7 +58,7 @@ class FileServiceImpl implements FileService
 
 	@Override
 	@Transactional("dataSourceTransactionManager")
-	public UploadTask uploadFile(@NonNull final File file, final String creationUrl) throws ServiceException
+	public UploadTask uploadFile(File file, String creationUrl) throws ServiceException
 	{
 		return Try.of(() -> 
 		{
@@ -121,14 +122,14 @@ class FileServiceImpl implements FileService
 
 	@Override
 	@Transactional("dataSourceTransactionManager")
-	public DownloadTask downloadFile(final String url) throws ServiceException
+	public DownloadTask downloadFile(String url, Instant startDate, Instant endDate) throws ServiceException
 	{
 		return Try.of(() -> 
 		{
 			try
 			{
 				val fsFile = fs.createEmptyFile(url);
-				val task = downloadTaskManager.createTask(fsFile.getId(),url);
+				val task = downloadTaskManager.createTask(fsFile.getId(),url,startDate,endDate);
 				return DownloadTaskMapper.INSTANCE.toDownloadTask(task);
 			}
 			catch (IOException e)
@@ -198,6 +199,18 @@ class FileServiceImpl implements FileService
 	}
 
 	@Override
+	public FileInfo getFileInfo(Long id) throws ServiceException
+	{
+		return Try.of(() ->
+		{
+			val fsFile = fs.findFile(id);
+			return fsFile.map(f -> FileInfoMapper.INSTANCE.toFileInfo(f))
+					.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
+		})
+		.getOrElseThrow(ServiceException.defaultExceptionProvider);
+	}
+
+	@Override
 	public List<FileInfo> getFiles() throws ServiceException
 	{
 		return Try.of(() -> 
@@ -211,6 +224,6 @@ class FileServiceImpl implements FileService
 
 	private FSFile createFile(final File file) throws IOException
 	{
-		return fs.createFile(file.getName(),file.getContentType(),file.getSha256Checksum(),file.getStartDate(),file.getEndDate(),file.getContent().getInputStream());
+		return fs.createFile(file.getName(),file.getContentType(),file.getSha256Checksum(),file.getContent().getInputStream());
 	}
 }

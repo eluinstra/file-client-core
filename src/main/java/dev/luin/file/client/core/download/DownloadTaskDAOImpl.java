@@ -40,7 +40,7 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QDownloadTask table = QDownloadTask.downloadTask;
-	Expression<?>[] downloadTaskColumns = {table.fileId,table.url,table.startDate,table.endDate,table.status,table.scheduleTime,table.retries};
+	Expression<?>[] downloadTaskColumns = {table.fileId,table.url,table.startDate,table.endDate,table.timestamp,table.status,table.statusTime,table.scheduleTime,table.retries};
 	ConstructorExpression<DownloadTask> downloadTaskProjection = Projections.constructor(DownloadTask.class,downloadTaskColumns);
 
 	@Override
@@ -86,10 +86,13 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	public DownloadTask insert(DownloadTask task)
 	{
 		queryFactory.insert(table)
+				.set(table.fileId,task.getFileId())
 				.set(table.url,task.getUrl())
 				.set(table.startDate,task.getStartDate())
 				.set(table.endDate,task.getEndDate())
-				.set(table.fileId,task.getFileId())
+				.set(table.timestamp,task.getTimestamp())
+				.set(table.status,task.getStatus())
+				.set(table.statusTime,task.getStatusTime())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.execute();

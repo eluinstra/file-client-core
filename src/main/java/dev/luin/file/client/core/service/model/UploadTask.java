@@ -43,7 +43,13 @@ public class UploadTask
 	String creationUrl;
 	@XmlElement(required = true)
 	@NonNull
+	Instant timetamp;
+	@XmlElement(required = true)
+	@NonNull
 	UploadStatus status;
+	@XmlElement(required = true)
+	@NonNull
+	Instant statusTime;
 	@XmlElement(required = true)
 	@NonNull
 	Instant scheduleTime;

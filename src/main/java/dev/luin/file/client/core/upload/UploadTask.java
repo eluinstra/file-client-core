@@ -34,10 +34,15 @@ public class UploadTask
 	@NonNull
 	URL creationUrl;
 	@NonNull
+	Instant timestamp;
 	@With
-	UploadStatus status;
 	@NonNull
+	UploadStatus status;
 	@With
+	@NonNull
+	Instant statusTime;
+	@With
+	@NonNull
 	Instant scheduleTime;
 	@With
 	int retries;
@@ -46,7 +51,8 @@ public class UploadTask
 	{
 		try
 		{
-			return new UploadTask(fileId,new URL(createUrl),UploadStatus.CREATED,Instant.now(),0);
+			Instant now = Instant.now();
+			return new UploadTask(fileId,new URL(createUrl),now,UploadStatus.CREATED,now,now,0);
 		}
 		catch (MalformedURLException e)
 		{

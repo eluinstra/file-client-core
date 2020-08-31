@@ -37,6 +37,8 @@ import lombok.experimental.FieldDefaults;
 public class DownloadTask
 {
 	@XmlElement(required = true)
+	long fileId;
+	@XmlElement(required = true)
 	@NonNull
 	String url;
 	@XmlElement
@@ -44,10 +46,14 @@ public class DownloadTask
 	@XmlElement
 	Instant endDate;
 	@XmlElement(required = true)
-	long fileId;
+	@NonNull
+	Instant timestamp;
 	@XmlElement(required = true)
 	@NonNull
 	DownloadStatus status;
+	@XmlElement(required = true)
+	@NonNull
+	Instant statusTime;
 	@XmlElement(required = true)
 	@NonNull
 	Instant scheduleTime;

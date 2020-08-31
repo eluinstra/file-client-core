@@ -47,6 +47,8 @@ public class FSFile
 	String md5Checksum;
 	@With
 	String sha256Checksum;
+	@NonNull
+	Instant timestamp;
 	@With
 	Long length;
 

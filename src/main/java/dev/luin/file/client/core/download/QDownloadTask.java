@@ -54,7 +54,9 @@ public class QDownloadTask extends com.querydsl.sql.RelationalPathBase<QDownload
 
     public final EnumPath<dev.luin.file.client.core.download.DownloadStatus> status = createEnum("status", dev.luin.file.client.core.download.DownloadStatus.class);
 
-    public final DateTimePath<java.time.Instant> timestamp = createDateTime("timestamp", java.time.Instant.class);
+    public final DateTimePath<java.time.Instant> statusTime = createDateTime("status_time", java.time.Instant.class);
+
+    public final DateTimePath<java.time.Instant> timestamp = createDateTime("time_stamp", java.time.Instant.class);
 
     public final SimplePath<java.net.URL> url = createSimple("url",java.net.URL.class);
 
@@ -88,11 +90,12 @@ public class QDownloadTask extends com.querydsl.sql.RelationalPathBase<QDownload
     public void addMetadata() {
         addMetadata(endDate, ColumnMetadata.named("end_date").withIndex(4).ofType(Types.TIMESTAMP).withSize(26));
         addMetadata(fileId, ColumnMetadata.named("file_id").withIndex(1).ofType(Types.INTEGER).withSize(32));
-        addMetadata(retries, ColumnMetadata.named("retries").withIndex(8).ofType(Types.TINYINT).withSize(8).notNull());
-        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(7).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(retries, ColumnMetadata.named("retries").withIndex(9).ofType(Types.TINYINT).withSize(8).notNull());
+        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(8).ofType(Types.TIMESTAMP).withSize(26).notNull());
         addMetadata(startDate, ColumnMetadata.named("start_date").withIndex(3).ofType(Types.TIMESTAMP).withSize(26));
         addMetadata(status, ColumnMetadata.named("status").withIndex(6).ofType(Types.TINYINT).withSize(8));
-        addMetadata(timestamp, ColumnMetadata.named("timestamp").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(statusTime, ColumnMetadata.named("status_time").withIndex(7).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(timestamp, ColumnMetadata.named("time_stamp").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
         addMetadata(url, ColumnMetadata.named("url").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
     }
 

@@ -35,19 +35,26 @@ public class DownloadTask
 	Instant startDate;
 	Instant endDate;
 	@NonNull
+	Instant timestamp;
 	@With
-	DownloadStatus status;
 	@NonNull
+	DownloadStatus status;
 	@With
+	@NonNull
+	Instant statusTime;
+	@With
+	@NonNull
 	Instant scheduleTime;
 	@With
 	int retries;
 
-	static DownloadTask of(long fileId, String url)
+	static DownloadTask of(long fileId, String url, Instant startDate, Instant endDate)
 	{
 		try
 		{
-			return new DownloadTask(fileId,new URL(url),null,null,DownloadStatus.CREATED,Instant.now(),0);
+			Instant now = Instant.now();
+			Instant scheduleTime = startDate != null ? startDate : now;
+			return new DownloadTask(fileId,new URL(url),startDate,endDate,now,DownloadStatus.CREATED,now,scheduleTime,0);
 		}
 		catch (MalformedURLException e)
 		{

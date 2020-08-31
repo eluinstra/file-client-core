@@ -18,12 +18,12 @@ CREATE TABLE fs_file
 (
 	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
 	url								VARCHAR(256)		NULL,
-	path							VARCHAR(256)		NOT NULL,
+	path							VARCHAR(256)		NOT NULL UNIQUE,
 	name							VARCHAR(256)		NULL,
 	content_type			VARCHAR(256)		NOT NULL,
 	md5_checksum			VARCHAR(32)			NULL,
 	sha256_checksum		VARCHAR(64)			NULL,
-	timestamp					TIMESTAMP				NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	time_stamp				TIMESTAMP				NOT NULL,
 	length						BIGINT					NULL
 );
 
@@ -31,22 +31,24 @@ CREATE TABLE upload_task
 (
 	file_id						INTEGER					NOT NULL UNIQUE,
 	creation_url			VARCHAR(256)		NOT NULL,
-	timestamp					TIMESTAMP				DEFAULT NOW NOT NULL,
-	status						TINYINT					DEFAULT 0 NOT NULL,
-	schedule_time			TIMESTAMP				DEFAULT NOW NOT NULL,
-	retries						TINYINT					DEFAULT 0 NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL,
+	status						TINYINT					NOT NULL,
+	status_time				TIMESTAMP				NOT NULL,
+	schedule_time			TIMESTAMP				NOT NULL,
+	retries						TINYINT					NOT NULL,
 	FOREIGN KEY (file_id) REFERENCES file(id)
 );
 
 CREATE TABLE download_task
 (
-	file_id						INTEGER					UNIQUE,
+	file_id						INTEGER					NOT NULL UNIQUE,
 	url								VARCHAR(256)		NOT NULL,
 	start_date				TIMESTAMP				NULL,
 	end_date					TIMESTAMP				NULL,
-	timestamp					TIMESTAMP				DEFAULT NOW NOT NULL,
-	status						TINYINT					DEFAULT 0 NOT NULL,
-	schedule_time			TIMESTAMP				DEFAULT NOW NOT NULL,
-	retries						TINYINT					DEFAULT 0 NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL,
+	status						TINYINT					NOT NULL,
+	status_time				TIMESTAMP				NOT NULL,
+	schedule_time			TIMESTAMP				NOT NULL,
+	retries						TINYINT					NOT NULL,
 	FOREIGN KEY (file_id) REFERENCES file(id)
 );

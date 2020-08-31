@@ -52,7 +52,9 @@ public class QUploadTask extends com.querydsl.sql.RelationalPathBase<QUploadTask
 
     public final EnumPath<dev.luin.file.client.core.upload.UploadStatus> status = createEnum("status", dev.luin.file.client.core.upload.UploadStatus.class);
 
-    public final DateTimePath<java.time.Instant> timestamp = createDateTime("timestamp", java.time.Instant.class);
+    public final DateTimePath<java.time.Instant> statusTime = createDateTime("status_time", java.time.Instant.class);
+
+    public final DateTimePath<java.time.Instant> timestamp = createDateTime("time_stamp", java.time.Instant.class);
 
     public final com.querydsl.sql.ForeignKey<QFile> sysFk10151 = createForeignKey(fileId, "id");
 
@@ -84,10 +86,11 @@ public class QUploadTask extends com.querydsl.sql.RelationalPathBase<QUploadTask
     public void addMetadata() {
         addMetadata(creationUrl, ColumnMetadata.named("creation_url").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
         addMetadata(fileId, ColumnMetadata.named("file_id").withIndex(1).ofType(Types.INTEGER).withSize(32).notNull());
-        addMetadata(retries, ColumnMetadata.named("retries").withIndex(6).ofType(Types.TINYINT).withSize(8).notNull());
-        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(retries, ColumnMetadata.named("retries").withIndex(7).ofType(Types.TINYINT).withSize(8).notNull());
+        addMetadata(scheduleTime, ColumnMetadata.named("schedule_time").withIndex(6).ofType(Types.TIMESTAMP).withSize(26).notNull());
         addMetadata(status, ColumnMetadata.named("status").withIndex(4).ofType(Types.TINYINT).withSize(8));
-        addMetadata(timestamp, ColumnMetadata.named("timestamp").withIndex(3).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(statusTime, ColumnMetadata.named("status_time").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(timestamp, ColumnMetadata.named("time_stamp").withIndex(3).ofType(Types.TIMESTAMP).withSize(26).notNull());
     }
 
 }
