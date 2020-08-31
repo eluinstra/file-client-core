@@ -25,8 +25,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileSystem;
-import dev.luin.file.client.core.transaction.TransactionException;
-import dev.luin.file.client.core.transaction.TransactionTemplate;
 import io.tus.java.client.ProtocolException;
 import io.tus.java.client.TusExecutor;
 import io.tus.java.client.TusUpload;
@@ -44,12 +42,74 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class UploadTaskHandler
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	private static class UploadTaskExecutor extends TusExecutor
+	{
+		@NonNull
+		SSLFactoryManager sslFactoryManager;
+		@NonNull
+		FileSystem fs;
+		@NonNull
+		UploadTaskManager uploadTaskManager;
+		@NonNull
+		UploadTask task;
+
+		@Override
+		protected void makeAttempt() throws ProtocolException, IOException
+		{
+			val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
+			val client = createClient();
+			val upload = createUpload(file);
+			log.info("Uploading {}",file);
+			val uploader = client.resumeOrCreateUpload(upload);
+			do
+			{
+				if (log.isDebugEnabled())
+					log.debug("Upload {} at {}%",file,getProgress(upload,uploader));
+			} while (uploader.uploadChunk() > -1);
+			val newFile = file.withUrl(uploader.getUploadURL());
+			fs.updateFile(newFile);
+			uploader.finish();
+			log.info("Uploaded {}",newFile);
+		}
+
+		private Client createClient()
+		{
+			val client = new Client(sslFactoryManager.getSslSocketFactory());
+			client.setUploadCreationURL(task.getCreationUrl());
+			client.enableResuming(uploadTaskManager);
+			return client;
+		}
+
+		private io.tus.java.client.TusUpload createUpload(final dev.luin.file.client.core.file.FSFile file)
+		{
+			val upload = Try.of(() -> new TusUpload(file.getFile())).get();
+			upload.setFingerprint(task.getFileId().toString());
+			upload.setMetadata(createMetaData(file));
+			return upload;
+		}
+
+		private Map<String,String> createMetaData(FSFile file)
+		{
+			val result = new HashMap<String,String>();
+			result.put("filename",file.getName());
+			result.put("content-type",file.getContentType());
+			return result;
+		}
+
+		private double getProgress(final TusUpload upload, TusUploader uploader)
+		{
+			val totalBytes = upload.getSize();
+			val bytesUploaded = uploader.getOffset();
+			return (double)bytesUploaded / totalBytes * 100;
+		}
+	}
+
 	@NonNull
 	SSLFactoryManager sslFactoryManager;
 	@NonNull
 	FileSystem fs;
-	@NonNull
-	TransactionTemplate transactionTemplate;
 	@NonNull
 	UploadTaskManager uploadTaskManager;
 	int maxRetries;
@@ -64,73 +124,29 @@ public class UploadTaskHandler
 	public Future<Void> run(UploadTask task) throws ProtocolException, IOException
 	{
 		log.info("Start task {}",task);
-		val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
-		val client = new Client(sslFactoryManager.getSslSocketFactory());
-		client.setUploadCreationURL(task.getCreationUrl());
-		client.enableResuming(uploadTaskManager);
-		val upload = Try.of(() -> new TusUpload(file.getFile())).get();
-		upload.setFingerprint(task.getFileId().toString());
-		upload.setMetadata(createMetaData(file));
-		log.info("Uploading {}",file);
-		val executor = new TusExecutor()
-		{
-			@Override
-			protected void makeAttempt() throws ProtocolException, IOException
-			{
-				val uploader = client.resumeOrCreateUpload(upload);
-				do
-				{
-					if (log.isDebugEnabled())
-						log.debug("Upload {} at {}%",file,getProgress(upload,uploader));
-				} while (uploader.uploadChunk() > -1);
-				val newFile = file.withUrl(uploader.getUploadURL());
-				Runnable runnable = () ->
-				{
-					try
-					{
-						fs.updateFile(newFile);
-						uploadTaskManager.createSucceededTask(task);
-						uploader.finish();
-					}
-					catch (ProtocolException | IOException e)
-					{
-						throw new TransactionException(e);
-					}
-				};
-				transactionTemplate.executeTransaction(runnable);
-				log.info("Uploaded {}",newFile);
-			}
-		};
+		val executor = new UploadTaskExecutor(sslFactoryManager,fs,uploadTaskManager,task);
+		val newTask = handleTask(executor,task);
+		log.info("Finished task {}",newTask);
+		return new AsyncResult<Void>(null);
+	}
+
+	private UploadTask handleTask(TusExecutor executor, UploadTask task)
+	{
 		try
 		{
 			if (!executor.makeAttempts())
 			{
 				if (task.getRetries() < maxRetries)
-					uploadTaskManager.createNextTask(task);
+					return uploadTaskManager.createNextTask(task);
 				else
-					uploadTaskManager.createFailedTask(task);
+					return uploadTaskManager.createFailedTask(task);
 			}
+			else
+				return uploadTaskManager.createSucceededTask(task);
 		}
 		catch (Exception e)
 		{
-			uploadTaskManager.createNextTask(task);
+			return uploadTaskManager.createNextTask(task);
 		}
-		log.info("Finished task {}",task);
-		return new AsyncResult<Void>(null);
-	}
-
-	private Map<String,String> createMetaData(FSFile file)
-	{
-		val result = new HashMap<String,String>();
-		result.put("filename",file.getName());
-		result.put("content-type",file.getContentType());
-		return result;
-	}
-
-	private double getProgress(final TusUpload upload, TusUploader uploader)
-	{
-		val totalBytes = upload.getSize();
-		val bytesUploaded = uploader.getOffset();
-		return (double)bytesUploaded / totalBytes * 100;
 	}
 }

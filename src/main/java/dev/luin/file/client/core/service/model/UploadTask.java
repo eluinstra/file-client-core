@@ -21,7 +21,10 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import dev.luin.file.client.core.jaxb.InstantAdapter;
 import dev.luin.file.client.core.upload.UploadStatus;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -42,15 +45,21 @@ public class UploadTask
 	@NonNull
 	String creationUrl;
 	@XmlElement(required = true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant timetamp;
 	@XmlElement(required = true)
 	@NonNull
 	UploadStatus status;
 	@XmlElement(required = true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant statusTime;
 	@XmlElement(required = true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant scheduleTime;
 	@XmlElement(required = true)

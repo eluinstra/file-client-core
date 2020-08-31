@@ -21,8 +21,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import dev.luin.file.client.core.download.DownloadStatus;
+import dev.luin.file.client.core.jaxb.InstantAdapter;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,19 +45,29 @@ public class DownloadTask
 	@NonNull
 	String url;
 	@XmlElement
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	Instant startDate;
 	@XmlElement
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	Instant endDate;
 	@XmlElement(required = true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant timestamp;
 	@XmlElement(required = true)
 	@NonNull
 	DownloadStatus status;
 	@XmlElement(required = true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant statusTime;
 	@XmlElement(required = true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name = "dateTime")
 	@NonNull
 	Instant scheduleTime;
 	@XmlElement(required = true)

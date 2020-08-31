@@ -30,7 +30,6 @@ import com.querydsl.sql.SQLQueryFactory;
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.security.KeyStore;
 import dev.luin.file.client.core.security.TrustStore;
-import dev.luin.file.client.core.transaction.TransactionTemplate;
 import io.tus.java.client.TusURLStore;
 import lombok.AccessLevel;
 import lombok.val;
@@ -55,9 +54,6 @@ public class UploadClientConfig
 	@Autowired
 	FileSystem fs;
 	@Autowired
-	@Qualifier("dataSourceTransactionTemplate")
-	TransactionTemplate transactionTemplate;
-	@Autowired
 	SQLQueryFactory queryFactory;
 	@Value("${uploadTask.retry.maxAttempts}")
 	int maxRetries;
@@ -76,7 +72,7 @@ public class UploadClientConfig
 				.enabledCipherSuites(enabledCipherSuites)
 				.verifyHostnames(verifyHostnames)
 				.build();
-		return new UploadTaskHandler(sslFactoryManager,fs,transactionTemplate,uploadTaskManager(),maxRetries);
+		return new UploadTaskHandler(sslFactoryManager,fs,uploadTaskManager(),maxRetries);
 	}
 
 	@Bean

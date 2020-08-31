@@ -120,7 +120,7 @@ public class FileSystem
 		return fsFileDAO.updateFile(file) > 0;
 	}
 
-	public FSFile append(@NonNull final FSFile fsFile, @NonNull final InputStream input) throws IOException
+	public FSFile append(@NonNull FSFile fsFile, @NonNull final InputStream input) throws IOException
 	{
 		val file = fsFile.getFile();
 		if (!file.exists() || fsFile.isCompleted())
@@ -129,7 +129,10 @@ public class FileSystem
 		{
 			IOUtils.copyLarge(input,output);
 			if (fsFile.isCompleted())
-				fsFileDAO.updateFile(completeFile(fsFile));
+			{
+				fsFile = completeFile(fsFile);
+				fsFileDAO.updateFile(fsFile);
+			}
 			return fsFile;
 		}
 	}

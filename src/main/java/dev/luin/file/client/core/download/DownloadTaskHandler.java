@@ -44,6 +44,65 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class DownloadTaskHandler
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	private static class DownloadTaskExecutor extends TusExecutor
+	{
+		@NonNull
+		SSLFactoryManager sslFactoryManager;
+		@NonNull
+		FileSystem fs;
+		@NonNull
+		DownloadTask task;
+		
+		@Override
+		protected void makeAttempt() throws ProtocolException, IOException
+		{
+			val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
+			log.info("Downloading {}",file);
+			var connection = createConnection(task.getUrl());
+			connection.setRequestMethod("HEAD");
+			if (connection.getResponseCode() / 100 == 2)
+			{
+				val conentLength = getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found"));
+				val contentType = connection.getContentType();
+				val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
+						.flatMap(h -> h.getParams().get("filename"))
+						.getOrNull();
+				var f = file.withLength(conentLength)
+						.withContentType(contentType)
+						.withName(filename);
+				while (!f.isCompleted())
+				{
+					connection = createConnection(task.getUrl());
+				  connection.setRequestProperty("Range","bytes=" + f.getFileLength() + "-" + f.getLength());
+				  f = fs.append(f,connection.getInputStream());
+				}
+				if (f.isCompleted())
+					log.info("Downloaded {}",f);
+			}
+			else
+				throw new IllegalStateException("Unexpected response: " + connection.getResponseCode());
+		}
+
+		private java.net.HttpURLConnection createConnection(final URL url) throws IOException
+		{
+			val connection = (HttpURLConnection)url.openConnection();
+			if (connection instanceof HttpsURLConnection)
+			{
+				HttpsURLConnection secureConnection = (HttpsURLConnection)connection;
+				secureConnection.setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
+		  }
+			return connection;
+		}
+
+		private Option<Long> getContentLength(java.net.HttpURLConnection connection)
+		{
+			val result = connection.getContentLengthLong();
+			return result != -1 ? Option.of(result) : Option.none();
+		}
+	}
+
 	@NonNull
 	SSLFactoryManager sslFactoryManager;
 	@NonNull
@@ -62,67 +121,29 @@ public class DownloadTaskHandler
 	public Future<Void> run(DownloadTask task) throws IOException
 	{
 		log.info("Start task {}",task);
-		val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
-		log.info("Downloading {}",file);
-		val connection = createConnection(task.getUrl());
-		connection.setRequestMethod("HEAD");
-		val conentLength = getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found"));
-		val contentType = connection.getContentType();
-		val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
-				.flatMap(h -> h.getParams().get("filename"))
-				.getOrNull();
-		val executor = new TusExecutor()
-		{
-			@Override
-			protected void makeAttempt() throws ProtocolException, IOException
-			{
-				var f = file.withLength(conentLength)
-						.withContentType(contentType)
-						.withName(filename);
-				while (!f.isCompleted())
-				{
-					val connection = createConnection(task.getUrl());
-				  connection.setRequestProperty("Range","bytes=" + f.getFileLength() + "-" + f.getLength());
-				  f = fs.append(f,connection.getInputStream());
-				}
-				if (f.isCompleted())
-					downloadTaskManager.createSucceededTask(task);
-			}
-		};
+		val executor = new DownloadTaskExecutor(sslFactoryManager,fs,task);
+		val newTask = handleTask(executor,task);
+		log.info("Finished task {}",newTask);
+		return new AsyncResult<Void>(null);
+	}
+
+	private DownloadTask handleTask(TusExecutor executor, DownloadTask task)
+	{
 		try
 		{
 			if (!executor.makeAttempts())
 			{
 				if (task.getRetries() < maxRetries)
-					downloadTaskManager.createNextTask(task);
+					return downloadTaskManager.createNextTask(task);
 				else
-					downloadTaskManager.createFailedTask(task);
+					return downloadTaskManager.createFailedTask(task);
 			}
 			else
-				log.info("Downloaded {}",file);
+				return downloadTaskManager.createSucceededTask(task);
 		}
 		catch (Exception e)
 		{
-			downloadTaskManager.createNextTask(task);
+			return downloadTaskManager.createNextTask(task);
 		}
-		log.info("Finished task {}",task);
-		return new AsyncResult<Void>(null);
-	}
-
-	private Option<Long> getContentLength(java.net.HttpURLConnection connection)
-	{
-		val result = connection.getContentLengthLong();
-		return result != -1 ? Option.of(result) : Option.none();
-	}
-
-	private java.net.HttpURLConnection createConnection(final URL url) throws IOException
-	{
-		val connection = (HttpURLConnection)url.openConnection();
-		if (connection instanceof HttpsURLConnection)
-		{
-			HttpsURLConnection secureConnection = (HttpsURLConnection)connection;
-			secureConnection.setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
-	  }
-		return connection;
 	}
 }
