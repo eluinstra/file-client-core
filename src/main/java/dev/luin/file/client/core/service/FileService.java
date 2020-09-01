@@ -38,7 +38,7 @@ import dev.luin.file.client.core.upload.UploadStatus;
 public interface FileService
 {
 	@WebResult(name="file")
-	UploadTask uploadFile(@WebParam(name="file") @XmlElement(required=true) File file, @WebParam(name="creationUrl") @XmlElement(required=true) String creationUrl) throws ServiceException;
+	UploadTask uploadFile(@WebParam(name="creationUrl") @XmlElement(required=true) String creationUrl, @WebParam(name="file") @XmlElement(required=true) File file) throws ServiceException;
 	@WebResult(name="uploadTask")
 	UploadTask getUploadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
 	@WebResult(name="uploadTask")
