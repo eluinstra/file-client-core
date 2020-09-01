@@ -44,7 +44,9 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
 @AllArgsConstructor
 class FileServiceImpl implements FileService
@@ -60,12 +62,14 @@ class FileServiceImpl implements FileService
 	@Transactional("dataSourceTransactionManager")
 	public UploadTask uploadFile(File file, String creationUrl) throws ServiceException
 	{
+		log.debug("uploadFile creationUrl={}, {}",creationUrl,file);
 		return Try.of(() -> 
 		{
 			try
 			{
 				val fsFile = createFile(file);
 				val task = uploadTaskManager.createTask(fsFile.getId(),creationUrl);
+				log.info("Created uploadTask {}",task);
 				return UploadTaskMapper.INSTANCE.toUploadTask(task);
 			}
 			catch (Exception e)
@@ -79,6 +83,7 @@ class FileServiceImpl implements FileService
 	@Override
 	public UploadTask getUploadTask(Long fileId) throws ServiceException
 	{
+		log.debug("getUploadTask {}",fileId);
 		return Try.of(() ->
 		{
 			val task = uploadTaskManager.getTask(fileId).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
@@ -90,6 +95,7 @@ class FileServiceImpl implements FileService
 	@Override
 	public List<UploadTask> getUploadTasks(List<UploadStatus> status) throws ServiceException
 	{
+		log.debug("getUploadTasks {}",status);
 		return Try.of(() -> 
 		{
 			return uploadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
@@ -103,6 +109,7 @@ class FileServiceImpl implements FileService
 	@Transactional("dataSourceTransactionManager")
 	public void deleteUploadTask(Long fileId) throws ServiceException
 	{
+		log.debug("deleteUploadTask {}",fileId);
 		Try.of(() -> 
 		{
 			try
@@ -110,6 +117,7 @@ class FileServiceImpl implements FileService
 				val fsFile = fs.findFile(fileId).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
 				fs.deleteFile(fsFile,true);
 				uploadTaskManager.deleteTask(fileId);
+				log.info("Deleted uploadTask {}",fileId);
 			}
 			catch (FileNotFoundException e)
 			{
@@ -124,12 +132,14 @@ class FileServiceImpl implements FileService
 	@Transactional("dataSourceTransactionManager")
 	public DownloadTask downloadFile(String url, Instant startDate, Instant endDate) throws ServiceException
 	{
+		log.debug("downloadFile {}",url);
 		return Try.of(() -> 
 		{
 			try
 			{
 				val fsFile = fs.createEmptyFile(url);
 				val task = downloadTaskManager.createTask(fsFile.getId(),url,startDate,endDate);
+				log.info("Created downloadTask {}",task);
 				return DownloadTaskMapper.INSTANCE.toDownloadTask(task);
 			}
 			catch (IOException e)
@@ -143,6 +153,7 @@ class FileServiceImpl implements FileService
 	@Override
 	public DownloadTask getDownloadTask(Long fileId) throws ServiceException
 	{
+		log.debug("getDownloadTask {}",fileId);
 		return Try.of(() ->
 		{
 			val task = downloadTaskManager.getTask(fileId).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
@@ -154,6 +165,7 @@ class FileServiceImpl implements FileService
 	@Override
 	public List<DownloadTask> getDownloadTasks(List<DownloadStatus> status) throws ServiceException
 	{
+		log.debug("getDownloadTasks");
 		return Try.of(() -> 
 		{
 			return downloadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
@@ -167,6 +179,7 @@ class FileServiceImpl implements FileService
 	@Transactional("dataSourceTransactionManager")
 	public void deleteDownloadTask(Long fileId) throws ServiceException
 	{
+		log.debug("deleteDownloadTask {}",fileId);
 		Try.of(() -> 
 		{
 			try
@@ -174,6 +187,7 @@ class FileServiceImpl implements FileService
 				val fsFile = fs.findFile(fileId).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
 				fs.deleteFile(fsFile,true);
 				downloadTaskManager.deleteTask(fileId);
+				log.info("Deleted downloadTask {}",fileId);
 			}
 			catch (FileNotFoundException e)
 			{
@@ -187,11 +201,13 @@ class FileServiceImpl implements FileService
 	@Override
 	public File getFile(Long id) throws ServiceException
 	{
+		log.debug("getFile {}",id);
 		return Try.of(() ->
 		{
 			val fsFile = fs.findFile(id);
 			val dataSource = fsFile.map(f -> fs.createDataSource(f));
 			return fsFile.filter(f -> f.isCompleted())
+					.peek(f -> log.info("Retreived file {}",f))
 					.flatMap(f -> dataSource.map(d -> FileMapper.INSTANCE.toFile(f,new DataHandler(d))))
 					.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
 		})
@@ -201,6 +217,7 @@ class FileServiceImpl implements FileService
 	@Override
 	public FileInfo getFileInfo(Long id) throws ServiceException
 	{
+		log.debug("getFileInfo {}",id);
 		return Try.of(() ->
 		{
 			val fsFile = fs.findFile(id);
@@ -213,6 +230,7 @@ class FileServiceImpl implements FileService
 	@Override
 	public List<FileInfo> getFiles() throws ServiceException
 	{
+		log.debug("getFiles");
 		return Try.of(() -> 
 		{
 			val fsFile = fs.getFiles();

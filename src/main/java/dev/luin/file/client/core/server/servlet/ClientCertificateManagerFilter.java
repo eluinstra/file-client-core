@@ -28,6 +28,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,7 +36,9 @@ import dev.luin.file.client.core.server.ClientCertificateManager;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @FieldDefaults(level=AccessLevel.PRIVATE)
 public class ClientCertificateManagerFilter implements Filter
 {
@@ -43,14 +46,14 @@ public class ClientCertificateManagerFilter implements Filter
 	boolean useX509CertificateHeader;
 
 	@Override
-	public void init(final FilterConfig filterConfig) throws ServletException
+	public void init(FilterConfig filterConfig) throws ServletException
 	{
 		x509CertificateHeader = filterConfig.getInitParameter("x509CertificateHeader");
 		useX509CertificateHeader = StringUtils.isEmpty(x509CertificateHeader);
 	}
 
 	@Override
-	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
 		try
 		{
@@ -61,9 +64,10 @@ public class ClientCertificateManagerFilter implements Filter
 			}
 			else
 			{
-				val certificate = decode(request.getAttribute(x509CertificateHeader));
+				val certificate = decode(((HttpServletRequest)request).getHeader(x509CertificateHeader));
 				ClientCertificateManager.setCertificate(certificate);
 			}
+			log.info("User " + ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : "unknown!");
 			chain.doFilter(request,response);
 		}
 		catch (CertificateException e)
@@ -72,38 +76,17 @@ public class ClientCertificateManagerFilter implements Filter
 		}
 	}
 
-	private X509Certificate decode(final Object certificate) throws CertificateException
+	private X509Certificate decode(String certificate) throws CertificateException
 	{
-		if (certificate != null)
-		{
-			if (certificate instanceof String)
-			{
-				val s = (String)certificate;
-				if (StringUtils.isNotBlank(s))
-				{
-					val is = new ByteArrayInputStream(s.getBytes(Charset.defaultCharset()));
-					val cf = CertificateFactory.getInstance("X509");
-					return (X509Certificate)cf.generateCertificate(is);
-				}
-			}
-			else if (certificate instanceof byte[])
-			{
-				byte[] bytes = (byte[])certificate;
-				val is = new ByteArrayInputStream(bytes);
-				val cf = CertificateFactory.getInstance("X509");
-				return (X509Certificate)cf.generateCertificate(is);
-			}
-			else if (certificate instanceof X509Certificate)
-			{
-				return (X509Certificate)certificate;
-			}
-		}
-		return null;
+		if (StringUtils.isBlank(certificate))
+			return null;
+		val is = new ByteArrayInputStream(certificate.getBytes(Charset.defaultCharset()));
+		val cf = CertificateFactory.getInstance("X509");
+		return (X509Certificate)cf.generateCertificate(is);
 	}
 
 	@Override
 	public void destroy()
 	{
 	}
-
 }
