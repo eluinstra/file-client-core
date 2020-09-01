@@ -28,9 +28,7 @@ public interface FileMapper
 {
 	public FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
 
-	@Mapping(source = "file.name", target = "name")
 	@Mapping(source = "content", target = "content")
-	@Mapping(source = "file.contentType", target = "contentType")
 	File toFile(FSFile file, DataHandler content);
 
 	File toFile(NewFile file);

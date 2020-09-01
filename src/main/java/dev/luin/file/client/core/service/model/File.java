@@ -19,6 +19,7 @@ import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.AccessLevel;
@@ -27,6 +28,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @XmlRootElement(name = "file")
@@ -38,17 +40,13 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class File
 {
-	@XmlElement
+	@XmlElement(required=true)
 	Long id;
-	@XmlElement(required = true)
-	@NonNull
-	String name;
-	@XmlElement(required = true)
-	@NonNull
-	String contentType;
 	@XmlElement
 	String sha256Checksum;
-	@XmlElement(required = true)
+	@XmlMimeType("application/octet-stream")
+	@XmlElement(required=true)
 	@NonNull
+	@ToString.Exclude
 	DataHandler content;
 }

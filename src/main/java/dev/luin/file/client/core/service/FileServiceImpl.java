@@ -243,6 +243,6 @@ class FileServiceImpl implements FileService
 
 	private FSFile createFile(final File file) throws IOException
 	{
-		return fs.createFile(file.getName(),file.getContentType(),file.getSha256Checksum(),file.getContent().getInputStream());
+		return fs.createFile(file.getContent().getName(),file.getContent().getContentType(),file.getSha256Checksum(),file.getContent().getInputStream());
 	}
 }
