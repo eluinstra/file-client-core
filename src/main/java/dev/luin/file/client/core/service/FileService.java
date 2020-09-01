@@ -30,33 +30,44 @@ import dev.luin.file.client.core.jaxb.InstantAdapter;
 import dev.luin.file.client.core.service.model.DownloadTask;
 import dev.luin.file.client.core.service.model.File;
 import dev.luin.file.client.core.service.model.FileInfo;
+import dev.luin.file.client.core.service.model.NewFile;
 import dev.luin.file.client.core.service.model.UploadTask;
 import dev.luin.file.client.core.upload.UploadStatus;
 
-@MTOM(enabled=true)
-@WebService(name = "FileService", targetNamespace="http://luin.dev/file/client/1.0", serviceName = "FileService", endpointInterface = "FileServiceSoapBinding", portName = "FileServicePort")
+@MTOM(enabled = true)
+@WebService(name = "FileService", targetNamespace = "http://luin.dev/file/client/1.0", serviceName = "FileService", endpointInterface = "FileServiceSoapBinding", portName = "FileServicePort")
 public interface FileService
 {
-	@WebResult(name="file")
-	UploadTask uploadFile(@WebParam(name="creationUrl") @XmlElement(required=true) String creationUrl, @WebParam(name="file") @XmlElement(required=true) File file) throws ServiceException;
-	@WebResult(name="uploadTask")
-	UploadTask getUploadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
-	@WebResult(name="uploadTask")
-	List<UploadTask> getUploadTasks(@WebParam(name="status") List<UploadStatus> status) throws ServiceException;
-	void deleteUploadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
-	@WebResult(name="file")
-	DownloadTask downloadFile(@WebParam(name="url") @XmlElement(required=true) String url,
-			@WebParam(name="startDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant startDate,
-			@WebParam(name="endDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant endDate) throws ServiceException;
-	@WebResult(name="downloadTask")
-	DownloadTask getDownloadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
-	@WebResult(name="downloadTask")
-	List<DownloadTask> getDownloadTasks(@WebParam(name="status") List<DownloadStatus> status) throws ServiceException;
-	void deleteDownloadTask(@WebParam(name="fileId") @XmlElement(required=true) Long fileId) throws ServiceException;
-	@WebResult(name="file")
-	File getFile(@WebParam(name="id") @XmlElement(required=true) Long id) throws ServiceException;
-	@WebResult(name="file")
-	FileInfo getFileInfo(@WebParam(name="id") @XmlElement(required=true) Long id) throws ServiceException;
-	@WebResult(name="fileInfo")
+	@WebResult(name = "file")
+	UploadTask uploadFile(@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl, @WebParam(name = "file") @XmlElement(required = true) NewFile file) throws ServiceException;
+
+	@WebResult(name = "uploadTask")
+	UploadTask getUploadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
+
+	@WebResult(name = "uploadTask")
+	List<UploadTask> getUploadTasks(@WebParam(name = "status") List<UploadStatus> status) throws ServiceException;
+
+	void deleteUploadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
+
+	@WebResult(name = "file")
+	DownloadTask downloadFile(@WebParam(name = "url") @XmlElement(required = true) String url,
+			@WebParam(name = "startDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant startDate,
+			@WebParam(name = "endDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant endDate) throws ServiceException;
+
+	@WebResult(name = "downloadTask")
+	DownloadTask getDownloadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
+
+	@WebResult(name = "downloadTask")
+	List<DownloadTask> getDownloadTasks(@WebParam(name = "status") List<DownloadStatus> status) throws ServiceException;
+
+	void deleteDownloadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
+
+	@WebResult(name = "file")
+	File getFile(@WebParam(name = "id") @XmlElement(required = true) Long id) throws ServiceException;
+
+	@WebResult(name = "file")
+	FileInfo getFileInfo(@WebParam(name = "id") @XmlElement(required = true) Long id) throws ServiceException;
+
+	@WebResult(name = "fileInfo")
 	List<FileInfo> getFiles() throws ServiceException;
 }

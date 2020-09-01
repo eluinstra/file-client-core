@@ -36,10 +36,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class File
+public class NewFile
 {
-	@XmlElement
-	Long id;
 	@XmlElement(required = true)
 	@NonNull
 	String name;

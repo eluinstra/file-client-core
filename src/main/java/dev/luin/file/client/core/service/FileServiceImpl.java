@@ -34,6 +34,7 @@ import dev.luin.file.client.core.service.model.File;
 import dev.luin.file.client.core.service.model.FileInfo;
 import dev.luin.file.client.core.service.model.FileInfoMapper;
 import dev.luin.file.client.core.service.model.FileMapper;
+import dev.luin.file.client.core.service.model.NewFile;
 import dev.luin.file.client.core.service.model.UploadTask;
 import dev.luin.file.client.core.service.model.UploadTaskMapper;
 import dev.luin.file.client.core.upload.UploadStatus;
@@ -60,14 +61,14 @@ class FileServiceImpl implements FileService
 
 	@Override
 	@Transactional("dataSourceTransactionManager")
-	public UploadTask uploadFile(String creationUrl, File file) throws ServiceException
+	public UploadTask uploadFile(String creationUrl, NewFile file) throws ServiceException
 	{
 		log.debug("uploadFile creationUrl={}, {}",creationUrl,file);
 		return Try.of(() -> 
 		{
 			try
 			{
-				val fsFile = createFile(file);
+				val fsFile = createFile(FileMapper.INSTANCE.toFile(file));
 				val task = uploadTaskManager.createTask(fsFile.getId(),creationUrl);
 				log.info("Created uploadTask {}",task);
 				return UploadTaskMapper.INSTANCE.toUploadTask(task);

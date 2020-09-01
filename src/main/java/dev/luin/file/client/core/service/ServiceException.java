@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@WebFault(targetNamespace="http://luin.dev/file/client/1.0")
+@WebFault(targetNamespace = "http://luin.dev/file/client/1.0")
 @NoArgsConstructor
 public class ServiceException extends RuntimeException
 {
