@@ -18,11 +18,9 @@ package dev.luin.file.client.core.download;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.Future;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import dev.luin.file.client.core.file.FileSystem;
@@ -115,16 +113,16 @@ public class DownloadTaskHandler
 	public void run()
 	{
 		val task = downloadTaskManager.getNextTask();
-		task.map(t -> Try.of(() -> run(t)).onFailure(e -> log.error("",e)));
+		task.map(t -> Try.of(() -> handle(t)).onFailure(e -> log.error("",e)));
 	}
 
-	public Future<Void> run(DownloadTask task) throws IOException
+	private DownloadTask handle(DownloadTask task) throws IOException
 	{
 		log.info("Start task {}",task);
 		val executor = new DownloadTaskExecutor(sslFactoryManager,fs,task);
 		val newTask = handleTask(executor,task);
 		log.info("Finished task {}",newTask);
-		return new AsyncResult<Void>(null);
+		return newTask;
 	}
 
 	private DownloadTask handleTask(TusExecutor executor, DownloadTask task)

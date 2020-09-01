@@ -18,9 +18,7 @@ package dev.luin.file.client.core.upload;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Future;
 
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import dev.luin.file.client.core.file.FSFile;
@@ -118,16 +116,16 @@ public class UploadTaskHandler
 	public void run()
 	{
 		val task = uploadTaskManager.getNextTask();
-		task.map(t -> Try.of(() -> run(t)).onFailure(e -> log.error("",e)));
+		task.map(t -> Try.of(() -> handle(t)).onFailure(e -> log.error("",e)));
 	}
 
-	public Future<Void> run(UploadTask task) throws ProtocolException, IOException
+	private UploadTask handle(UploadTask task) throws ProtocolException, IOException
 	{
 		log.info("Start task {}",task);
 		val executor = new UploadTaskExecutor(sslFactoryManager,fs,uploadTaskManager,task);
 		val newTask = handleTask(executor,task);
 		log.info("Finished task {}",newTask);
-		return new AsyncResult<Void>(null);
+		return newTask;
 	}
 
 	private UploadTask handleTask(TusExecutor executor, UploadTask task)
