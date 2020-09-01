@@ -92,7 +92,7 @@ public class UploadTaskHandler
 		{
 			val result = new HashMap<String,String>();
 			result.put("filename",file.getName());
-			result.put("content-type",file.getContentType());
+			result.put("Content-Type",file.getContentType());
 			return result;
 		}
 
