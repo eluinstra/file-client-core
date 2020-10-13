@@ -23,11 +23,14 @@ import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.val;
 
 @Value
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class HeaderValue
 {
 	@NonNull
