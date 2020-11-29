@@ -131,6 +131,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-core</artifactId>
+			<version>3.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.tus.java.client</groupId>
 			<artifactId>tus-java-client</artifactId>
 			<version>0.4.2</version>
