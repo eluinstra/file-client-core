@@ -22,7 +22,7 @@
 	<artifactId>file-client-core</artifactId>
 	<packaging>jar</packaging>
 	<name>File Client Core</name>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0-M3</version>
 	<description>This library implements a HTTP file up and download client</description>
 	<url>https://bitbucket.org/eluinstra/file-client-core</url>
 	<developers>
