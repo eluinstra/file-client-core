@@ -72,7 +72,7 @@ public class DownloadClientConfig
 				.enabledCipherSuites(enabledCipherSuites)
 				.verifyHostnames(verifyHostnames)
 				.build();
-		return new DownloadTaskHandler(sslFactoryManager,fs,downloadTaskManager(),maxRetries);
+		return new DownloadTaskHandler(fs,HttpClient.createClient(sslFactoryManager.getSslSocketFactory(),fs),downloadTaskManager(),maxRetries);
 	}
 
 	@Bean

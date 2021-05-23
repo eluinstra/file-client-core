@@ -16,12 +16,10 @@
 package dev.luin.file.client.core.file;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -92,7 +90,7 @@ public class FSFile
 		return new FileDataSource(getFile(),name,contentType);
 	}
 
-	public FSFile append(@NonNull final InputStream input) throws IOException
+	FSFile append(@NonNull final InputStream input) throws IOException
 	{
 		val file = getFile();
 		if (!file.exists() || isCompleted())
@@ -118,7 +116,7 @@ public class FSFile
 		return result;
 	}
 
-	public FSFile append(@NonNull final InputStream input, final long first, final long length) throws IOException
+	FSFile append(@NonNull final InputStream input, final long first, final long length) throws IOException
 	{
 		val file = getFile();
 		if (!file.exists() || isCompleted())
@@ -132,27 +130,4 @@ public class FSFile
 				return this;
 		}
 	}
-
-	public long write(@NonNull final OutputStream output) throws IOException
-	{
-		val file = getFile();
-		if (!file.exists() || !isCompleted())
-			throw new FileNotFoundException(getUrl().toString());
-		try (val input = new FileInputStream(file))
-		{
-			return IOUtils.copyLarge(input,output);
-		}
-	}
-
-	public long write(@NonNull final OutputStream output, final long first, final long length) throws IOException
-	{
-		val file = getFile();
-		if (!file.exists() || !isCompleted())
-			throw new FileNotFoundException(getUrl().toString());
-		try (val input = new FileInputStream(file))
-		{
-			return IOUtils.copyLarge(input,output,first,length);
-		}
-	}
-
 }

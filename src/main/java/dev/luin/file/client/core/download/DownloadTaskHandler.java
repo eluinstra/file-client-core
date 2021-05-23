@@ -16,19 +16,12 @@
 package dev.luin.file.client.core.download;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.scheduling.annotation.Scheduled;
 
-import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileSystem;
-import dev.luin.file.client.core.upload.SSLFactoryManager;
 import io.tus.java.client.ProtocolException;
 import io.tus.java.client.TusExecutor;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,9 +40,9 @@ public class DownloadTaskHandler
 	private static class DownloadTaskExecutor extends TusExecutor
 	{
 		@NonNull
-		SSLFactoryManager sslFactoryManager;
-		@NonNull
 		FileSystem fs;
+		@NonNull
+		HttpClient client;
 		@NonNull
 		DownloadTask task;
 		
@@ -57,66 +50,14 @@ public class DownloadTaskHandler
 		protected void makeAttempt() throws ProtocolException, IOException
 		{
 			val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
-			log.info("Downloading {}",file);
-			val connection = createConnection(task.getUrl());
-			connection.setRequestMethod("HEAD");
-			boolean isResponseSuccessful = connection.getResponseCode() / 100 == 2;
-			if (isResponseSuccessful)
-			{
-				val f = getFile(file,connection);
-				if (download(f).isCompleted())
-					log.info("Downloaded {}",f);
-			}
-			else
-				throw new IllegalStateException("Unexpected response: " + connection.getResponseCode());
-		}
-
-		private HttpURLConnection createConnection(final URL url) throws IOException
-		{
-			val result = (HttpURLConnection)url.openConnection();
-			if (result instanceof HttpsURLConnection)
-			{
-				HttpsURLConnection secureConnection = (HttpsURLConnection)result;
-				secureConnection.setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
-		  }
-			return result;
-		}
-
-		private FSFile getFile(final FSFile file, final HttpURLConnection connection)
-		{
-			val conentLength = getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found"));
-			val contentType = connection.getContentType();
-			val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
-					.flatMap(h -> h.getParams().get("filename"))
-					.getOrNull();
-			val f = file.withLength(conentLength)
-					.withContentType(contentType)
-					.withName(filename);
-			return f;
-		}
-
-		private Option<Long> getContentLength(HttpURLConnection connection)
-		{
-			val result = connection.getContentLengthLong();
-			return result != -1 ? Option.of(result) : Option.none();
-		}
-
-		private FSFile download(FSFile file) throws IOException
-		{
-			while (!file.isCompleted())
-			{
-				val connection = createConnection(task.getUrl());
-			  connection.setRequestProperty("Range","bytes=" + file.getFileLength() + "-" + file.getLength());
-			  file = fs.append(file,connection.getInputStream());
-			}
-			return file;
+			client.download(file,task.getUrl());
 		}
 	}
 
 	@NonNull
-	SSLFactoryManager sslFactoryManager;
-	@NonNull
 	FileSystem fs;
+	@NonNull
+	HttpClient client;
 	@NonNull
 	DownloadTaskManager downloadTaskManager;
 	int maxRetries;
@@ -131,7 +72,7 @@ public class DownloadTaskHandler
 	private DownloadTask handle(DownloadTask task) throws IOException
 	{
 		log.info("Start task {}",task);
-		val executor = new DownloadTaskExecutor(sslFactoryManager,fs,task);
+		val executor = new DownloadTaskExecutor(fs,client,task);
 		val newTask = handleTask(executor,task);
 		log.info("Finished task {}\nCreated task {}",task,newTask);
 		return newTask;
