@@ -18,9 +18,10 @@ package dev.luin.file.client.core.service.model;
 import java.net.URL;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface DownloadTaskMapper
 {
 	public DownloadTaskMapper INSTANCE = Mappers.getMapper(DownloadTaskMapper.class);

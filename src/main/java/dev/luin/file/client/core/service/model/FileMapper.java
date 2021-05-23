@@ -19,11 +19,14 @@ import javax.activation.DataHandler;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import dev.luin.file.client.core.file.FSFile;
+import dev.luin.file.client.core.file.Md5Checksum;
+import dev.luin.file.client.core.file.Sha256Checksum;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface FileMapper
 {
 	public FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
@@ -31,5 +34,16 @@ public interface FileMapper
 	@Mapping(source = "content", target = "content")
 	File toFile(FSFile file, DataHandler content);
 
+	@Mapping(target = "id", ignore = true)
 	File toFile(NewFile file);
+
+	default String map(Sha256Checksum value)
+	{
+		return value.getValue();
+	}
+
+	default String map(Md5Checksum value)
+	{
+		return value.getValue();
+	}
 }

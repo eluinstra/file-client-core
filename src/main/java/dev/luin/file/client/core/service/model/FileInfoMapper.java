@@ -18,19 +18,35 @@ package dev.luin.file.client.core.service.model;
 import java.net.URL;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import dev.luin.file.client.core.file.FSFile;
+import dev.luin.file.client.core.file.Md5Checksum;
+import dev.luin.file.client.core.file.Sha256Checksum;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface FileInfoMapper
 {
 	public FileInfoMapper INSTANCE = Mappers.getMapper(FileInfoMapper.class);
 
+	@Mapping(target = "endDate", ignore = true)
+	@Mapping(target = "startDate", ignore = true)
 	FileInfo toFileInfo(FSFile file);
 	
 	default String map(URL value)
 	{
 		return value.toString();
+	}
+
+	default String map(Sha256Checksum value)
+	{
+		return value.getValue();
+	}
+
+	default String map(Md5Checksum value)
+	{
+		return value.getValue();
 	}
 }

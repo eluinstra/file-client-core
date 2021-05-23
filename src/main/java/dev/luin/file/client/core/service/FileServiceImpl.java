@@ -34,6 +34,7 @@ import dev.luin.file.client.core.service.model.File;
 import dev.luin.file.client.core.service.model.FileInfo;
 import dev.luin.file.client.core.service.model.FileInfoMapper;
 import dev.luin.file.client.core.service.model.FileMapper;
+import dev.luin.file.client.core.service.model.NewFSFileImpl;
 import dev.luin.file.client.core.service.model.NewFile;
 import dev.luin.file.client.core.service.model.UploadTask;
 import dev.luin.file.client.core.service.model.UploadTaskMapper;
@@ -206,7 +207,7 @@ class FileServiceImpl implements FileService
 		return Try.of(() ->
 		{
 			val fsFile = fs.findFile(id);
-			val dataSource = fsFile.map(f -> fs.createDataSource(f));
+			val dataSource = fsFile.map(f -> f.toDataSource());
 			return fsFile.filter(f -> f.isCompleted())
 					.peek(f -> log.info("Retreived file {}",f))
 					.flatMap(f -> dataSource.map(d -> FileMapper.INSTANCE.toFile(f,new DataHandler(d))))
@@ -243,6 +244,6 @@ class FileServiceImpl implements FileService
 
 	private FSFile createFile(final File file) throws IOException
 	{
-		return fs.createFile(file.getContent().getName(),file.getContent().getContentType(),file.getSha256Checksum(),file.getContent().getInputStream());
+		return fs.createNewFile(NewFSFileImpl.of(file));
 	}
 }

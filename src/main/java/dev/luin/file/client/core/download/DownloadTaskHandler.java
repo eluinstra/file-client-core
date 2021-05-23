@@ -23,6 +23,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.scheduling.annotation.Scheduled;
 
+import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.upload.SSLFactoryManager;
 import io.tus.java.client.ProtocolException;
@@ -33,7 +34,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,46 +58,58 @@ public class DownloadTaskHandler
 		{
 			val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
 			log.info("Downloading {}",file);
-			var connection = createConnection(task.getUrl());
+			val connection = createConnection(task.getUrl());
 			connection.setRequestMethod("HEAD");
-			if (connection.getResponseCode() / 100 == 2)
+			boolean isResponseSuccessful = connection.getResponseCode() / 100 == 2;
+			if (isResponseSuccessful)
 			{
-				val conentLength = getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found"));
-				val contentType = connection.getContentType();
-				val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
-						.flatMap(h -> h.getParams().get("filename"))
-						.getOrNull();
-				var f = file.withLength(conentLength)
-						.withContentType(contentType)
-						.withName(filename);
-				while (!f.isCompleted())
-				{
-					connection = createConnection(task.getUrl());
-				  connection.setRequestProperty("Range","bytes=" + f.getFileLength() + "-" + f.getLength());
-				  f = fs.append(f,connection.getInputStream());
-				}
-				if (f.isCompleted())
+				val f = getFile(file,connection);
+				if (download(f).isCompleted())
 					log.info("Downloaded {}",f);
 			}
 			else
 				throw new IllegalStateException("Unexpected response: " + connection.getResponseCode());
 		}
 
-		private java.net.HttpURLConnection createConnection(final URL url) throws IOException
+		private HttpURLConnection createConnection(final URL url) throws IOException
 		{
-			val connection = (HttpURLConnection)url.openConnection();
-			if (connection instanceof HttpsURLConnection)
+			val result = (HttpURLConnection)url.openConnection();
+			if (result instanceof HttpsURLConnection)
 			{
-				HttpsURLConnection secureConnection = (HttpsURLConnection)connection;
+				HttpsURLConnection secureConnection = (HttpsURLConnection)result;
 				secureConnection.setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		  }
-			return connection;
+			return result;
 		}
 
-		private Option<Long> getContentLength(java.net.HttpURLConnection connection)
+		private FSFile getFile(final FSFile file, final HttpURLConnection connection)
+		{
+			val conentLength = getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found"));
+			val contentType = connection.getContentType();
+			val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
+					.flatMap(h -> h.getParams().get("filename"))
+					.getOrNull();
+			val f = file.withLength(conentLength)
+					.withContentType(contentType)
+					.withName(filename);
+			return f;
+		}
+
+		private Option<Long> getContentLength(HttpURLConnection connection)
 		{
 			val result = connection.getContentLengthLong();
 			return result != -1 ? Option.of(result) : Option.none();
+		}
+
+		private FSFile download(FSFile file) throws IOException
+		{
+			while (!file.isCompleted())
+			{
+				val connection = createConnection(task.getUrl());
+			  connection.setRequestProperty("Range","bytes=" + file.getFileLength() + "-" + file.getLength());
+			  file = fs.append(file,connection.getInputStream());
+			}
+			return file;
 		}
 	}
 
@@ -121,7 +133,7 @@ public class DownloadTaskHandler
 		log.info("Start task {}",task);
 		val executor = new DownloadTaskExecutor(sslFactoryManager,fs,task);
 		val newTask = handleTask(executor,task);
-		log.info("Finished task {}",newTask);
+		log.info("Finished task {}\nCreated task {}",task,newTask);
 		return newTask;
 	}
 

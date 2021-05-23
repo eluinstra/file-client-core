@@ -23,7 +23,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-public class Health extends GenericServlet
+public class HealthServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
 

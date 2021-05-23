@@ -46,13 +46,13 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile>
 
 	public final NumberPath<Long> length = createNumber("length",Long.class);
 
-	public final StringPath md5Checksum = createString("md5Checksum");
+	public final SimplePath<Md5Checksum> md5Checksum = createSimple("md5Checksum", Md5Checksum.class);
 
 	public final StringPath name = createString("name");
 
 	public final StringPath path = createString("path");
 
-	public final StringPath sha256Checksum = createString("sha256Checksum");
+	public final SimplePath<Sha256Checksum> sha256Checksum = createSimple("sha256Checksum", Sha256Checksum.class);
 
 	public final DateTimePath<java.time.Instant> timestamp = createDateTime("time_stamp",java.time.Instant.class);
 

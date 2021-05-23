@@ -19,23 +19,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 
-import dev.luin.file.client.core.file.FileSystem;
+import dev.luin.file.client.core.file.FSFile;
+import dev.luin.file.client.core.file.RandomFile;
 import dev.luin.file.client.core.security.KeyStore;
 import dev.luin.file.client.core.security.KeyStoreType;
 import dev.luin.file.client.core.security.TrustStore;
 import dev.luin.file.client.core.upload.SSLFactoryManager;
-import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.val;
 import lombok.var;
 import lombok.experimental.FieldDefaults;
@@ -44,6 +42,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class Client
 {
+	int chunkSize = 256;
+	@NonNull
+	String baseDir = "";
+	int filenameLength = 32;
+	@NonNull
 	SSLSocketFactory sslSocketFactory;
 
 	public static void main(String[] args) throws Exception
@@ -67,8 +70,7 @@ public class Client
 		var connection = createConnection(url);
 		connection.setRequestMethod("HEAD");
 		val contentLength = connection.getContentLengthLong();
-		val chunkSize = 256;
-		val file = FileSystem.getFile.apply(createRandomFile().get());
+		val file = RandomFile.create(baseDir,filenameLength).map(f -> FSFile.getFile.apply(f.getPath())).get();
 		long fileLength = 0;
 		while (fileLength < contentLength)
 		{
@@ -83,7 +85,7 @@ public class Client
 		System.out.println(file.getAbsolutePath());
 	}
 
-	private java.net.HttpURLConnection createConnection(final java.net.URL url) throws IOException
+	private HttpURLConnection createConnection(final URL url) throws IOException
 	{
 		val connection = (HttpURLConnection)url.openConnection();
 		if (connection instanceof HttpsURLConnection)
@@ -92,24 +94,5 @@ public class Client
 			secureConnection.setSSLSocketFactory(sslSocketFactory);
 	  }
 		return connection;
-	}
-
-	private Try<String> createRandomFile()
-	{
-		var result = (Path)null;
-		try
-		{
-			while (true)
-			{
-				val filename = RandomStringUtils.randomNumeric(32);
-				result = Paths.get(filename);
-				if (result.toFile().createNewFile())
-					return Try.success(result.toString());
-			}
-		}
-		catch (IOException e)
-		{
-			return Try.failure(new IOException("Error creating file " + result,e));
-		}
 	}
 }

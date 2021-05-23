@@ -80,7 +80,7 @@ public class UploadTaskHandler
 			return client;
 		}
 
-		private io.tus.java.client.TusUpload createUpload(final dev.luin.file.client.core.file.FSFile file)
+		private io.tus.java.client.TusUpload createUpload(final FSFile file)
 		{
 			val upload = Try.of(() -> new TusUpload(file.getFile())).get();
 			upload.setFingerprint(task.getFileId().toString());
@@ -124,7 +124,7 @@ public class UploadTaskHandler
 		log.info("Start task {}",task);
 		val executor = new UploadTaskExecutor(sslFactoryManager,fs,uploadTaskManager,task);
 		val newTask = handleTask(executor,task);
-		log.info("Finished task {}",newTask);
+		log.info("Finished task {}\nCreated task {}",task,newTask);
 		return newTask;
 	}
 

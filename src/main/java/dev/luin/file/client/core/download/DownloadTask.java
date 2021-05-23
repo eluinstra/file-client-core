@@ -26,7 +26,7 @@ import lombok.Value;
 import lombok.With;
 
 @Value
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DownloadTask
 {
 	long fileId;
