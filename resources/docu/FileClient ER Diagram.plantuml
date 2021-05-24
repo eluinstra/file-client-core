@@ -1,0 +1,63 @@
+@startuml FileClient ERD
+
+right footer FileClient ERD
+
+skinparam linetype ortho
+' hide circle
+hide empty members
+
+entity file {
+	* id : number <<generated>>
+	--
+	url : string
+	* **path** : string
+	name : string
+	content_type : string
+	md5_checksum : string
+	sha256_checksum : string
+	* time_stamp : timestamp
+	length : number
+}
+
+entity upload_task {
+	* **file_id** : number <<FK>>
+	* creation_url : string
+	* time_stamp : timestamp
+	* status : UploadStatus
+	* status_time : timestamp
+	* schedule_time : timestamp
+	* retries : number
+}
+
+enum UploadStatus {
+  CREATED[0]
+  SUCCEEDED[1]
+  FAILED[2]
+}
+
+entity download_task {
+	* **file_id** : number <<FK>>
+	* url : string
+	start_date : timestamp
+	end_date : timestamp
+	* time_stamp : timestamp
+	* status : DownloadStatus
+	* status_time : timestamp
+	* schedule_time : timestamp
+	* retries : number
+}
+
+enum DownloadStatus {
+  CREATED[0]
+  SUCCEEDED[1]
+  FAILED[2]
+}
+
+upload_task ||--|| file
+upload_task::status -- UploadStatus
+download_task ||--|| file
+download_task::status -- DownloadStatus
+
+UploadStatus -[hidden]> file
+
+@enduml
