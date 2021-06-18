@@ -15,50 +15,44 @@
  */
 package dev.luin.file.client.core.download;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Instant;
 
+import dev.luin.file.client.core.Retries;
+import dev.luin.file.client.core.ScheduleTime;
+import dev.luin.file.client.core.download.DownloadStatus.Status;
+import dev.luin.file.client.core.file.FileId;
+import dev.luin.file.client.core.file.Timestamp;
+import dev.luin.file.client.core.file.Url;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
+import lombok.val;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DownloadTask
 {
-	long fileId;
+	FileId fileId;
 	@NonNull
-	URL url;
-	Instant startDate;
-	Instant endDate;
+	Url url;
+	TimeFrame validTimeFrame;
 	@NonNull
-	Instant timestamp;
+	Timestamp timestamp;
 	@With
 	@NonNull
 	DownloadStatus status;
 	@With
 	@NonNull
-	Instant statusTime;
+	ScheduleTime scheduleTime;
 	@With
-	@NonNull
-	Instant scheduleTime;
-	@With
-	int retries;
+	Retries retries;
 
-	static DownloadTask of(long fileId, String url, Instant startDate, Instant endDate)
+	static DownloadTask of(FileId fileId, Url url, Instant startDate, Instant endDate)
 	{
-		try
-		{
-			Instant now = Instant.now();
-			Instant scheduleTime = startDate != null ? startDate : now;
-			return new DownloadTask(fileId,new URL(url),startDate,endDate,now,DownloadStatus.CREATED,now,scheduleTime,0);
-		}
-		catch (MalformedURLException e)
-		{
-			throw new IllegalArgumentException("CreateUrl " + url + " is not a valid URL");
-		}
+		val now = Instant.now();
+		val scheduleTime = new ScheduleTime(startDate != null ? startDate : now);
+		return new DownloadTask(fileId,url,new TimeFrame(startDate,endDate),new Timestamp(now),new DownloadStatus(Status.CREATED,now),scheduleTime,new Retries());
 	}
 }

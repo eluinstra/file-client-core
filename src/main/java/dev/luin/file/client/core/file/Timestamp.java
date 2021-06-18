@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.file.client.core.service.model;
+package dev.luin.file.client.core.file;
 
-import java.net.URL;
+import java.time.Instant;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
+import dev.luin.file.client.core.ValueObject;
+import lombok.NonNull;
+import lombok.Value;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
-public interface UploadTaskMapper
+@Value
+public class Timestamp implements ValueObject<Instant>
 {
-	public UploadTaskMapper INSTANCE = Mappers.getMapper(UploadTaskMapper.class);
+	@NonNull
+	Instant value;
 
-	UploadTask toUploadTask(dev.luin.file.client.core.upload.UploadTask task);
-	
-	default String map(URL value)
+	public Timestamp()
 	{
-		return value.toString();
+		this(Instant.now());
+	}
+
+	public Timestamp(@NonNull Instant timestamp)
+	{
+		value = timestamp;
 	}
 }

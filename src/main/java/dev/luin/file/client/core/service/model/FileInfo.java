@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.jaxb.InstantAdapter;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -77,4 +78,18 @@ public class FileInfo
 	Instant lastModified;
 	@XmlElement(required = true)
 	boolean completed;
+
+	public FileInfo(FSFile file)
+	{
+		this.id = file.getId().getValue();
+		this.url = file.getUrl().getValue();
+		this.name = file.getName().getValue();
+		this.contentType = file.getContentType().getValue();
+		this.md5Checksum = file.getMd5Checksum().getValue();
+		this.sha256Checksum = file.getSha256Checksum().getValue();
+		this.timestamp = file.getTimestamp().getValue();
+		this.length = file.getLength().getValue();
+		this.lastModified = file.getLastModified();
+		this.completed = file.isCompleted();
+	}
 }

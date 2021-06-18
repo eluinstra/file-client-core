@@ -13,46 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.file.client.core.service.model;
+package dev.luin.file.client.core;
 
-import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import dev.luin.file.client.core.file.ContentType;
-import dev.luin.file.client.core.file.FSFile;
-import dev.luin.file.client.core.file.Filename;
+import org.apache.commons.lang3.Validate;
+
+import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
+//@Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class FileDataSource extends javax.activation.FileDataSource
+public class Retries implements ValueObject<Integer>
 {
 	@NonNull
-	Filename name;
-	@NonNull
-	ContentType contentType;
+	AtomicInteger value;
 
-	public static FileDataSource of(FSFile file)
+	public Retries()
 	{
-		return new FileDataSource(file.getFile(),file.getName(),file.getContentType());
+		this(0);
 	}
 
-	public FileDataSource(File file, @NonNull Filename name, @NonNull ContentType contentType)
+	public Retries(@NonNull final Integer retries)
 	{
-		super(file);
-		this.name = name;
-		this.contentType = contentType;
+		value = Try.success(retries)
+				.andThenTry(v -> Validate.isTrue(v.compareTo(0) >= 0))
+				.map(AtomicInteger::new)
+				.get();
+	}
+
+	public Retries increment()
+	{
+		return new Retries(value.incrementAndGet());
 	}
 
 	@Override
-	public String getName()
+	public Integer getValue()
 	{
-		return name.getValue();
-	}
-
-	@Override
-	public String getContentType()
-	{
-		return contentType.getValue();
+		return value.get();
 	}
 }

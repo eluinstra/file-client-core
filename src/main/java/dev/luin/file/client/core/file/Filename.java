@@ -15,16 +15,25 @@
  */
 package dev.luin.file.client.core.file;
 
-import io.vavr.collection.Seq;
-import io.vavr.control.Option;
-import lombok.NonNull;
+import static org.apache.commons.lang3.Validate.inclusiveBetween;
+import static org.apache.commons.lang3.Validate.matchesPattern;
 
-interface FSFileDAO
+import dev.luin.file.client.core.ValueObject;
+import io.vavr.control.Try;
+import lombok.NonNull;
+import lombok.Value;
+
+@Value
+public class Filename implements ValueObject<String>
 {
-	Option<FSFile> findFile(FileId id);
-	Option<FSFile> findFile(Url url);
-	Seq<FSFile> selectFiles();
-	FSFile insertFile(@NonNull FSFile fsFile);
-	long updateFile(@NonNull FSFile fsFile);
-	long deleteFile(FileId id);
+	@NonNull
+	String value;
+
+	public Filename(@NonNull final String filename)
+	{
+		value = Try.success(filename)
+				.andThenTry(v -> inclusiveBetween(0,256,v.length()))
+				.andThenTry(v -> matchesPattern(v,"^[^\\/:\\*\\?\"<>\\|]*$"))
+				.get();
+	}
 }

@@ -15,7 +15,29 @@
  */
 package dev.luin.file.client.core.upload;
 
-public enum UploadStatus
+import java.time.Instant;
+
+import dev.luin.file.client.core.ValueObject;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
+
+@Value
+@AllArgsConstructor
+public class UploadStatus implements ValueObject<UploadStatus.Status>
 {
-	CREATED, SUCCEEDED, FAILED;
+	public enum Status
+	{
+		CREATED, SUCCEEDED, FAILED;
+	}
+
+	@NonNull
+	Status value;
+	@NonNull
+	Instant time;
+
+	public UploadStatus(@NonNull Status status)
+	{
+		this(status,Instant.now());
+	}
 }

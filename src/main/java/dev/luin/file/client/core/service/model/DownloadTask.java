@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import dev.luin.file.client.core.download.DownloadStatus;
+import dev.luin.file.client.core.download.DownloadStatus.Status;
 import dev.luin.file.client.core.jaxb.InstantAdapter;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -59,7 +59,7 @@ public class DownloadTask
 	Instant timestamp;
 	@XmlElement(required = true)
 	@NonNull
-	DownloadStatus status;
+	Status status;
 	@XmlElement(required = true)
 	@XmlJavaTypeAdapter(InstantAdapter.class)
 	@XmlSchemaType(name = "dateTime")
@@ -72,4 +72,17 @@ public class DownloadTask
 	Instant scheduleTime;
 	@XmlElement(required = true)
 	int retries;
+
+	public DownloadTask(dev.luin.file.client.core.download.DownloadTask task)
+	{
+		this.fileId = task.getFileId().getValue();
+		this.url = task.getUrl().getValue();
+		this.startDate = task.getValidTimeFrame().getStartDate();
+		this.endDate = task.getValidTimeFrame().getEndDate();
+		this.timestamp = task.getTimestamp().getValue();
+		this.status = task.getStatus().getValue();
+		this.statusTime = task.getStatus().getTime();
+		this.scheduleTime = task.getScheduleTime().getValue();
+		this.retries = task.getRetries().getValue();
+	}
 }

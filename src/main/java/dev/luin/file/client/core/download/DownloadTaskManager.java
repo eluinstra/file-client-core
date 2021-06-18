@@ -18,6 +18,11 @@ package dev.luin.file.client.core.download;
 import java.time.Duration;
 import java.time.Instant;
 
+import dev.luin.file.client.core.Retries;
+import dev.luin.file.client.core.ScheduleTime;
+import dev.luin.file.client.core.download.DownloadStatus.Status;
+import dev.luin.file.client.core.file.FileId;
+import dev.luin.file.client.core.file.Url;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
@@ -36,7 +41,7 @@ public class DownloadTaskManager
 	int retryInterval;
 	int retryMaxMultiplier;
 
-	public Option<DownloadTask> getTask(long fileId)
+	public Option<DownloadTask> getTask(FileId fileId)
 	{
 		return downloadTaskDAO.getTask(fileId);
 	}
@@ -51,12 +56,12 @@ public class DownloadTaskManager
 		return statuses.length() == 0 ? downloadTaskDAO.getTasks() : downloadTaskDAO.getTasks(statuses);
 	}
 
-	public DownloadTask createTask(long fileId, String url)
+	public DownloadTask createTask(FileId fileId, Url url)
 	{
 		return createTask(fileId,url,null,null);
 	}
 
-	public DownloadTask createTask(long fileId, String url, Instant startDate, Instant endDate)
+	public DownloadTask createTask(FileId fileId, Url url, Instant startDate, Instant endDate)
 	{
 		val task = DownloadTask.of(fileId,url,startDate,endDate);
 		return downloadTaskDAO.insert(task);
@@ -64,40 +69,38 @@ public class DownloadTaskManager
 
 	public DownloadTask createNextTask(DownloadTask task)
 	{
-		val retries = task.getRetries() + 1;
-		Option<Instant> nextScheduleTime = getNextScheduleTime(task,retries);
-		val result = nextScheduleTime.map(t -> task
-				.withScheduleTime(t)
-				.withRetries(retries))
-				.getOrElse(task.withStatus(DownloadStatus.FAILED)
-						.withStatusTime(Instant.now()));
+		val retries = task.getRetries().increment();
+		Option<ScheduleTime> nextScheduleTime = getNextScheduleTime(task,retries);
+		val result = nextScheduleTime
+				.map(t -> task
+					.withScheduleTime(t)
+					.withRetries(retries))
+					.getOrElse(task.withStatus(new DownloadStatus(Status.FAILED)));
 		downloadTaskDAO.update(result);
 		return result;
 	}
 
-	private Option<Instant> getNextScheduleTime(DownloadTask task, final int retries)
+	private Option<ScheduleTime> getNextScheduleTime(DownloadTask task, final Retries retries)
 	{
-		val result = task.getScheduleTime().plus(Duration.ofMinutes((retries > retryMaxMultiplier ? retryMaxMultiplier : retries) * retryInterval));
-		return task.getEndDate() != null && result.isAfter(task.getEndDate()) ? Option.none() : Option.of(result);
+		val result = task.getScheduleTime().plus(Duration.ofMinutes((retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval));
+		return task.getValidTimeFrame().getEndDate() != null && result.isAfter(task.getValidTimeFrame().getEndDate()) ? Option.none() : Option.of(result);
 	}
 
 	public DownloadTask createSucceededTask(DownloadTask task)
 	{
-		val result = task.withStatus(DownloadStatus.SUCCEEDED)
-				.withStatusTime(Instant.now());
+		val result = task.withStatus(new DownloadStatus(Status.SUCCEEDED));
 		downloadTaskDAO.update(result);
 		return result;
 	}
 
 	public DownloadTask createFailedTask(DownloadTask task)
 	{
-		val result = task.withStatus(DownloadStatus.FAILED)
-				.withStatusTime(Instant.now());
+		val result = task.withStatus(new DownloadStatus(Status.FAILED));
 		downloadTaskDAO.update(result);
 		return result;
 	}
 
-	public boolean deleteTask(long fileId)
+	public boolean deleteTask(FileId fileId)
 	{
 		return downloadTaskDAO.delete(fileId) > 0;
 	}

@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileSystem;
+import dev.luin.file.client.core.file.Url;
 import io.tus.java.client.ProtocolException;
 import io.tus.java.client.TusExecutor;
 import io.tus.java.client.TusUpload;
@@ -66,7 +67,7 @@ public class UploadTaskHandler
 				if (log.isDebugEnabled())
 					log.debug("Upload {} at {}%",file,getProgress(upload,uploader));
 			} while (uploader.uploadChunk() > -1);
-			val newFile = file.withUrl(uploader.getUploadURL());
+			val newFile = file.withUrl(new Url(uploader.getUploadURL()));
 			fs.updateFile(newFile);
 			uploader.finish();
 			log.info("Uploaded {}",newFile);
@@ -75,7 +76,7 @@ public class UploadTaskHandler
 		private Client createClient()
 		{
 			val client = new Client(sslFactoryManager.getSslSocketFactory());
-			client.setUploadCreationURL(task.getCreationUrl());
+			client.setUploadCreationURL(task.getCreationUrl().toURL());
 			client.enableResuming(uploadTaskManager);
 			return client;
 		}
@@ -91,8 +92,8 @@ public class UploadTaskHandler
 		private Map<String,String> createMetaData(FSFile file)
 		{
 			val result = new HashMap<String,String>();
-			result.put("filename",file.getName());
-			result.put("Content-Type",file.getContentType());
+			result.put("filename",file.getName().getValue());
+			result.put("Content-Type",file.getContentType().getValue());
 			return result;
 		}
 
@@ -134,7 +135,7 @@ public class UploadTaskHandler
 		{
 			if (!executor.makeAttempts())
 			{
-				if (task.getRetries() < maxRetries)
+				if (task.getRetries().getValue() < maxRetries)
 					return uploadTaskManager.createNextTask(task);
 				else
 					return uploadTaskManager.createFailedTask(task);

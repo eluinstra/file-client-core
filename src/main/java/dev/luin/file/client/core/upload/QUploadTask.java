@@ -25,9 +25,16 @@ import com.querydsl.core.types.Path;
 
 import com.querydsl.sql.ColumnMetadata;
 
+import dev.luin.file.client.core.Retries;
+import dev.luin.file.client.core.ScheduleTime;
+import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.QFile;
+import dev.luin.file.client.core.file.Timestamp;
+import dev.luin.file.client.core.file.Url;
+import dev.luin.file.client.core.upload.UploadStatus.Status;
 
 import java.sql.Types;
+import java.time.Instant;
 
 
 
@@ -42,19 +49,19 @@ public class QUploadTask extends com.querydsl.sql.RelationalPathBase<QUploadTask
 
     public static final QUploadTask uploadTask = new QUploadTask("upload_task");
 
-    public final SimplePath<java.net.URL> creationUrl = createSimple("creationUrl",java.net.URL.class);
+    public final SimplePath<Url> creationUrl = createSimple("creationUrl", Url.class);
 
-    public final NumberPath<Long> fileId = createNumber("fileId", Long.class);
+    public final SimplePath<FileId> fileId = createSimple("fileId", FileId.class);
 
-    public final NumberPath<Integer> retries = createNumber("retries", Integer.class);
+    public final SimplePath<Retries> retries = createSimple("retries", Retries.class);
 
-    public final DateTimePath<java.time.Instant> scheduleTime = createDateTime("scheduleTime", java.time.Instant.class);
+    public final SimplePath<ScheduleTime> scheduleTime = createSimple("scheduleTime", ScheduleTime.class);
 
-    public final EnumPath<dev.luin.file.client.core.upload.UploadStatus> status = createEnum("status", dev.luin.file.client.core.upload.UploadStatus.class);
+    public final EnumPath<Status> status = createEnum("status", Status.class);
 
-    public final DateTimePath<java.time.Instant> statusTime = createDateTime("status_time", java.time.Instant.class);
+    public final DateTimePath<Instant> statusTime = createDateTime("status_time", Instant.class);
 
-    public final DateTimePath<java.time.Instant> timestamp = createDateTime("time_stamp", java.time.Instant.class);
+    public final SimplePath<Timestamp> timestamp = createSimple("time_stamp", Timestamp.class);
 
     public final com.querydsl.sql.ForeignKey<QFile> sysFk10151 = createForeignKey(fileId, "id");
 

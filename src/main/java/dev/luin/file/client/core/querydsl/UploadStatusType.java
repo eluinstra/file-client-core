@@ -21,9 +21,9 @@ import java.sql.SQLException;
 
 import com.querydsl.sql.types.AbstractType;
 
-import dev.luin.file.client.core.upload.UploadStatus;
+import dev.luin.file.client.core.upload.UploadStatus.Status;
 
-public class UploadStatusType extends AbstractType<UploadStatus>
+public class UploadStatusType extends AbstractType<Status>
 {
 	public UploadStatusType(int type)
 	{
@@ -31,19 +31,19 @@ public class UploadStatusType extends AbstractType<UploadStatus>
 	}
 
 	@Override
-	public Class<UploadStatus> getReturnedClass()
+	public Class<Status> getReturnedClass()
 	{
-		return UploadStatus.class;
+		return Status.class;
 	}
 
 	@Override
-	public UploadStatus getValue(ResultSet rs, int startIndex) throws SQLException
+	public Status getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return UploadStatus.values()[rs.getInt(startIndex)];
+		return Status.values()[rs.getInt(startIndex)];
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, UploadStatus value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, Status value) throws SQLException
 	{
 		st.setInt(startIndex,value.ordinal());
 	}

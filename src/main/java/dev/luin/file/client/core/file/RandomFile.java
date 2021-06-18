@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 E.Luinstra
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package dev.luin.file.client.core.file;
 
 import java.io.File;
@@ -12,16 +27,22 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.Value;
 import lombok.val;
 
 @Value
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RandomFile
 {
-	String path;
+	@NonNull
+	Path path;
+	@NonNull
 	File file;
 
-	public static Try<RandomFile> create(String baseDir, int filenameLength)
+	public static Try<RandomFile> create(@NonNull final String baseDir, final int filenameLength)
 	{
 		while (true)
 		{
@@ -39,35 +60,33 @@ public class RandomFile
 		}
 	}
 	
-	private static Path createRandomPath(String baseDir, int filenameLength)
+	private static Path createRandomPath(final String baseDir, final int filenameLength)
 	{
 		val filename = RandomStringUtils.randomNumeric(filenameLength);
 		return Paths.get(baseDir,filename);
 	}
 	
-	private static Option<RandomFile> createFile(Path path) throws IOException
+	private static Option<RandomFile> createFile(final Path path) throws IOException
 	{
-		if (path.toFile().createNewFile())
-			return Option.some(new RandomFile(path.toString()));
-		else
-			return Option.none();
+		val file = path.toFile();
+		return file.createNewFile() ? Option.some(new RandomFile(path,file)) : Option.none();
 	}
 
-	private RandomFile(String path)
+	private RandomFile(final Path path)
 	{
 		this.path = path;
-		file = FSFile.getFile.apply(path);
+		file = path.toFile();
 	}
 
-	public long write(final InputStream input) throws IOException
+	Length getLength()
 	{
-		try (val output = new FileOutputStream(file))
-		{
-			return IOUtils.copyLarge(input,output);
-		}
-		catch(IOException e)
-		{
-			throw new IOException("Error writing to file " + path,e);
-		}
+		return new Length(file.length());
+	}
+
+	public long write(@NonNull final InputStream input)
+	{
+		return Try.withResources(() -> new FileOutputStream(file))
+				.of(o -> IOUtils.copyLarge(input,o))
+				.getOrElseThrow(t -> new IllegalStateException("Error writing to file " + path,t));
 	}
 }

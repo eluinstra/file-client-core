@@ -21,30 +21,30 @@ import java.sql.SQLException;
 
 import com.querydsl.sql.types.AbstractType;
 
-import dev.luin.file.client.core.download.DownloadStatus.Status;
+import dev.luin.file.client.core.file.VirtualPath;
 
-public class DownloadStatusType extends AbstractType<Status>
+class VirtualPathType extends AbstractType<VirtualPath>
 {
-	public DownloadStatusType(int type)
+	public VirtualPathType(int type)
 	{
 		super(type);
 	}
 
 	@Override
-	public Class<Status> getReturnedClass()
+	public Class<VirtualPath> getReturnedClass()
 	{
-		return Status.class;
+		return VirtualPath.class;
 	}
 
 	@Override
-	public Status getValue(ResultSet rs, int startIndex) throws SQLException
+	public VirtualPath getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return Status.values()[rs.getInt(startIndex)];
+		return new VirtualPath(rs.getString(startIndex));
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, Status value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, VirtualPath value) throws SQLException
 	{
-		st.setInt(startIndex,value.ordinal());
+		st.setString(startIndex,value.getValue());
 	}
 }

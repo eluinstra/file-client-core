@@ -15,17 +15,18 @@
  */
 package dev.luin.file.client.core.download;
 
+import dev.luin.file.client.core.file.FileId;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 
 public interface DownloadTaskDAO
 {
-	Option<DownloadTask> getTask(long fileId);
+	Option<DownloadTask> getTask(FileId fileId);
 	Option<DownloadTask> getNextTask();
 	Seq<DownloadTask> getTasks();
 	Seq<DownloadTask> getTasks(List<DownloadStatus> statuses);
 	DownloadTask insert(DownloadTask task);
 	long update(DownloadTask task);
-	long delete(long fileId);
+	long delete(FileId fileId);
 }

@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import dev.luin.file.client.core.file.FSFile;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,4 +50,17 @@ public class File
 	@NonNull
 	@ToString.Exclude
 	DataHandler content;
+
+	public File(FSFile file, DataHandler content)
+	{
+		this.id = file.getId().getValue();
+		this.sha256Checksum = file.getSha256Checksum().getValue();
+		this.content = content;
+	}
+
+	public File(NewFile newFile)
+	{
+		this.sha256Checksum = newFile.getSha256Checksum();
+		this.content = newFile.getContent();
+	}
 }

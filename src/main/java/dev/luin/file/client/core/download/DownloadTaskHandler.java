@@ -84,7 +84,7 @@ public class DownloadTaskHandler
 		{
 			if (!executor.makeAttempts())
 			{
-				if (task.getRetries() < maxRetries)
+				if (task.getRetries().getValue() < maxRetries)
 					return downloadTaskManager.createNextTask(task);
 				else
 					return downloadTaskManager.createFailedTask(task);

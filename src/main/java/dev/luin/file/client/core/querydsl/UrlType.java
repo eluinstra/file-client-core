@@ -15,17 +15,16 @@
  */
 package dev.luin.file.client.core.querydsl;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.querydsl.sql.types.AbstractType;
 
+import dev.luin.file.client.core.file.Url;
 import lombok.val;
 
-public class UrlType extends AbstractType<URL>
+public class UrlType extends AbstractType<Url>
 {
 	public UrlType(int type)
 	{
@@ -33,28 +32,21 @@ public class UrlType extends AbstractType<URL>
 	}
 
 	@Override
-	public Class<URL> getReturnedClass()
+	public Class<Url> getReturnedClass()
 	{
-		return URL.class;
+		return Url.class;
 	}
 
 	@Override
-	public URL getValue(ResultSet rs, int startIndex) throws SQLException
+	public Url getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		try
-		{
-			val url = rs.getString(startIndex);
-			return url != null ? new URL(url) : null;
-		}
-		catch (MalformedURLException e)
-		{
-			throw new SQLException(e);
-		}
+		val url = rs.getString(startIndex);
+		return url != null ? new Url(url) : null;
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, URL value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, Url value) throws SQLException
 	{
-		st.setString(startIndex,value != null ? value.toString() : null);
+		st.setString(startIndex,value != null ? value.getValue() : null);
 	}
 }

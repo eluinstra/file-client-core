@@ -20,16 +20,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.Instant;
-
-import javax.activation.DataSource;
 
 import org.apache.commons.io.IOUtils;
 
-import dev.luin.file.client.core.service.model.FileDataSource;
-import io.vavr.Function1;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,35 +39,34 @@ import lombok.val;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class FSFile
 {
-	public static final Function1<String,File> getFile = path -> Paths.get(path).toFile();
 	@With
-	Long id;
+	FileId id;
 	@With
-	URL url;
+	Url url;
 	@NonNull
 	@Getter(value=AccessLevel.PACKAGE)
-	String path;
+	Path path;
 	@With
-	String name;
+	Filename name;
 	@With
-	String contentType;
+	ContentType contentType;
 	@With
 	Md5Checksum md5Checksum;
 	@With
 	Sha256Checksum sha256Checksum;
 	@NonNull
-	Instant timestamp;
+	Timestamp timestamp;
 	@With
-	Long length;
+	Length length;
 
 	public File getFile()
 	{
-		return getFile.apply(path);
+		return path.toFile();
 	}
 
-	public long getFileLength()
+	public Length getFileLength()
 	{
-		return getFile().length();
+		return new Length(getFile().length());
 	}
 
 	public Instant getLastModified()
@@ -82,12 +76,7 @@ public class FSFile
 
 	public boolean isCompleted()
 	{
-		return length != null && length == getFileLength();
-	}
-
-	public DataSource toDataSource()
-	{
-		return new FileDataSource(getFile(),name,contentType);
+		return length.equals(getFileLength());
 	}
 
 	FSFile append(@NonNull final InputStream input) throws IOException
@@ -98,10 +87,7 @@ public class FSFile
 		try (val output = new FileOutputStream(file,true))
 		{
 			IOUtils.copyLarge(input,output);
-			if (isCompleted())
-				return complete();
-			else
-				return this;
+			return isCompleted() ? complete() : this;
 		}
 	}
 
@@ -124,10 +110,7 @@ public class FSFile
 		try (val output = new FileOutputStream(file,true))
 		{
 			IOUtils.copyLarge(input,output,first,length);
-			if (isCompleted())
-				return complete();
-			else
-				return this;
+			return isCompleted() ? complete() : this;
 		}
 	}
 }

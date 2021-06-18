@@ -15,32 +15,38 @@
  */
 package dev.luin.file.client.core.file;
 
-import static org.apache.commons.lang3.Validate.inclusiveBetween;
-import static org.apache.commons.lang3.Validate.matchesPattern;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-
-import org.apache.commons.codec.digest.DigestUtils;
+import java.net.URL;
+import java.net.URLConnection;
 
 import dev.luin.file.client.core.ValueObject;
 import io.vavr.control.Try;
-import lombok.NonNull;
-import lombok.Value;
-import lombok.val;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
-@Value
-public class Md5Checksum implements ValueObject<String>
+//@Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class Url implements ValueObject<String>
 {
-	@NonNull
-	String value;
+	URL value;
 
-	public static Md5Checksum of(@NonNull final File file)
+	public Url(String url)
 	{
-		try (val is = new FileInputStream(file))
+		this(Try.success(url.contains("://0.0.0.0:") ? url.replace("://0.0.0.0:","://localhost:") : url)
+				.mapTry(u -> new URL(u))
+				.getOrElseThrow(() -> new IllegalArgumentException("Url is invalid")));
+	}
+
+	public Url(URL url)
+	{
+		value = url;
+	}
+
+	public URLConnection openConnection()
+	{
+		try
 		{
-			return new Md5Checksum(DigestUtils.md5Hex(is));
+			return value.openConnection();
 		}
 		catch (IOException e)
 		{
@@ -48,12 +54,13 @@ public class Md5Checksum implements ValueObject<String>
 		}
 	}
 
-	public Md5Checksum(@NonNull final String checksum)
+	public String getValue()
 	{
-		value = Try.success(checksum)
-				.andThen(v -> inclusiveBetween(32,32,v.length()))
-				.map(v -> v.toUpperCase())
-				.andThen(v -> matchesPattern(v,"^[0-9A-F]*$"))
-				.get();
+		return value.toString();
+	}
+
+	public URL toURL()
+	{
+		return value;
 	}
 }

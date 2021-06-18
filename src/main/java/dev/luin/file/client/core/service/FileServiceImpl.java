@@ -26,18 +26,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import dev.luin.file.client.core.download.DownloadStatus;
 import dev.luin.file.client.core.download.DownloadTaskManager;
+import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileSystem;
+import dev.luin.file.client.core.file.Url;
 import dev.luin.file.client.core.service.model.DownloadTask;
-import dev.luin.file.client.core.service.model.DownloadTaskMapper;
 import dev.luin.file.client.core.service.model.File;
+import dev.luin.file.client.core.service.model.FileDataSource;
 import dev.luin.file.client.core.service.model.FileInfo;
-import dev.luin.file.client.core.service.model.FileInfoMapper;
-import dev.luin.file.client.core.service.model.FileMapper;
 import dev.luin.file.client.core.service.model.NewFSFileImpl;
 import dev.luin.file.client.core.service.model.NewFile;
 import dev.luin.file.client.core.service.model.UploadTask;
-import dev.luin.file.client.core.service.model.UploadTaskMapper;
 import dev.luin.file.client.core.upload.UploadStatus;
 import dev.luin.file.client.core.upload.UploadTaskManager;
 import io.vavr.control.Try;
@@ -69,10 +68,10 @@ class FileServiceImpl implements FileService
 		{
 			try
 			{
-				val fsFile = createFile(FileMapper.INSTANCE.toFile(file));
-				val task = uploadTaskManager.createTask(fsFile.getId(),creationUrl);
+				val fsFile = createFile(new File(file));
+				val task = uploadTaskManager.createTask(fsFile.getId(),new Url(creationUrl));
 				log.info("Created uploadTask {}",task);
-				return UploadTaskMapper.INSTANCE.toUploadTask(task);
+				return new UploadTask(task);
 			}
 			catch (Exception e)
 			{
@@ -88,8 +87,8 @@ class FileServiceImpl implements FileService
 		log.debug("getUploadTask {}",fileId);
 		return Try.of(() ->
 		{
-			val task = uploadTaskManager.getTask(fileId).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
-			return UploadTaskMapper.INSTANCE.toUploadTask(task);
+			val task = uploadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
+			return new UploadTask(task);
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
@@ -101,7 +100,7 @@ class FileServiceImpl implements FileService
 		return Try.of(() -> 
 		{
 			return uploadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
-					.map(t -> UploadTaskMapper.INSTANCE.toUploadTask(t))
+					.map(t -> new UploadTask(t))
 					.asJava();
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
@@ -116,9 +115,10 @@ class FileServiceImpl implements FileService
 		{
 			try
 			{
-				val fsFile = fs.findFile(fileId).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
+				FileId id = new FileId(fileId);
+				val fsFile = fs.findFile(id).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
 				fs.deleteFile(fsFile,true);
-				uploadTaskManager.deleteTask(fileId);
+				uploadTaskManager.deleteTask(id);
 				log.info("Deleted uploadTask {}",fileId);
 			}
 			catch (FileNotFoundException e)
@@ -140,9 +140,9 @@ class FileServiceImpl implements FileService
 			try
 			{
 				val fsFile = fs.createEmptyFile(url);
-				val task = downloadTaskManager.createTask(fsFile.getId(),url,startDate,endDate);
+				val task = downloadTaskManager.createTask(fsFile.getId(),new Url(url),startDate,endDate);
 				log.info("Created downloadTask {}",task);
-				return DownloadTaskMapper.INSTANCE.toDownloadTask(task);
+				return new DownloadTask(task);
 			}
 			catch (IOException e)
 			{
@@ -158,8 +158,8 @@ class FileServiceImpl implements FileService
 		log.debug("getDownloadTask {}",fileId);
 		return Try.of(() ->
 		{
-			val task = downloadTaskManager.getTask(fileId).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
-			return DownloadTaskMapper.INSTANCE.toDownloadTask(task);
+			val task = downloadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
+			return new DownloadTask(task);
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
@@ -171,7 +171,7 @@ class FileServiceImpl implements FileService
 		return Try.of(() -> 
 		{
 			return downloadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
-					.map(t -> DownloadTaskMapper.INSTANCE.toDownloadTask(t))
+					.map(t -> new DownloadTask(t))
 					.asJava();
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
@@ -186,9 +186,9 @@ class FileServiceImpl implements FileService
 		{
 			try
 			{
-				val fsFile = fs.findFile(fileId).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
+				val fsFile = fs.findFile(new FileId(fileId)).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
 				fs.deleteFile(fsFile,true);
-				downloadTaskManager.deleteTask(fileId);
+				downloadTaskManager.deleteTask(new FileId(fileId));
 				log.info("Deleted downloadTask {}",fileId);
 			}
 			catch (FileNotFoundException e)
@@ -206,11 +206,11 @@ class FileServiceImpl implements FileService
 		log.debug("getFile {}",id);
 		return Try.of(() ->
 		{
-			val fsFile = fs.findFile(id);
-			val dataSource = fsFile.map(f -> f.toDataSource());
+			val fsFile = fs.findFile(new FileId(id));
+			val dataSource = fsFile.map(FileDataSource::of);
 			return fsFile.filter(f -> f.isCompleted())
 					.peek(f -> log.info("Retreived file {}",f))
-					.flatMap(f -> dataSource.map(d -> FileMapper.INSTANCE.toFile(f,new DataHandler(d))))
+					.flatMap(f -> dataSource.map(d -> new File(f,new DataHandler(d))))
 					.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
@@ -222,8 +222,8 @@ class FileServiceImpl implements FileService
 		log.debug("getFileInfo {}",id);
 		return Try.of(() ->
 		{
-			val fsFile = fs.findFile(id);
-			return fsFile.map(f -> FileInfoMapper.INSTANCE.toFileInfo(f))
+			val fsFile = fs.findFile(new FileId(id));
+			return fsFile.map(f -> new FileInfo(f))
 					.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
@@ -236,7 +236,7 @@ class FileServiceImpl implements FileService
 		return Try.of(() -> 
 		{
 			val fsFile = fs.getFiles();
-			return fsFile.map(f -> FileInfoMapper.INSTANCE.toFileInfo(f))
+			return fsFile.map(f -> new FileInfo(f))
 					.asJava();
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);

@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import dev.luin.file.client.core.jaxb.InstantAdapter;
-import dev.luin.file.client.core.upload.UploadStatus;
+import dev.luin.file.client.core.upload.UploadStatus.Status;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -48,7 +48,7 @@ public class UploadTask
 	Instant timestamp;
 	@XmlElement(required = true)
 	@NonNull
-	UploadStatus status;
+	Status status;
 	@XmlElement(required = true)
 	@XmlJavaTypeAdapter(InstantAdapter.class)
 	@XmlSchemaType(name = "dateTime")
@@ -61,4 +61,15 @@ public class UploadTask
 	Instant scheduleTime;
 	@XmlElement(required = true)
 	int retries;
+
+	public UploadTask(dev.luin.file.client.core.upload.UploadTask task)
+	{
+		this.fileId = task.getFileId().getValue();
+		this.creationUrl = task.getCreationUrl().getValue();
+		this.timestamp = task.getTimestamp().getValue();
+		this.status = task.getStatus().getValue();
+		this.statusTime = task.getStatus().getTime();
+		this.scheduleTime = task.getScheduleTime().getValue();
+		this.retries = task.getRetries().getValue();
+	}
 }

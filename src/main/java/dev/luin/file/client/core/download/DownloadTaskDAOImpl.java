@@ -21,9 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLQueryFactory;
 
+import dev.luin.file.client.core.ScheduleTime;
+import dev.luin.file.client.core.download.DownloadStatus.Status;
+import dev.luin.file.client.core.file.FileId;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
@@ -42,9 +48,11 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	QDownloadTask table = QDownloadTask.downloadTask;
 	Expression<?>[] downloadTaskColumns = {table.fileId,table.url,table.startDate,table.endDate,table.timestamp,table.status,table.statusTime,table.scheduleTime,table.retries};
 	ConstructorExpression<DownloadTask> downloadTaskProjection = Projections.constructor(DownloadTask.class,downloadTaskColumns);
+	Path<DownloadTask> downloadTask = Expressions.path(DownloadTask.class,"downloadTask");
+	DateTimePath<Instant> scheduleTime = Expressions.dateTimePath(Instant.class,Expressions.path(ScheduleTime.class,downloadTask,"scheduleTime"),"value");
 
 	@Override
-	public Option<DownloadTask> getTask(long fileId)
+	public Option<DownloadTask> getTask(FileId fileId)
 	{
 		return Option.of(queryFactory.select(downloadTaskProjection)
 				.from(table)
@@ -57,9 +65,9 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	{
 		return Option.of(queryFactory.select(downloadTaskProjection)
 				.from(table)
-				.where(table.scheduleTime.before(Instant.now())
-						.and(table.status.eq(DownloadStatus.CREATED)))
-				.orderBy(table.scheduleTime.asc())
+				.where(scheduleTime.before(Instant.now())
+						.and(table.status.eq(Status.CREATED)))
+				.orderBy(scheduleTime.asc())
 				.fetchFirst());
 	}
 
@@ -68,7 +76,7 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	{
 		return List.ofAll(queryFactory.select(downloadTaskProjection)
 				.from(table)
-				.orderBy(table.scheduleTime.desc())
+				.orderBy(scheduleTime.desc())
 				.fetch());
 	}
 
@@ -77,8 +85,8 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	{
 		return List.ofAll(queryFactory.select(downloadTaskProjection)
 				.from(table)
-				.where(table.status.in(statuses.asJava()))
-				.orderBy(table.scheduleTime.asc())
+				.where(table.status.in(statuses.map(DownloadStatus::getValue).asJava()))
+				.orderBy(scheduleTime.asc())
 				.fetch());
 	}
 
@@ -88,11 +96,11 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 		queryFactory.insert(table)
 				.set(table.fileId,task.getFileId())
 				.set(table.url,task.getUrl())
-				.set(table.startDate,task.getStartDate())
-				.set(table.endDate,task.getEndDate())
+				.set(table.startDate,task.getValidTimeFrame().getStartDate())
+				.set(table.endDate,task.getValidTimeFrame().getEndDate())
 				.set(table.timestamp,task.getTimestamp())
-				.set(table.status,task.getStatus())
-				.set(table.statusTime,task.getStatusTime())
+				.set(table.status,task.getStatus().getValue())
+				.set(table.statusTime,task.getStatus().getTime())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.execute();
@@ -103,7 +111,8 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	public long update(DownloadTask task)
 	{
 		return queryFactory.update(table)
-				.set(table.status,task.getStatus())
+				.set(table.status,task.getStatus().getValue())
+				.set(table.statusTime,task.getStatus().getTime())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.where(table.fileId.eq(task.getFileId()))
@@ -111,7 +120,7 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	}
 
 	@Override
-	public long delete(long fileId)
+	public long delete(FileId fileId)
 	{
 		return queryFactory.delete(table)
 				.where(table.fileId.eq(fileId))

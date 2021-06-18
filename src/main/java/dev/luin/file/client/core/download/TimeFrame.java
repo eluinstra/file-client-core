@@ -17,27 +17,32 @@ package dev.luin.file.client.core.download;
 
 import java.time.Instant;
 
-import dev.luin.file.client.core.ValueObject;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.Value;
+import lombok.val;
 
 @Value
-@AllArgsConstructor
-public class DownloadStatus implements ValueObject<DownloadStatus.Status>
+public class TimeFrame
 {
-	public enum Status
+	Instant startDate;
+	Instant endDate;
+
+	public TimeFrame(final Instant startDate, final Instant endDate)
 	{
-		CREATED, SUCCEEDED, FAILED;
+		if (startDate != null && endDate != null && !startDate.isBefore(endDate))
+			throw new IllegalStateException("StartDate not before EndDate");
+		this.startDate = startDate;
+		this.endDate = endDate;
 	}
 
-	@NonNull
-	Status value;
-	@NonNull
-	Instant time;
-
-	public DownloadStatus(@NonNull Status status)
+	public boolean hasTimeFrame()
 	{
-		this(status,Instant.now());
+		return startDate != null || endDate != null;
+	}
+
+	public boolean isValid()
+	{
+		val now = Instant.now();
+		return (startDate == null || startDate.compareTo(now) <= 0
+				&& endDate == null || endDate.compareTo(now) > 0);
 	}
 }

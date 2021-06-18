@@ -15,16 +15,34 @@
  */
 package dev.luin.file.client.core.file;
 
-import io.vavr.collection.Seq;
+import org.apache.commons.lang3.StringUtils;
+
+import dev.luin.file.client.core.ValueObject;
 import io.vavr.control.Option;
 import lombok.NonNull;
+import lombok.Value;
 
-interface FSFileDAO
+@Value
+public class ContentType implements ValueObject<String>
 {
-	Option<FSFile> findFile(FileId id);
-	Option<FSFile> findFile(Url url);
-	Seq<FSFile> selectFiles();
-	FSFile insertFile(@NonNull FSFile fsFile);
-	long updateFile(@NonNull FSFile fsFile);
-	long deleteFile(FileId id);
+	public static final ContentType TEXT = new ContentType("text/plain");
+	@NonNull
+	String value;
+
+	public ContentType(@NonNull final String contentType)
+	{
+		value = Option.of(contentType)
+				.flatMap(this::parseValue)
+				.get();
+	}
+
+	private Option<String> parseValue(final String s)
+	{
+		return s != null ? Option.of(s.split(";")[0].trim()).filter(StringUtils::isNotEmpty) : Option.none();
+	}
+
+	public boolean isBinary()
+	{
+		return !value.matches("^(text/.*|.*/xml)$");
+	}
 }

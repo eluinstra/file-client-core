@@ -15,20 +15,19 @@
  */
 package dev.luin.file.client.core.file;
 
-import static com.querydsl.core.types.PathMetadataFactory.*;
+import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 
-import com.querydsl.core.types.dsl.*;
+import java.sql.Types;
 
-import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
-import com.querydsl.core.types.Path;
 
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.PathMetadata;
+import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.sql.ColumnMetadata;
 
 import dev.luin.file.client.core.download.QDownloadTask;
 import dev.luin.file.client.core.upload.QUploadTask;
-
-import java.sql.Types;
 
 /**
  * QFile is a Querydsl query type for QFile
@@ -40,23 +39,23 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile>
 
 	public static final QFile file = new QFile("file");
 
-	public final StringPath contentType = createString("contentType");
+	public final SimplePath<ContentType> contentType = createSimple("contentType", ContentType.class);
 
-	public final NumberPath<Long> id = createNumber("id",Long.class);
+	public final SimplePath<FileId> id = createSimple("id", FileId.class);
 
-	public final NumberPath<Long> length = createNumber("length",Long.class);
+	public final SimplePath<Length> length = createSimple("length", Length.class);
 
 	public final SimplePath<Md5Checksum> md5Checksum = createSimple("md5Checksum", Md5Checksum.class);
 
-	public final StringPath name = createString("name");
+	public final SimplePath<Filename> name = createSimple("name", Filename.class);
 
-	public final StringPath path = createString("path");
+	public final SimplePath<java.nio.file.Path> path = createSimple("path", java.nio.file.Path.class);
 
 	public final SimplePath<Sha256Checksum> sha256Checksum = createSimple("sha256Checksum", Sha256Checksum.class);
 
-	public final DateTimePath<java.time.Instant> timestamp = createDateTime("time_stamp",java.time.Instant.class);
+	public final SimplePath<Timestamp> timestamp = createSimple("time_stamp", Timestamp.class);
 
-	public final SimplePath<java.net.URL> url = createSimple("url",java.net.URL.class);
+	public final SimplePath<Url> url = createSimple("url", Url.class);
 
 	public final com.querydsl.sql.PrimaryKey<QFile> sysPk10137 = createPrimaryKey(id);
 

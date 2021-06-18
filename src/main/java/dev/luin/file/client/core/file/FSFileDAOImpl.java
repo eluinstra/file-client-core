@@ -15,13 +15,13 @@
  */
 package dev.luin.file.client.core.file;
 
-import java.net.URL;
-
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.ComparablePath;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLQueryFactory;
 
 import io.vavr.collection.List;
@@ -43,9 +43,11 @@ class FSFileDAOImpl implements FSFileDAO
 	QFile table = QFile.file;
 	Expression<?>[] fsFileColumns = {table.id,table.url,table.path,table.name,table.contentType,table.md5Checksum,table.sha256Checksum,table.timestamp,table.length};
 	ConstructorExpression<FSFile> fsFileProjection = Projections.constructor(FSFile.class,fsFileColumns);
+	ComparablePath<String> namePath = Expressions.comparablePath(String.class,Expressions.path(Filename.class,table,"name"),"value");
+	ComparablePath<String> urlPath = Expressions.comparablePath(String.class,Expressions.path(Url.class,table,"url"),"value");
 
 	@Override
-	public Option<FSFile> findFile(final long id)
+	public Option<FSFile> findFile(final FileId id)
 	{
 		return Option.of(queryFactory.select(fsFileProjection)
 				.from(table)
@@ -54,11 +56,11 @@ class FSFileDAOImpl implements FSFileDAO
 	}
 
 	@Override
-	public Option<FSFile> findFile(final URL url)
+	public Option<FSFile> findFile(final Url url)
 	{
 		return Option.of(queryFactory.select(fsFileProjection)
 				.from(table)
-				.where(table.url.eq(url))
+				.where(urlPath.eq(url.getValue()))
 				.fetchOne());
 	}
 
@@ -67,7 +69,7 @@ class FSFileDAOImpl implements FSFileDAO
 	{
 		return List.ofAll(queryFactory.select(fsFileProjection)
 				.from(table)
-				.orderBy(table.name.asc())
+				.orderBy(namePath.asc())
 				.fetch());
 	}
 
@@ -84,7 +86,7 @@ class FSFileDAOImpl implements FSFileDAO
 				.set(table.timestamp,fsFile.getTimestamp())
 				.set(table.length,fsFile.getLength())
 				.executeWithKey(Long.class);
-		return fsFile.withId(id);
+		return fsFile.withId(new FileId(id));
 	}
 
 	@Override
@@ -102,7 +104,7 @@ class FSFileDAOImpl implements FSFileDAO
 	}
 
 	@Override
-	public long deleteFile(final long id)
+	public long deleteFile(final FileId id)
 	{
 		return queryFactory.delete(table)
 				.where(table.id.eq(id))

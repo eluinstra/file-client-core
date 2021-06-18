@@ -25,7 +25,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.commons.io.IOUtils;
 
-import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.RandomFile;
 import dev.luin.file.client.core.security.KeyStore;
 import dev.luin.file.client.core.security.KeyStoreType;
@@ -70,7 +69,7 @@ public class Client
 		var connection = createConnection(url);
 		connection.setRequestMethod("HEAD");
 		val contentLength = connection.getContentLengthLong();
-		val file = RandomFile.create(baseDir,filenameLength).map(f -> FSFile.getFile.apply(f.getPath())).get();
+		val file = RandomFile.create(baseDir,filenameLength).map(f -> f.getPath().toFile()).get();
 		long fileLength = 0;
 		while (fileLength < contentLength)
 		{

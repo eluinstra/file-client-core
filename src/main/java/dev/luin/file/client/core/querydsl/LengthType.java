@@ -21,30 +21,30 @@ import java.sql.SQLException;
 
 import com.querydsl.sql.types.AbstractType;
 
-import dev.luin.file.client.core.download.DownloadStatus.Status;
+import dev.luin.file.client.core.file.Length;
 
-public class DownloadStatusType extends AbstractType<Status>
+class LengthType extends AbstractType<Length>
 {
-	public DownloadStatusType(int type)
+	public LengthType(int type)
 	{
 		super(type);
 	}
 
 	@Override
-	public Class<Status> getReturnedClass()
+	public Class<Length> getReturnedClass()
 	{
-		return Status.class;
+		return Length.class;
 	}
 
 	@Override
-	public Status getValue(ResultSet rs, int startIndex) throws SQLException
+	public Length getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return Status.values()[rs.getInt(startIndex)];
+		return new Length(rs.getLong(startIndex));
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, Status value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, Length value) throws SQLException
 	{
-		st.setInt(startIndex,value.ordinal());
+		st.setLong(startIndex,value.getValue());
 	}
 }

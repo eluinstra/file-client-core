@@ -17,8 +17,6 @@ package dev.luin.file.client.core.file;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.time.Instant;
 
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
@@ -43,7 +41,7 @@ public class FileSystem
 	String baseDir;
 	int filenameLength;
 
-	public Option<FSFile> findFile(final long id)
+	public Option<FSFile> findFile(final FileId id)
 	{
 		return fsFileDAO.findFile(id);
 	}
@@ -67,8 +65,8 @@ public class FileSystem
 					.contentType(newFile.getContentType())
 					.md5Checksum(Md5Checksum.of(randomFile.getFile()))
 					.sha256Checksum(calculatedSha256Checksum)
-					.timestamp(Instant.now())
-					.length(randomFile.getFile().length())
+					.timestamp(new Timestamp())
+					.length(randomFile.getLength())
 					.build();
 			return fsFileDAO.insertFile(result);
 		}
@@ -80,9 +78,9 @@ public class FileSystem
 	{
 		val randomFile = RandomFile.create(baseDir,filenameLength).get();
 		val result = FSFile.builder()
-				.url(new URL(url))
+				.url(new Url(url))
 				.path(randomFile.getPath())
-				.timestamp(Instant.now())
+				.timestamp(new Timestamp())
 				.build();
 		return fsFileDAO.insertFile(result);
 	}

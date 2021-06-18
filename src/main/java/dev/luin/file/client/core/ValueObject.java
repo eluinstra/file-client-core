@@ -13,18 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.file.client.core.file;
+package dev.luin.file.client.core;
 
-import io.vavr.collection.Seq;
-import io.vavr.control.Option;
-import lombok.NonNull;
-
-interface FSFileDAO
+public interface ValueObject<T>
 {
-	Option<FSFile> findFile(FileId id);
-	Option<FSFile> findFile(Url url);
-	Seq<FSFile> selectFiles();
-	FSFile insertFile(@NonNull FSFile fsFile);
-	long updateFile(@NonNull FSFile fsFile);
-	long deleteFile(FileId id);
+	T getValue();
 }

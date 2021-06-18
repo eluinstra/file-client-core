@@ -21,9 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLQueryFactory;
 
+import dev.luin.file.client.core.ScheduleTime;
+import dev.luin.file.client.core.file.FileId;
+import dev.luin.file.client.core.upload.UploadStatus.Status;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
@@ -42,9 +48,11 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	QUploadTask table = QUploadTask.uploadTask;
 	Expression<?>[] uploadTaskColumns = {table.fileId,table.creationUrl,table.timestamp,table.status,table.statusTime,table.scheduleTime,table.retries};
 	ConstructorExpression<UploadTask> uploadTaskProjection = Projections.constructor(UploadTask.class,uploadTaskColumns);
+	Path<UploadTask> uploadTask = Expressions.path(UploadTask.class,"uploadTask");
+	DateTimePath<Instant> scheduleTime = Expressions.dateTimePath(Instant.class,Expressions.path(ScheduleTime.class,uploadTask,"scheduleTime"),"value");
 
 	@Override
-	public Option<UploadTask> getTask(long fileId)
+	public Option<UploadTask> getTask(FileId fileId)
 	{
 		return Option.of(queryFactory.select(uploadTaskProjection)
 				.from(table)
@@ -57,9 +65,9 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	{
 		return Option.of(queryFactory.select(uploadTaskProjection)
 				.from(table)
-				.where(table.scheduleTime.before(Instant.now())
-						.and(table.status.eq(UploadStatus.CREATED)))
-				.orderBy(table.scheduleTime.asc())
+				.where(scheduleTime.before(Instant.now())
+						.and(table.status.eq(Status.CREATED)))
+				.orderBy(scheduleTime.asc())
 				.fetchFirst());
 	}
 
@@ -68,7 +76,7 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	{
 		return List.ofAll(queryFactory.select(uploadTaskProjection)
 				.from(table)
-				.orderBy(table.scheduleTime.desc())
+				.orderBy(scheduleTime.desc())
 				.fetch());
 	}
 
@@ -77,8 +85,8 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	{
 		return List.ofAll(queryFactory.select(uploadTaskProjection)
 				.from(table)
-				.where(table.status.in(statuses.asJava()))
-				.orderBy(table.scheduleTime.asc())
+				.where(table.status.in(statuses.map(UploadStatus::getValue).asJava()))
+				.orderBy(scheduleTime.asc())
 				.fetch());
 	}
 
@@ -89,8 +97,8 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 				.set(table.fileId,task.getFileId())
 				.set(table.creationUrl,task.getCreationUrl())
 				.set(table.timestamp,task.getTimestamp())
-				.set(table.status,task.getStatus())
-				.set(table.statusTime,task.getStatusTime())
+				.set(table.status,task.getStatus().getValue())
+				.set(table.statusTime,task.getStatus().getTime())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.execute();
@@ -101,7 +109,8 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	public long update(UploadTask task)
 	{
 		return queryFactory.update(table)
-				.set(table.status,task.getStatus())
+				.set(table.status,task.getStatus().getValue())
+				.set(table.statusTime,task.getStatus().getTime())
 				.set(table.scheduleTime,task.getScheduleTime())
 				.set(table.retries,task.getRetries())
 				.where(table.fileId.eq(task.getFileId()))
@@ -109,7 +118,7 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	}
 
 	@Override
-	public long delete(long fileId)
+	public long delete(FileId fileId)
 	{
 		return queryFactory.delete(table)
 				.where(table.fileId.eq(fileId))

@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Clockwork
+ * Copyright 2020 E.Luinstra
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class Sha256ChecksumType extends AbstractType<Sha256Checksum>
 	@Override
 	public Sha256Checksum getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return Sha256Checksum.of(rs.getString(startIndex));
+		return new Sha256Checksum(rs.getString(startIndex));
 	}
 
 	@Override

@@ -17,8 +17,10 @@ package dev.luin.file.client.core.upload;
 
 import java.net.URL;
 import java.time.Duration;
-import java.time.Instant;
 
+import dev.luin.file.client.core.file.FileId;
+import dev.luin.file.client.core.file.Url;
+import dev.luin.file.client.core.upload.UploadStatus.Status;
 import io.tus.java.client.TusURLStore;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
@@ -40,7 +42,7 @@ public class UploadTaskManager implements TusURLStore
 	int retryInterval;
 	int retryMaxMultiplier;
 
-	public Option<UploadTask> getTask(long fileId)
+	public Option<UploadTask> getTask(FileId fileId)
 	{
 		return uploadTaskDAO.getTask(fileId);
 	}
@@ -55,7 +57,7 @@ public class UploadTaskManager implements TusURLStore
 		return statuses.length() == 0 ? uploadTaskDAO.getTasks() : uploadTaskDAO.getTasks(statuses);
 	}
 
-	public UploadTask createTask(long fileId, String creationUrl)
+	public UploadTask createTask(FileId fileId, Url creationUrl)
 	{
 		val task = UploadTask.of(fileId,creationUrl);
 		return uploadTaskDAO.insert(task);
@@ -63,9 +65,9 @@ public class UploadTaskManager implements TusURLStore
 
 	public UploadTask createNextTask(UploadTask task)
 	{
-		int retries = task.getRetries() + 1;
+		val retries = task.getRetries().increment();
 		val result = task
-				.withScheduleTime(task.getScheduleTime().plus(Duration.ofMinutes((retries > retryMaxMultiplier ? retryMaxMultiplier : retries) * retryInterval)))
+				.withScheduleTime(task.getScheduleTime().plus(Duration.ofMinutes((retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval)))
 				.withRetries(retries);
 		uploadTaskDAO.update(result);
 		return result;
@@ -73,21 +75,19 @@ public class UploadTaskManager implements TusURLStore
 
 	public UploadTask createSucceededTask(UploadTask task)
 	{
-		val result = task.withStatus(UploadStatus.SUCCEEDED)
-				.withStatusTime(Instant.now());
+		val result = task.withStatus(new UploadStatus(Status.SUCCEEDED));
 		uploadTaskDAO.update(result);
 		return result;
 	}
 
 	public UploadTask createFailedTask(UploadTask task)
 	{
-		val result = task.withStatus(UploadStatus.FAILED)
-				.withStatusTime(Instant.now());
+		val result = task.withStatus(new UploadStatus(Status.FAILED));
 		uploadTaskDAO.update(result);
 		return result;
 	}
 
-	public boolean deleteTask(long fileId)
+	public boolean deleteTask(FileId fileId)
 	{
 		return uploadTaskDAO.delete(fileId) > 0;
 	}

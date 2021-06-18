@@ -15,17 +15,18 @@
  */
 package dev.luin.file.client.core.upload;
 
+import dev.luin.file.client.core.file.FileId;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 
 public interface UploadTaskDAO
 {
-	Option<UploadTask> getTask(long fileId);
+	Option<UploadTask> getTask(FileId fileId);
 	Option<UploadTask> getNextTask();
 	Seq<UploadTask> getTasks();
 	Seq<UploadTask> getTasks(List<UploadStatus> statuses);
 	UploadTask insert(UploadTask task);
 	long update(UploadTask task);
-	long delete(long fileId);
+	long delete(FileId fileId);
 }

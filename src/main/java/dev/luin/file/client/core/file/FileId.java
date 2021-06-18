@@ -15,16 +15,28 @@
  */
 package dev.luin.file.client.core.file;
 
-import io.vavr.collection.Seq;
-import io.vavr.control.Option;
-import lombok.NonNull;
+import static org.apache.commons.lang3.Validate.isTrue;
 
-interface FSFileDAO
+import dev.luin.file.client.core.ValueObject;
+import io.vavr.control.Try;
+import lombok.NonNull;
+import lombok.Value;
+
+@Value
+public class FileId implements ValueObject<Long>
 {
-	Option<FSFile> findFile(FileId id);
-	Option<FSFile> findFile(Url url);
-	Seq<FSFile> selectFiles();
-	FSFile insertFile(@NonNull FSFile fsFile);
-	long updateFile(@NonNull FSFile fsFile);
-	long deleteFile(FileId id);
+	@NonNull
+	Long value;
+
+	public FileId(@NonNull String userId)
+	{
+		this(Long.getLong(userId));
+	}
+
+	public FileId(@NonNull Long userId)
+	{
+		value = Try.success(userId)
+				.andThen(v -> isTrue(v > 0))
+				.get();
+	}
 }

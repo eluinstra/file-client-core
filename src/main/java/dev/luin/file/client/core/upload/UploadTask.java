@@ -15,48 +15,43 @@
  */
 package dev.luin.file.client.core.upload;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Instant;
 
+import dev.luin.file.client.core.Retries;
+import dev.luin.file.client.core.ScheduleTime;
+import dev.luin.file.client.core.file.FileId;
+import dev.luin.file.client.core.file.Timestamp;
+import dev.luin.file.client.core.file.Url;
+import dev.luin.file.client.core.upload.UploadStatus.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
+import lombok.val;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class UploadTask
 {
 	@With
-	Long fileId;
+	FileId fileId;
 	@NonNull
-	URL creationUrl;
+	Url creationUrl;
 	@NonNull
-	Instant timestamp;
+	Timestamp timestamp;
 	@With
 	@NonNull
 	UploadStatus status;
 	@With
 	@NonNull
-	Instant statusTime;
+	ScheduleTime scheduleTime;
 	@With
-	@NonNull
-	Instant scheduleTime;
-	@With
-	int retries;
+	Retries retries;
 
-	static UploadTask of(long fileId, String createUrl)
+	static UploadTask of(FileId fileId, Url createUrl)
 	{
-		try
-		{
-			Instant now = Instant.now();
-			return new UploadTask(fileId,new URL(createUrl),now,UploadStatus.CREATED,now,now,0);
-		}
-		catch (MalformedURLException e)
-		{
-			throw new IllegalArgumentException("CreateUrl " + createUrl + " is not a valid URL");
-		}
+		val now = Instant.now();
+		return new UploadTask(fileId,createUrl,new Timestamp(now),new UploadStatus(Status.CREATED,now),new ScheduleTime(now),new Retries());
 	}
 }

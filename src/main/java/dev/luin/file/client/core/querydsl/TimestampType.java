@@ -21,30 +21,30 @@ import java.sql.SQLException;
 
 import com.querydsl.sql.types.AbstractType;
 
-import dev.luin.file.client.core.download.DownloadStatus.Status;
+import dev.luin.file.client.core.file.Timestamp;
 
-public class DownloadStatusType extends AbstractType<Status>
+class TimestampType extends AbstractType<Timestamp>
 {
-	public DownloadStatusType(int type)
+	public TimestampType(int type)
 	{
 		super(type);
 	}
 
 	@Override
-	public Class<Status> getReturnedClass()
+	public Class<Timestamp> getReturnedClass()
 	{
-		return Status.class;
+		return Timestamp.class;
 	}
 
 	@Override
-	public Status getValue(ResultSet rs, int startIndex) throws SQLException
+	public Timestamp getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return Status.values()[rs.getInt(startIndex)];
+		return new Timestamp(rs.getTimestamp(startIndex).toInstant());
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, Status value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, Timestamp value) throws SQLException
 	{
-		st.setInt(startIndex,value.ordinal());
+		st.setTimestamp(startIndex,java.sql.Timestamp.from(value.getValue()));
 	}
 }

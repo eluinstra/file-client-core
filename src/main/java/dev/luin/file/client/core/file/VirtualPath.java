@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.file.client.core.service.model;
+package dev.luin.file.client.core.file;
 
-import java.net.URL;
+import static org.apache.commons.lang3.Validate.inclusiveBetween;
+import static org.apache.commons.lang3.Validate.matchesPattern;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
+import dev.luin.file.client.core.ValueObject;
+import io.vavr.control.Try;
+import lombok.NonNull;
+import lombok.Value;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
-public interface DownloadTaskMapper
+@Value
+public class VirtualPath implements ValueObject<String>
 {
-	public DownloadTaskMapper INSTANCE = Mappers.getMapper(DownloadTaskMapper.class);
+	@NonNull
+	String value;
 
-	DownloadTask toDownloadTask(dev.luin.file.client.core.download.DownloadTask task);
-	
-	default String map(URL value)
+	public VirtualPath(@NonNull String virtualPath)
 	{
-		return value.toString();
+		value = Try.success(virtualPath)
+				.andThen(v -> inclusiveBetween(2,256,v.length()))
+				.andThen(v -> matchesPattern(v,"^/[a-zA-Z0-9]+$"))
+				.get();
 	}
 }

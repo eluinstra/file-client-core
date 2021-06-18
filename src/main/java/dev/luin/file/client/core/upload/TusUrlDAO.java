@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
 
+import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.QFile;
+import dev.luin.file.client.core.file.Url;
 import io.tus.java.client.TusURLStore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,8 +41,8 @@ public class TusUrlDAO implements TusURLStore
 	public void set(String id, URL url)
 	{
 		queryFactory.update(table)
-				.set(table.url,url)
-				.where(table.id.eq(Long.parseLong(id)));
+				.set(table.url,new Url(url))
+				.where(table.id.eq(new FileId(id)));
 	}
 
 	@Override
@@ -48,8 +50,9 @@ public class TusUrlDAO implements TusURLStore
 	{
 		return queryFactory.select(table.url)
 				.from(table)
-				.where(table.id.eq(Long.parseLong(id)))
-				.fetchOne();
+				.where(table.id.eq(new FileId(id)))
+				.fetchOne()
+				.toURL();
 	}
 
 	@Override
@@ -57,6 +60,6 @@ public class TusUrlDAO implements TusURLStore
 	{
 		//TODO: replace?
 //		queryFactory.delete(table)
-//				.where(table.id.eq(Long.parseLong(id)));
+//				.where(table.id.eq(new FileId(id)));
 	}
 }

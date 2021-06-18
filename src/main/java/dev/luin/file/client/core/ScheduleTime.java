@@ -13,18 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.file.client.core.file;
+package dev.luin.file.client.core;
 
-import io.vavr.collection.Seq;
-import io.vavr.control.Option;
+import java.time.Duration;
+import java.time.Instant;
+
 import lombok.NonNull;
+import lombok.Value;
 
-interface FSFileDAO
+@Value
+public class ScheduleTime implements ValueObject<Instant>
 {
-	Option<FSFile> findFile(FileId id);
-	Option<FSFile> findFile(Url url);
-	Seq<FSFile> selectFiles();
-	FSFile insertFile(@NonNull FSFile fsFile);
-	long updateFile(@NonNull FSFile fsFile);
-	long deleteFile(FileId id);
+	@NonNull
+	Instant value;
+
+	public ScheduleTime()
+	{
+		this(Instant.now());
+	}
+
+	public ScheduleTime(@NonNull Instant timestamp)
+	{
+		value = timestamp;
+	}
+
+	public boolean isAfter(Instant instant)
+	{
+		return value.isAfter(instant);
+	}
+
+	public ScheduleTime plus(Duration duration)
+	{
+		return new ScheduleTime(value.plus(duration));
+	}
 }
