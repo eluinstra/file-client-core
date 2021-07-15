@@ -55,4 +55,16 @@ public class DownloadTask
 		val scheduleTime = new ScheduleTime(startDate != null ? startDate : now);
 		return new DownloadTask(fileId,url,new TimeFrame(startDate,endDate),new Timestamp(now),new DownloadStatus(Status.CREATED,now),scheduleTime,new Retries());
 	}
+
+	public DownloadTask(FileId fileId, @NonNull Url url, Instant startDate, Instant endDate, @NonNull Timestamp timestamp, @NonNull Status status, @NonNull Instant statusTime, @NonNull ScheduleTime scheduleTime, Retries retries)
+	{
+		this.fileId = fileId;
+		this.url = url;
+		this.validTimeFrame = new TimeFrame(startDate,endDate);
+		this.timestamp = timestamp;
+		this.status = new DownloadStatus(status,statusTime);
+		this.scheduleTime = scheduleTime;
+		this.retries = retries;
+	}
+
 }

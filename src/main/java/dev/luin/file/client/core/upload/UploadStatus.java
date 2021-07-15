@@ -17,6 +17,8 @@ package dev.luin.file.client.core.upload;
 
 import java.time.Instant;
 
+import javax.xml.bind.annotation.XmlType;
+
 import dev.luin.file.client.core.ValueObject;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -26,6 +28,7 @@ import lombok.Value;
 @AllArgsConstructor
 public class UploadStatus implements ValueObject<UploadStatus.Status>
 {
+	@XmlType(name = "UploadStatusStatus")
 	public enum Status
 	{
 		CREATED, SUCCEEDED, FAILED;

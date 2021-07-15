@@ -22,10 +22,12 @@ import java.net.URLConnection;
 import dev.luin.file.client.core.ValueObject;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
 //@Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@EqualsAndHashCode
 public class Url implements ValueObject<String>
 {
 	URL value;

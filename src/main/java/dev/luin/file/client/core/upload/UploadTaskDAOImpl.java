@@ -21,13 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLQueryFactory;
 
-import dev.luin.file.client.core.ScheduleTime;
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.upload.UploadStatus.Status;
 import io.vavr.collection.List;
@@ -48,8 +46,7 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	QUploadTask table = QUploadTask.uploadTask;
 	Expression<?>[] uploadTaskColumns = {table.fileId,table.creationUrl,table.timestamp,table.status,table.statusTime,table.scheduleTime,table.retries};
 	ConstructorExpression<UploadTask> uploadTaskProjection = Projections.constructor(UploadTask.class,uploadTaskColumns);
-	Path<UploadTask> uploadTask = Expressions.path(UploadTask.class,"uploadTask");
-	DateTimePath<Instant> scheduleTime = Expressions.dateTimePath(Instant.class,Expressions.path(ScheduleTime.class,uploadTask,"scheduleTime"),"value");
+	DateTimePath<Instant> scheduleTime = Expressions.dateTimePath(Instant.class,"schedule_time");
 
 	@Override
 	public Option<UploadTask> getTask(FileId fileId)

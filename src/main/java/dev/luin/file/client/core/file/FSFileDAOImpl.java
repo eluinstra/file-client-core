@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -43,8 +42,6 @@ class FSFileDAOImpl implements FSFileDAO
 	QFile table = QFile.file;
 	Expression<?>[] fsFileColumns = {table.id,table.url,table.path,table.name,table.contentType,table.md5Checksum,table.sha256Checksum,table.timestamp,table.length};
 	ConstructorExpression<FSFile> fsFileProjection = Projections.constructor(FSFile.class,fsFileColumns);
-	ComparablePath<String> namePath = Expressions.comparablePath(String.class,Expressions.path(Filename.class,table,"name"),"value");
-	ComparablePath<String> urlPath = Expressions.comparablePath(String.class,Expressions.path(Url.class,table,"url"),"value");
 
 	@Override
 	public Option<FSFile> findFile(final FileId id)
@@ -60,13 +57,14 @@ class FSFileDAOImpl implements FSFileDAO
 	{
 		return Option.of(queryFactory.select(fsFileProjection)
 				.from(table)
-				.where(urlPath.eq(url.getValue()))
+				.where(table.url.eq(url))
 				.fetchOne());
 	}
 
 	@Override
 	public Seq<FSFile> selectFiles()
 	{
+		val namePath = Expressions.comparablePath(String.class,"name");
 		return List.ofAll(queryFactory.select(fsFileProjection)
 				.from(table)
 				.orderBy(namePath.asc())

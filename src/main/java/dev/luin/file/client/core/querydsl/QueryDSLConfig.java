@@ -64,12 +64,19 @@ public class QueryDSLConfig
 	{
 		val templates = getSQLTemplates();
 		val result = new com.querydsl.sql.Configuration(templates);
-		result.register(new InstantType(Types.TIMESTAMP));
-		result.register(new Md5ChecksumType(Types.VARCHAR));
-		result.register(new Sha256ChecksumType(Types.VARCHAR));
-		result.register(new UrlType(Types.VARCHAR));
-		result.register(new UploadStatusType(Types.TINYINT));
+		result.register(new ContentTypeType(Types.VARCHAR));
 		result.register(new DownloadStatusType(Types.TINYINT));
+		result.register(new FileIdType(Types.BIGINT));
+		result.register(new FilenameType(Types.VARBINARY));
+		result.register(new InstantType(Types.TIMESTAMP));
+		result.register(new LengthType(Types.BIGINT));
+		result.register(new Md5ChecksumType(Types.VARCHAR));
+		result.register(new ScheduleTimeType(Types.TIMESTAMP));
+		result.register(new Sha256ChecksumType(Types.VARCHAR));
+		result.register(new TimestampType(Types.TIMESTAMP));
+		result.register(new UploadStatusType(Types.TINYINT));
+		result.register(new UrlType(Types.VARCHAR));
+		result.register(new VirtualPathType(Types.VARCHAR));
 		result.setExceptionTranslator(new SpringExceptionTranslator());
 		return result;
 	}

@@ -54,4 +54,14 @@ public class UploadTask
 		val now = Instant.now();
 		return new UploadTask(fileId,createUrl,new Timestamp(now),new UploadStatus(Status.CREATED,now),new ScheduleTime(now),new Retries());
 	}
+
+	public UploadTask(FileId fileId, @NonNull Url creationUrl, @NonNull Timestamp timestamp, @NonNull Status status, @NonNull Instant statusTime, @NonNull ScheduleTime scheduleTime, Retries retries)
+	{
+		this.fileId = fileId;
+		this.creationUrl = creationUrl;
+		this.timestamp = timestamp;
+		this.status = new UploadStatus(status,statusTime);
+		this.scheduleTime = scheduleTime;
+		this.retries = retries;
+	}
 }
