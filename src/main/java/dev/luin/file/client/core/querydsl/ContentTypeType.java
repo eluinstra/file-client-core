@@ -39,7 +39,12 @@ class ContentTypeType extends AbstractType<ContentType>
 	@Override
 	public ContentType getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return new ContentType(rs.getString(startIndex));
+		return toContentType(rs.getString(startIndex));
+	}
+
+	private ContentType toContentType(String value)
+	{
+		return value == null ? null : new ContentType(value);
 	}
 
 	@Override

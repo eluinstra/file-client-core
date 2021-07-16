@@ -20,7 +20,7 @@ CREATE TABLE fs_file
 	url								VARCHAR(256)		NULL,
 	path							VARCHAR(256)		NOT NULL UNIQUE,
 	name							VARCHAR(256)		NULL,
-	content_type			VARCHAR(256)		NOT NULL,
+	content_type			VARCHAR(256)		NULL,
 	md5_checksum			VARCHAR(32)			NULL,
 	sha256_checksum		VARCHAR(64)			NULL,
 	time_stamp				TIMESTAMP				NOT NULL,

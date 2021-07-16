@@ -44,7 +44,12 @@ public class Md5ChecksumType extends AbstractType<Md5Checksum>
 	@Override
 	public Md5Checksum getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return new Md5Checksum(rs.getString(startIndex));
+		return toMd5Checksum(rs.getString(startIndex));
+	}
+
+	private Md5Checksum toMd5Checksum(String value)
+	{
+		return value == null ? null : new Md5Checksum(value);
 	}
 
 	@Override

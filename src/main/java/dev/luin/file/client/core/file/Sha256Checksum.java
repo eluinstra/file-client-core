@@ -57,7 +57,7 @@ public class Sha256Checksum implements ValueObject<String>
 				.get();
 	}
 	
-	public boolean validate(@NonNull final Sha256Checksum checksum)
+	public boolean validate(/*@NonNull*/ final Sha256Checksum checksum)
 	{
 		return this.equals(checksum);
 	}

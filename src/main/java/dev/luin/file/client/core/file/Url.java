@@ -23,11 +23,13 @@ import dev.luin.file.client.core.ValueObject;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 //@Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @EqualsAndHashCode
+@ToString
 public class Url implements ValueObject<String>
 {
 	URL value;

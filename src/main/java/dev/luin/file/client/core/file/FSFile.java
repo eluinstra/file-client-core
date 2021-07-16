@@ -96,10 +96,9 @@ public class FSFile
 		val file = getFile();
 		if (!file.exists())// || !fsFile.isCompleted())
 			throw new FileNotFoundException(url.toString());
-		val result = this
-				.withSha256Checksum(getSha256Checksum())
-				.withMd5Checksum(getMd5Checksum());
-		return result;
+		return this
+			.withSha256Checksum(Sha256Checksum.of(file))
+			.withMd5Checksum(Md5Checksum.of(file));
 	}
 
 	FSFile append(@NonNull final InputStream input, final long first, final long length) throws IOException

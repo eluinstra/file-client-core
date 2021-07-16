@@ -94,7 +94,7 @@ class FileServiceImpl implements FileService
 	}
 
 	@Override
-	public List<UploadTask> getUploadTasks(List<UploadStatus> status) throws ServiceException
+	public List<UploadTask> getUploadTasks(List<UploadStatus.Status> status) throws ServiceException
 	{
 		log.debug("getUploadTasks {}",status);
 		return Try.of(() -> 
@@ -165,7 +165,7 @@ class FileServiceImpl implements FileService
 	}
 
 	@Override
-	public List<DownloadTask> getDownloadTasks(List<DownloadStatus> status) throws ServiceException
+	public List<DownloadTask> getDownloadTasks(List<DownloadStatus.Status> status) throws ServiceException
 	{
 		log.debug("getDownloadTasks");
 		return Try.of(() -> 

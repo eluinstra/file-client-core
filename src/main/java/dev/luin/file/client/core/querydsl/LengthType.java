@@ -18,6 +18,7 @@ package dev.luin.file.client.core.querydsl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import com.querydsl.sql.types.AbstractType;
 
@@ -39,12 +40,17 @@ class LengthType extends AbstractType<Length>
 	@Override
 	public Length getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return new Length(rs.getLong(startIndex));
+		return toLength(rs.getObject(startIndex,Long.class));
+	}
+
+	private Length toLength(Long value)
+	{
+		return value == null ? null : new Length(value);
 	}
 
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Length value) throws SQLException
 	{
-		st.setLong(startIndex,value.getValue());
+		st.setObject(startIndex,value.getValue(),Types.BIGINT);
 	}
 }

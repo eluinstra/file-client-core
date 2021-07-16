@@ -51,7 +51,7 @@ public class DownloadTaskManager
 		return downloadTaskDAO.getNextTask();
 	}
 
-	public Seq<DownloadTask> getTasks(List<DownloadStatus> statuses)
+	public Seq<DownloadTask> getTasks(List<Status> statuses)
 	{
 		return statuses.length() == 0 ? downloadTaskDAO.getTasks() : downloadTaskDAO.getTasks(statuses);
 	}

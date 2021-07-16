@@ -78,11 +78,11 @@ public class DownloadTaskDAOImpl implements DownloadTaskDAO
 	}
 
 	@Override
-	public Seq<DownloadTask> getTasks(List<DownloadStatus> statuses)
+	public Seq<DownloadTask> getTasks(List<Status> statuses)
 	{
 		return List.ofAll(queryFactory.select(downloadTaskProjection)
 				.from(table)
-				.where(table.status.in(statuses.map(DownloadStatus::getValue).asJava()))
+				.where(table.status.in(statuses.asJava()))
 				.orderBy(scheduleTime.asc())
 				.fetch());
 	}

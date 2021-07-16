@@ -15,6 +15,7 @@
  */
 package dev.luin.file.client.core.download;
 
+import dev.luin.file.client.core.download.DownloadStatus.Status;
 import dev.luin.file.client.core.file.FileId;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
@@ -25,7 +26,7 @@ public interface DownloadTaskDAO
 	Option<DownloadTask> getTask(FileId fileId);
 	Option<DownloadTask> getNextTask();
 	Seq<DownloadTask> getTasks();
-	Seq<DownloadTask> getTasks(List<DownloadStatus> statuses);
+	Seq<DownloadTask> getTasks(List<Status> statuses);
 	DownloadTask insert(DownloadTask task);
 	long update(DownloadTask task);
 	long delete(FileId fileId);

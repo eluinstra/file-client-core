@@ -45,7 +45,7 @@ public interface FileService
 	UploadTask getUploadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
 
 	@WebResult(name = "uploadTask")
-	List<UploadTask> getUploadTasks(@WebParam(name = "status") List<UploadStatus> status) throws ServiceException;
+	List<UploadTask> getUploadTasks(@WebParam(name = "status") List<UploadStatus.Status> status) throws ServiceException;
 
 	void deleteUploadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
 
@@ -58,7 +58,7 @@ public interface FileService
 	DownloadTask getDownloadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
 
 	@WebResult(name = "downloadTask")
-	List<DownloadTask> getDownloadTasks(@WebParam(name = "status") List<DownloadStatus> status) throws ServiceException;
+	List<DownloadTask> getDownloadTasks(@WebParam(name = "status") List<DownloadStatus.Status> status) throws ServiceException;
 
 	void deleteDownloadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
 

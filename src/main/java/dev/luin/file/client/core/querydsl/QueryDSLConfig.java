@@ -24,10 +24,6 @@ import java.sql.Types;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.querydsl.sql.DB2Templates;
 import com.querydsl.sql.H2Templates;
 import com.querydsl.sql.HSQLDBTemplates;
@@ -40,6 +36,10 @@ import com.querydsl.sql.SQLTemplates;
 import com.querydsl.sql.spring.SpringConnectionProvider;
 import com.querydsl.sql.spring.SpringExceptionTranslator;
 import com.zaxxer.hikari.HikariDataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -71,6 +71,8 @@ public class QueryDSLConfig
 		result.register(new InstantType(Types.TIMESTAMP));
 		result.register(new LengthType(Types.BIGINT));
 		result.register(new Md5ChecksumType(Types.VARCHAR));
+		result.register(new PathType(Types.VARCHAR));
+		result.register(new RetriesType(Types.TINYINT));
 		result.register(new ScheduleTimeType(Types.TIMESTAMP));
 		result.register(new Sha256ChecksumType(Types.VARCHAR));
 		result.register(new TimestampType(Types.TIMESTAMP));

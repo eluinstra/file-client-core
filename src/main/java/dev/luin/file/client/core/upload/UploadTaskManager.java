@@ -52,7 +52,7 @@ public class UploadTaskManager implements TusURLStore
 		return uploadTaskDAO.getNextTask();
 	}
 
-	public Seq<UploadTask> getTasks(List<UploadStatus> statuses)
+	public Seq<UploadTask> getTasks(List<Status> statuses)
 	{
 		return statuses.length() == 0 ? uploadTaskDAO.getTasks() : uploadTaskDAO.getTasks(statuses);
 	}

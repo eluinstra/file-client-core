@@ -15,46 +15,37 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
 import com.querydsl.sql.types.AbstractType;
 
-import dev.luin.file.client.core.file.Sha256Checksum;
-
-public class Sha256ChecksumType extends AbstractType<Sha256Checksum>
+public class PathType extends AbstractType<Path>
 {
-	public Sha256ChecksumType()
-	{
-		this(Types.VARCHAR);
-	}
-	public Sha256ChecksumType(int type)
+	public PathType(int type)
 	{
 		super(type);
 	}
 
 	@Override
-	public Class<Sha256Checksum> getReturnedClass()
+	public Class<Path> getReturnedClass()
 	{
-		return Sha256Checksum.class;
+		return Path.class;
 	}
 
 	@Override
-	public Sha256Checksum getValue(ResultSet rs, int startIndex) throws SQLException
+	public Path getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return toSha256Checksum(rs.getString(startIndex));
-	}
-
-	private Sha256Checksum toSha256Checksum(String value)
-	{
-		return value == null ? null : new Sha256Checksum(value);
+		return Paths.get(rs.getString(startIndex));
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, Sha256Checksum value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, Path value) throws SQLException
 	{
-		st.setString(startIndex,value.getValue());
+		st.setString(startIndex,value.toString());
 	}
+
 }

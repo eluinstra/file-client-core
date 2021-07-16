@@ -94,6 +94,7 @@ public class DownloadTaskHandler
 		}
 		catch (Exception e)
 		{
+			log.error("",e);
 			return downloadTaskManager.createNextTask(task);
 		}
 	}

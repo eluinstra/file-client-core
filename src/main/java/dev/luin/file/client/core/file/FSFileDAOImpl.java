@@ -83,8 +83,8 @@ class FSFileDAOImpl implements FSFileDAO
 				.set(table.sha256Checksum,fsFile.getSha256Checksum())
 				.set(table.timestamp,fsFile.getTimestamp())
 				.set(table.length,fsFile.getLength())
-				.executeWithKey(Long.class);
-		return fsFile.withId(new FileId(id));
+				.executeWithKey(FileId.class);
+		return fsFile.withId(id);
 	}
 
 	@Override

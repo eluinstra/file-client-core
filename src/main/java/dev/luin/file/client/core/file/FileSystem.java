@@ -57,7 +57,7 @@ public class FileSystem
 				.andThenTry(f -> f.write(newFile.getInputStream()))
 				.get();
 		val calculatedSha256Checksum = Sha256Checksum.of(randomFile.getFile());
-		if (calculatedSha256Checksum.validate(newFile.getSha256Checksum()))
+		if (newFile.getSha256Checksum() == null || calculatedSha256Checksum.validate(newFile.getSha256Checksum()))
 		{
 			val result = FSFile.builder()
 					.path(randomFile.getPath())

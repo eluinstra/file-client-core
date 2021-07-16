@@ -47,7 +47,7 @@ public class NewFSFileImpl implements NewFSFile
 	@Override
 	public Sha256Checksum getSha256Checksum()
 	{
-		return new Sha256Checksum(file.getSha256Checksum());
+		return file.getSha256Checksum() == null ? null : new Sha256Checksum(file.getSha256Checksum());
 	}
 
 	@Override

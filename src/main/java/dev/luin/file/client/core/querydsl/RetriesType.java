@@ -18,43 +18,33 @@ package dev.luin.file.client.core.querydsl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
 import com.querydsl.sql.types.AbstractType;
 
-import dev.luin.file.client.core.file.Sha256Checksum;
+import dev.luin.file.client.core.Retries;
 
-public class Sha256ChecksumType extends AbstractType<Sha256Checksum>
+class RetriesType extends AbstractType<Retries>
 {
-	public Sha256ChecksumType()
-	{
-		this(Types.VARCHAR);
-	}
-	public Sha256ChecksumType(int type)
+	public RetriesType(int type)
 	{
 		super(type);
 	}
 
 	@Override
-	public Class<Sha256Checksum> getReturnedClass()
+	public Class<Retries> getReturnedClass()
 	{
-		return Sha256Checksum.class;
+		return Retries.class;
 	}
 
 	@Override
-	public Sha256Checksum getValue(ResultSet rs, int startIndex) throws SQLException
+	public Retries getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return toSha256Checksum(rs.getString(startIndex));
-	}
-
-	private Sha256Checksum toSha256Checksum(String value)
-	{
-		return value == null ? null : new Sha256Checksum(value);
+		return new Retries(rs.getInt(startIndex));
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, Sha256Checksum value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, Retries value) throws SQLException
 	{
-		st.setString(startIndex,value.getValue());
+		st.setLong(startIndex,value.getValue());
 	}
 }

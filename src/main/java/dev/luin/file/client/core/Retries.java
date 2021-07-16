@@ -21,11 +21,15 @@ import org.apache.commons.lang3.Validate;
 
 import io.vavr.control.Try;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 //@Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@EqualsAndHashCode
+@ToString
 public class Retries implements ValueObject<Integer>
 {
 	@NonNull

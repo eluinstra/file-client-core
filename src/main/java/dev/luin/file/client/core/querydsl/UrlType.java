@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import com.querydsl.sql.types.AbstractType;
 
 import dev.luin.file.client.core.file.Url;
-import lombok.val;
 
 public class UrlType extends AbstractType<Url>
 {
@@ -40,8 +39,12 @@ public class UrlType extends AbstractType<Url>
 	@Override
 	public Url getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		val url = rs.getString(startIndex);
-		return url != null ? new Url(url) : null;
+		return toUrl(rs.getString(startIndex));
+	}
+
+	private Url toUrl(final String url)
+	{
+		return url == null ? null : new Url(url);
 	}
 
 	@Override

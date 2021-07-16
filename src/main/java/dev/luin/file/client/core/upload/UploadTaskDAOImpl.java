@@ -78,11 +78,11 @@ class UploadTaskDAOImpl implements UploadTaskDAO
 	}
 
 	@Override
-	public Seq<UploadTask> getTasks(List<UploadStatus> statuses)
+	public Seq<UploadTask> getTasks(List<Status> statuses)
 	{
 		return List.ofAll(queryFactory.select(uploadTaskProjection)
 				.from(table)
-				.where(table.status.in(statuses.map(UploadStatus::getValue).asJava()))
+				.where(table.status.in(statuses.asJava()))
 				.orderBy(scheduleTime.asc())
 				.fetch());
 	}

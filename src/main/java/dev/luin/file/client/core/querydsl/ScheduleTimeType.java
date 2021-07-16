@@ -18,12 +18,13 @@ package dev.luin.file.client.core.querydsl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import com.querydsl.sql.types.AbstractType;
 
-import dev.luin.file.client.core.file.Timestamp;
+import dev.luin.file.client.core.ScheduleTime;
 
-class ScheduleTimeType extends AbstractType<Timestamp>
+class ScheduleTimeType extends AbstractType<ScheduleTime>
 {
 	public ScheduleTimeType(int type)
 	{
@@ -31,20 +32,20 @@ class ScheduleTimeType extends AbstractType<Timestamp>
 	}
 
 	@Override
-	public Class<Timestamp> getReturnedClass()
+	public Class<ScheduleTime> getReturnedClass()
 	{
-		return Timestamp.class;
+		return ScheduleTime.class;
 	}
 
 	@Override
-	public Timestamp getValue(ResultSet rs, int startIndex) throws SQLException
+	public ScheduleTime getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return new Timestamp(rs.getTimestamp(startIndex).toInstant());
+		return new ScheduleTime(rs.getTimestamp(startIndex).toInstant());
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, Timestamp value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, ScheduleTime value) throws SQLException
 	{
-		st.setTimestamp(startIndex,java.sql.Timestamp.from(value.getValue()));
+		st.setTimestamp(startIndex,Timestamp.from(value.getValue()));
 	}
 }

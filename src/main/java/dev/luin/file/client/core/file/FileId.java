@@ -28,15 +28,20 @@ public class FileId implements ValueObject<Long>
 	@NonNull
 	Long value;
 
-	public FileId(@NonNull String userId)
+	public FileId(@NonNull String fileId)
 	{
-		this(Long.getLong(userId));
+		this(Long.parseLong(fileId));
 	}
 
-	public FileId(@NonNull Long userId)
+	public FileId(@NonNull Long fileId)
 	{
-		value = Try.success(userId)
-				.andThen(v -> isTrue(v > 0))
+		value = Try.success(fileId)
+				.andThen(v -> isTrue(v >= 0))
 				.get();
+	}
+
+	public String getStringValue()
+	{
+		return value.toString();
 	}
 }

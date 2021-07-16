@@ -27,6 +27,7 @@ import dev.luin.file.client.core.file.Url;
 import io.tus.java.client.TusURLStore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -48,11 +49,11 @@ public class TusUrlDAO implements TusURLStore
 	@Override
 	public URL get(String id)
 	{
-		return queryFactory.select(table.url)
+		val result = queryFactory.select(table.url)
 				.from(table)
 				.where(table.id.eq(new FileId(id)))
-				.fetchOne()
-				.toURL();
+				.fetchOne();
+		return result == null ? null : result.toURL();
 	}
 
 	@Override

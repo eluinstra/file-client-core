@@ -39,7 +39,12 @@ class FilenameType extends AbstractType<Filename>
 	@Override
 	public Filename getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return new Filename(rs.getString(startIndex));
+		return toFilename(rs.getString(startIndex));
+	}
+
+	private Filename toFilename(String value)
+	{
+		return value == null ? null : new Filename(value);
 	}
 
 	@Override

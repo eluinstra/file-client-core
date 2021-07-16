@@ -81,10 +81,10 @@ public class UploadTaskHandler
 			return client;
 		}
 
-		private io.tus.java.client.TusUpload createUpload(final FSFile file)
+		private TusUpload createUpload(final FSFile file)
 		{
 			val upload = Try.of(() -> new TusUpload(file.getFile())).get();
-			upload.setFingerprint(task.getFileId().toString());
+			upload.setFingerprint(task.getFileId().getStringValue());
 			upload.setMetadata(createMetaData(file));
 			return upload;
 		}
@@ -145,6 +145,7 @@ public class UploadTaskHandler
 		}
 		catch (Exception e)
 		{
+			log.error("",e);
 			return uploadTaskManager.createNextTask(task);
 		}
 	}
