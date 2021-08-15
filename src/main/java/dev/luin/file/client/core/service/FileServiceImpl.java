@@ -21,13 +21,23 @@ import java.time.Instant;
 import java.util.List;
 
 import javax.activation.DataHandler;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.springframework.transaction.annotation.Transactional;
 
 import dev.luin.file.client.core.download.DownloadStatus;
 import dev.luin.file.client.core.download.DownloadTaskManager;
-import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.FSFile;
+import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.file.Url;
 import dev.luin.file.client.core.service.model.DownloadTask;
@@ -50,7 +60,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
 @AllArgsConstructor
-class FileServiceImpl implements FileService
+@Path("files")
+@Produces(MediaType.APPLICATION_JSON)
+public class FileServiceImpl implements FileService
 {
 	@NonNull
 	FileSystem fs;
@@ -58,6 +70,14 @@ class FileServiceImpl implements FileService
 	UploadTaskManager uploadTaskManager;
 	@NonNull
 	DownloadTaskManager downloadTaskManager;
+
+	@POST
+	@Path("upload/{creationUrl}")
+	@Consumes("multipart/form-data")
+	public UploadTask uploadFile(@PathParam("creationUrl") String creationUrl, @Multipart("sha256Checksum") String sha256Checksum, @Multipart("file") Attachment file) throws ServiceException
+	{
+		return uploadFile(creationUrl,new NewFile(sha256Checksum, file.getDataHandler()));
+	}
 
 	@Override
 	@Transactional("dataSourceTransactionManager")
@@ -81,18 +101,22 @@ class FileServiceImpl implements FileService
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@GET
+	@Path("upload/{fileId}")
 	@Override
-	public UploadTask getUploadTask(Long fileId) throws ServiceException
+	public UploadTask getUploadTask(@PathParam("fileId") Long fileId) throws ServiceException
 	{
 		log.debug("getUploadTask {}",fileId);
 		return Try.of(() ->
 		{
-			val task = uploadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
+			val task = uploadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> new NotFoundException("Task " + fileId + " not found"));
 			return new UploadTask(task);
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@GET
+	@Path("upload")
 	@Override
 	public List<UploadTask> getUploadTasks(List<UploadStatus.Status> status) throws ServiceException
 	{
@@ -106,30 +130,27 @@ class FileServiceImpl implements FileService
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@DELETE
+	@Path("upload/{fileId}")
 	@Override
 	@Transactional("dataSourceTransactionManager")
-	public void deleteUploadTask(Long fileId) throws ServiceException
+	public void deleteUploadTask(@PathParam("fileId") Long fileId) throws ServiceException
 	{
 		log.debug("deleteUploadTask {}",fileId);
 		Try.of(() -> 
 		{
-			try
-			{
-				FileId id = new FileId(fileId);
-				val fsFile = fs.findFile(id).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
-				fs.deleteFile(fsFile,true);
-				uploadTaskManager.deleteTask(id);
-				log.info("Deleted uploadTask {}",fileId);
-			}
-			catch (FileNotFoundException e)
-			{
-				throw new ServiceException(e);
-			}
+			FileId id = new FileId(fileId);
+			val fsFile = fs.findFile(id).getOrElseThrow(() -> new NotFoundException("File " + fileId + " not found"));
+			fs.deleteFile(fsFile,true);
+			uploadTaskManager.deleteTask(id);
+			log.info("Deleted uploadTask {}",fileId);
 			return null;
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@POST
+	@Path("download")
 	@Override
 	@Transactional("dataSourceTransactionManager")
 	public DownloadTask downloadFile(String url, Instant startDate, Instant endDate) throws ServiceException
@@ -152,18 +173,22 @@ class FileServiceImpl implements FileService
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@GET
+	@Path("download/{fileId}")
 	@Override
-	public DownloadTask getDownloadTask(Long fileId) throws ServiceException
+	public DownloadTask getDownloadTask(@PathParam("fileId") Long fileId) throws ServiceException
 	{
 		log.debug("getDownloadTask {}",fileId);
 		return Try.of(() ->
 		{
-			val task = downloadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> new ServiceException("Task " + fileId + " not found"));
+			val task = downloadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> new NotFoundException("Task " + fileId + " not found"));
 			return new DownloadTask(task);
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@GET
+	@Path("download")
 	@Override
 	public List<DownloadTask> getDownloadTasks(List<DownloadStatus.Status> status) throws ServiceException
 	{
@@ -177,31 +202,28 @@ class FileServiceImpl implements FileService
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@DELETE
+	@Path("download/{fileId}")
 	@Override
 	@Transactional("dataSourceTransactionManager")
-	public void deleteDownloadTask(Long fileId) throws ServiceException
+	public void deleteDownloadTask(@PathParam("fileId") Long fileId) throws ServiceException
 	{
 		log.debug("deleteDownloadTask {}",fileId);
 		Try.of(() -> 
 		{
-			try
-			{
-				val fsFile = fs.findFile(new FileId(fileId)).getOrElseThrow(() -> new FileNotFoundException("File " + fileId + " not found"));
-				fs.deleteFile(fsFile,true);
-				downloadTaskManager.deleteTask(new FileId(fileId));
-				log.info("Deleted downloadTask {}",fileId);
-			}
-			catch (FileNotFoundException e)
-			{
-				throw new ServiceException(e);
-			}
+			val fsFile = fs.findFile(new FileId(fileId)).getOrElseThrow(() -> new NotFoundException("File " + fileId + " not found"));
+			fs.deleteFile(fsFile,true);
+			downloadTaskManager.deleteTask(new FileId(fileId));
+			log.info("Deleted downloadTask {}",fileId);
 			return null;
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@GET
+	@Path("{id}")
 	@Override
-	public File getFile(Long id) throws ServiceException
+	public File getFile(@PathParam("id") Long id) throws ServiceException
 	{
 		log.debug("getFile {}",id);
 		return Try.of(() ->
@@ -211,11 +233,13 @@ class FileServiceImpl implements FileService
 			return fsFile.filter(f -> f.isCompleted())
 					.peek(f -> log.info("Retreived file {}",f))
 					.flatMap(f -> dataSource.map(d -> new File(f,new DataHandler(d))))
-					.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
+					.getOrElseThrow(() -> new NotFoundException("File " + id + " not found!"));
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@GET
+	@Path("{id}/info")
 	@Override
 	public FileInfo getFileInfo(Long id) throws ServiceException
 	{
@@ -224,11 +248,12 @@ class FileServiceImpl implements FileService
 		{
 			val fsFile = fs.findFile(new FileId(id));
 			return fsFile.map(f -> new FileInfo(f))
-					.getOrElseThrow(() -> new ServiceException("File " + id + " not found!"));
+					.getOrElseThrow(() -> new NotFoundException("File " + id + " not found!"));
 		})
 		.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
+	@GET
 	@Override
 	public List<FileInfo> getFiles() throws ServiceException
 	{
