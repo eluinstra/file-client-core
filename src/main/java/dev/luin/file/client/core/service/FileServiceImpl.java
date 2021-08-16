@@ -15,7 +15,6 @@
  */
 package dev.luin.file.client.core.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
@@ -28,6 +27,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -72,9 +72,9 @@ public class FileServiceImpl implements FileService
 	DownloadTaskManager downloadTaskManager;
 
 	@POST
-	@Path("upload/{creationUrl}")
+	@Path("upload")
 	@Consumes("multipart/form-data")
-	public UploadTask uploadFile(@PathParam("creationUrl") String creationUrl, @Multipart("sha256Checksum") String sha256Checksum, @Multipart("file") Attachment file) throws ServiceException
+	public UploadTask uploadFile(@Multipart("creationUrl") String creationUrl, @Multipart("sha256Checksum") String sha256Checksum, @Multipart("file") Attachment file) throws ServiceException
 	{
 		return uploadFile(creationUrl,new NewFile(sha256Checksum, file.getDataHandler()));
 	}
@@ -116,9 +116,9 @@ public class FileServiceImpl implements FileService
 	}
 
 	@GET
-	@Path("upload")
+	@Path("upload?status={status}")
 	@Override
-	public List<UploadTask> getUploadTasks(List<UploadStatus.Status> status) throws ServiceException
+	public List<UploadTask> getUploadTasks(@QueryParam("status") List<UploadStatus.Status> status) throws ServiceException
 	{
 		log.debug("getUploadTasks {}",status);
 		return Try.of(() -> 
@@ -151,9 +151,10 @@ public class FileServiceImpl implements FileService
 
 	@POST
 	@Path("download")
+	@Consumes("multipart/form-data")
 	@Override
 	@Transactional("dataSourceTransactionManager")
-	public DownloadTask downloadFile(String url, Instant startDate, Instant endDate) throws ServiceException
+	public DownloadTask downloadFile(@Multipart("url") String url, @Multipart("startDate") Instant startDate, @Multipart("endDate") Instant endDate) throws ServiceException
 	{
 		log.debug("downloadFile {}",url);
 		return Try.of(() -> 
@@ -188,7 +189,7 @@ public class FileServiceImpl implements FileService
 	}
 
 	@GET
-	@Path("download")
+	@Path("download?status={status}")
 	@Override
 	public List<DownloadTask> getDownloadTasks(List<DownloadStatus.Status> status) throws ServiceException
 	{
