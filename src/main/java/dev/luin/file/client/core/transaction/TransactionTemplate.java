@@ -15,11 +15,11 @@
  */
 package dev.luin.file.client.core.transaction;
 
-import io.vavr.Function0;
+import java.util.function.Supplier;
 
 public interface TransactionTemplate
 {
 	void executeTransaction(Runnable runnable);
 	
-	<T> T executeTransactionWithResult(Function0<T> transaction);
+	<T> T executeTransactionWithResult(Supplier<T> transaction);
 }

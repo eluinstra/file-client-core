@@ -27,6 +27,7 @@ import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.ws.WebFault;
 
@@ -54,14 +55,14 @@ public class ServiceException extends RuntimeException
   {
     val message = PhaseInterceptorChain.getCurrentMessage();
     val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
-    if (servletRequest.getContentType() == null || servletRequest.getContentType().equals("application/json"))
+    if (servletRequest.getContentType() == null || servletRequest.getContentType().equals(MediaType.APPLICATION_JSON))
   	{
       val response = Match(exception).of(
 				Case($(instanceOf(NotFoundException.class)),o -> Response.status(NOT_FOUND)
-						.type("application/json")
+						.type(MediaType.APPLICATION_JSON)
 						.build()),
 				Case($(),o ->	Response.status(INTERNAL_SERVER_ERROR)
-						.type("application/json")
+						.type(MediaType.APPLICATION_JSON)
 						.entity(exception.getMessage())
 						.build()));
       throw new WebApplicationException(response);

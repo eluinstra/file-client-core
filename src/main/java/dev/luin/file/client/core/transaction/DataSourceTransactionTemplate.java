@@ -15,9 +15,9 @@
  */
 package dev.luin.file.client.core.transaction;
 
-import org.springframework.transaction.annotation.Transactional;
+import java.util.function.Supplier;
 
-import io.vavr.Function0;
+import org.springframework.transaction.annotation.Transactional;
 
 public class DataSourceTransactionTemplate implements TransactionTemplate
 {
@@ -30,8 +30,8 @@ public class DataSourceTransactionTemplate implements TransactionTemplate
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public <T> T executeTransactionWithResult(Function0<T> function)
+	public <T> T executeTransactionWithResult(Supplier<T> function)
 	{
-		return (T)function.apply();
+		return function.get();
 	}
 }
