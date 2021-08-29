@@ -21,6 +21,12 @@ import org.springframework.context.annotation.Configuration;
 
 import dev.luin.file.client.core.download.DownloadTaskManager;
 import dev.luin.file.client.core.file.FileSystem;
+import dev.luin.file.client.core.service.download.DownloadService;
+import dev.luin.file.client.core.service.download.DownloadServiceImpl;
+import dev.luin.file.client.core.service.file.FileService;
+import dev.luin.file.client.core.service.file.FileServiceImpl;
+import dev.luin.file.client.core.service.upload.UploadService;
+import dev.luin.file.client.core.service.upload.UploadServiceImpl;
 import dev.luin.file.client.core.upload.UploadTaskManager;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -31,14 +37,24 @@ public class ServiceConfig
 {
 	@Autowired
 	FileSystem fs;
+
+	@Bean
 	@Autowired
-	UploadTaskManager uploadTaskManager;
+	public UploadService uploadService(UploadTaskManager uploadTaskManager)
+	{
+		return new UploadServiceImpl(fs,uploadTaskManager);
+	}
+
+	@Bean
 	@Autowired
-	DownloadTaskManager downloadTaskManager;
+	public DownloadService downloadService(DownloadTaskManager downloadTaskManager)
+	{
+		return new DownloadServiceImpl(fs,downloadTaskManager);
+	}
 
 	@Bean
 	public FileService fileService()
 	{
-		return new FileServiceImpl(fs,uploadTaskManager,downloadTaskManager);
+		return new FileServiceImpl(fs);
 	}
 }
