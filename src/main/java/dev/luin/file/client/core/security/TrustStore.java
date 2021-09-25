@@ -15,8 +15,6 @@
  */
 package dev.luin.file.client.core.security;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
@@ -38,14 +36,12 @@ public class TrustStore
 	@NonNull
 	KeyStore keyStore;
 
-	public static TrustStore of(KeyStoreType type, String path, String password) throws GeneralSecurityException, IOException
+	public static TrustStore of(KeyStoreType type, String path, String password)
 	{
-		if (!trustStores.containsKey(path))
-			trustStores.put(path,new TrustStore(type,path,password));
-		return trustStores.get(path);
+		return trustStores.computeIfAbsent(path,k -> new TrustStore(type,k,password));
 	}
 	
-	private TrustStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password) throws GeneralSecurityException, IOException
+	private TrustStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password)
 	{
 		this.keyStore = KeyStoreUtils.loadKeyStore(type,path,password);
 	}

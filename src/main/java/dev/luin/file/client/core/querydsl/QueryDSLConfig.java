@@ -100,7 +100,7 @@ public class QueryDSLConfig
 				Case($(contains("postgresql")),o -> PostgreSQLTemplates.builder().build()),
 				Case($(contains("sqlserver")),o -> SQLServer2012Templates.builder().build()),
 				Case($(),o -> {
-					throw new RuntimeException("Driver class name " + driverClassName + " not recognized!");
+					throw new IllegalArgumentException("Driver class name " + driverClassName + " not recognized!");
 				}));
 	}
 }

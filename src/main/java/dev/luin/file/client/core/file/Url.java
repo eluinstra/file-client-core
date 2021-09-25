@@ -37,7 +37,7 @@ public class Url implements ValueObject<String>
 	public Url(String url)
 	{
 		this(Try.success(url.contains("://0.0.0.0:") ? url.replace("://0.0.0.0:","://localhost:") : url)
-				.mapTry(u -> new URL(u))
+				.mapTry(URL::new)
 				.getOrElseThrow(() -> new IllegalArgumentException("Url is invalid")));
 	}
 

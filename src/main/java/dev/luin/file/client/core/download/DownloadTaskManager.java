@@ -82,7 +82,7 @@ public class DownloadTaskManager
 
 	private Option<ScheduleTime> getNextScheduleTime(DownloadTask task, final Retries retries)
 	{
-		val result = task.getScheduleTime().plus(Duration.ofMinutes((retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval));
+		val result = task.getScheduleTime().plus(Duration.ofMinutes((long)(retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval));
 		return task.getValidTimeFrame().getEndDate() != null && result.isAfter(task.getValidTimeFrame().getEndDate()) ? Option.none() : Option.of(result);
 	}
 

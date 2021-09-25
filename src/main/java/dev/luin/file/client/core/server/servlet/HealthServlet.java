@@ -15,8 +15,6 @@
  */
 package dev.luin.file.client.core.server.servlet;
 
-import java.io.IOException;
-
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -28,7 +26,7 @@ public class HealthServlet extends GenericServlet
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException
+	public void service(ServletRequest req, ServletResponse res) throws ServletException
 	{
 		((HttpServletResponse)res).setStatus(HttpServletResponse.SC_OK);
 	}

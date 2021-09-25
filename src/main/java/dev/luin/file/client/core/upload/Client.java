@@ -55,7 +55,7 @@ public class Client extends TusClient
 	  }
 	}
 
-	public static void main(String[] args) throws GeneralSecurityException, IOException, Exception
+	public static void main(String[] args) throws GeneralSecurityException, ProtocolException, IOException
 	{
 		if (args.length == 0)
 			System.out.println("Usage: Client <file>");

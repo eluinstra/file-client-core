@@ -52,7 +52,7 @@ public class Md5Checksum implements ValueObject<String>
 	{
 		value = Try.success(checksum)
 				.andThen(v -> inclusiveBetween(32,32,v.length()))
-				.map(v -> v.toUpperCase())
+				.map(String::toUpperCase)
 				.andThen(v -> matchesPattern(v,"^[0-9A-F]*$"))
 				.get();
 	}

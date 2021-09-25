@@ -84,5 +84,6 @@ public class ClientCertificateAuthenticationFilter implements Filter
 	@Override
 	public void destroy()
 	{
+		// Do nothing
 	}
 }

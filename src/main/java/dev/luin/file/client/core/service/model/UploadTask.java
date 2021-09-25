@@ -26,13 +26,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import dev.luin.file.client.core.jaxb.InstantAdapter;
 import dev.luin.file.client.core.upload.UploadStatus.Status;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class UploadTask
 {

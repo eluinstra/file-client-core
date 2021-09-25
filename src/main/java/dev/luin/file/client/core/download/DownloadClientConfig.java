@@ -15,8 +15,12 @@
  */
 package dev.luin.file.client.core.download;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+
+import com.querydsl.sql.SQLQueryFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,8 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import com.querydsl.sql.SQLQueryFactory;
 
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.security.KeyStore;
@@ -40,21 +42,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DownloadClientConfig
 {
-	@Autowired
-	@Qualifier("clientKeyStore")
-	KeyStore clientKeyStore;
-	@Autowired
-	TrustStore trustStore;
 	@Value("${https.enabledProtocols}")
 	String[] enabledProtocols;
 	@Value("${https.enabledCipherSuites}")
 	String[] enabledCipherSuites;
 	@Value("${https.verifyHostnames}")
 	boolean verifyHostnames;
-	@Autowired
-	FileSystem fs;
-	@Autowired
-	SQLQueryFactory queryFactory;
 	@Value("${downloadTask.retry.maxAttempts}")
 	int maxRetries;
 	@Value("${downloadTask.retry.interval}")
@@ -63,7 +56,11 @@ public class DownloadClientConfig
 	int retryMaxMultiplier;
 
 	@Bean
-	public DownloadTaskHandler downloadTaskHandler() throws GeneralSecurityException, IOException, Exception
+	public DownloadTaskHandler downloadTaskHandler(
+			@Autowired @Qualifier("clientKeyStore") KeyStore clientKeyStore,
+			@Autowired TrustStore trustStore,
+			@Autowired FileSystem fs,
+			@Autowired DownloadTaskManager downloadTaskManager) throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException
 	{
 		val sslFactoryManager = SSLFactoryManager.builder()
 				.keyStore(clientKeyStore)
@@ -72,17 +69,17 @@ public class DownloadClientConfig
 				.enabledCipherSuites(enabledCipherSuites)
 				.verifyHostnames(verifyHostnames)
 				.build();
-		return new DownloadTaskHandler(fs,HttpClient.createClient(sslFactoryManager.getSslSocketFactory(),fs),downloadTaskManager(),maxRetries);
+		return new DownloadTaskHandler(fs,HttpClient.createClient(sslFactoryManager.getSslSocketFactory(),fs),downloadTaskManager,maxRetries);
 	}
 
 	@Bean
-	public DownloadTaskManager downloadTaskManager()
+	public DownloadTaskManager downloadTaskManager(@Autowired DownloadTaskDAO downloadTaskDAO)
 	{
-		return new DownloadTaskManager(downloadTaskDAO(),retryInterval,retryMaxMultiplier);
+		return new DownloadTaskManager(downloadTaskDAO,retryInterval,retryMaxMultiplier);
 	}
 
 	@Bean
-	public DownloadTaskDAO downloadTaskDAO()
+	public DownloadTaskDAO downloadTaskDAO(@Autowired SQLQueryFactory queryFactory)
 	{
 		return new DownloadTaskDAOImpl(queryFactory);
 	}

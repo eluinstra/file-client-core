@@ -30,13 +30,17 @@ import lombok.var;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class KeyStoreUtils
 {
-	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
+	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password)
 	{
 		try (val in = getInputStream(location))
 		{
 			val keyStore = KeyStore.getInstance(type.name());
 			keyStore.load(in,password.toCharArray());
 			return keyStore;
+		}
+		catch (GeneralSecurityException | IOException e)
+		{
+			throw new IllegalStateException(e);
 		}
 	}
 

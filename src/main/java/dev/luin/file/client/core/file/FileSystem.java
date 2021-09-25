@@ -17,6 +17,7 @@ package dev.luin.file.client.core.file;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
@@ -108,7 +109,7 @@ public class FileSystem
 
 	public boolean deleteFile(@NonNull final FSFile fsFile, final boolean force)
 	{
-		val result = Try.of(() -> fsFile.getFile().delete()).onFailure(t -> log.error("",t));
+		val result = Try.of(() -> Files.deleteIfExists(fsFile.getFile().toPath())).onFailure(t -> log.error("",t));
 		if (force || result.isSuccess())
 			fsFileDAO.deleteFile(fsFile.getId());
 		return force || result.getOrElse(false);

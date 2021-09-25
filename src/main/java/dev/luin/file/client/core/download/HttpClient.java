@@ -17,7 +17,6 @@ package dev.luin.file.client.core.download;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
@@ -46,7 +45,7 @@ public class HttpClient
 	@NonNull
 	FileSystem fs;
 
-	public void download(final FSFile file, final Url url) throws IOException, ProtocolException
+	public void download(final FSFile file, final Url url) throws IOException
 	{
 		log.info("Downloading {}",file);
 		val connection = createHttpConnection(url);
@@ -62,7 +61,7 @@ public class HttpClient
 			throw new IllegalStateException("Unexpected response: " + connection.getResponseCode());
 	}
 
-	private HttpURLConnection createHttpConnection(final Url url) throws IOException
+	private HttpURLConnection createHttpConnection(final Url url)
 	{
 		val connection = (HttpURLConnection)url.openConnection();
 		if (connection instanceof HttpsURLConnection)
@@ -80,10 +79,9 @@ public class HttpClient
 		val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
 				.flatMap(h -> h.getParams().get("filename"))
 				.getOrNull();
-		val result = file.withLength(new Length(contentLength))
+		return file.withLength(new Length(contentLength))
 				.withContentType(new ContentType(contentType))
 				.withName(new Filename(filename));
-		return result;
 	}
 
 	private Option<Long> getContentLength(HttpURLConnection connection)

@@ -15,8 +15,6 @@
  */
 package dev.luin.file.client.core.security;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -44,22 +42,18 @@ public class KeyStore
 	String keyPassword;
 	String defaultAlias;
 
-	public static KeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword) throws GeneralSecurityException, IOException
+	public static KeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword)
 	{
-		if (!keyStores.containsKey(path))
-			keyStores.put(path,new KeyStore(type,path,password,keyPassword,null));
-		return keyStores.get(path);
+		return keyStores.computeIfAbsent(path,k -> new KeyStore(type,k,password,keyPassword,null));
 	}
 
-	public static KeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, @NonNull String defaultAlias) throws GeneralSecurityException, IOException
+	public static KeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, @NonNull String defaultAlias)
 	{
 		String key = path + defaultAlias;
-		if (!keyStores.containsKey(key))
-			keyStores.put(key,new KeyStore(type,path,password,keyPassword,defaultAlias));
-		return keyStores.get(key);
+		return keyStores.computeIfAbsent(key,k -> new KeyStore(type,path,password,keyPassword,defaultAlias));
 	}
 
-	private KeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	private KeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias)
 	{
 		this.path = path;
 		this.keyPassword = keyPassword;

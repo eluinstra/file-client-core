@@ -15,8 +15,6 @@
  */
 package dev.luin.file.client.core.transaction;
 
-import java.beans.PropertyVetoException;
-
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +32,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TransactionManagerConfig
 {
-	@Autowired
-	DataSource dataSource;
-
 	@Bean("dataSourceTransactionManager")
-	public PlatformTransactionManager dataSourceTransactionManager() throws PropertyVetoException
+	public PlatformTransactionManager dataSourceTransactionManager(@Autowired DataSource dataSource)
 	{
 		return new DataSourceTransactionManager(dataSource);
 	}

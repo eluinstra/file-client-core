@@ -15,12 +15,12 @@
  */
 package dev.luin.file.client.core.file;
 
+import com.querydsl.sql.SQLQueryFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -33,21 +33,19 @@ public class FileSystemConfig
 	String baseDir;
 	@Value("${file.filenameLength}")
 	int filenameLength;
-	@Autowired
-	SQLQueryFactory queryFactory;
 
 	@Bean
-	public FileSystem fileSystem()
+	public FileSystem fileSystem(@Autowired FSFileDAO fsFileDAO)
 	{
 		return FileSystem.builder()
-				.fsFileDAO(fsFileDAO())
+				.fsFileDAO(fsFileDAO)
 				.baseDir(baseDir)
 				.filenameLength(filenameLength)
 				.build();
 	}
 
 	@Bean
-	public FSFileDAO fsFileDAO()
+	public FSFileDAO fsFileDAO(@Autowired SQLQueryFactory queryFactory)
 	{
 		return new FSFileDAOImpl(queryFactory);
 	}
