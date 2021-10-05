@@ -16,6 +16,7 @@
 package dev.luin.file.client.core.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +24,7 @@ import dev.luin.file.client.core.download.DownloadTaskManager;
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.service.download.DownloadService;
 import dev.luin.file.client.core.service.download.DownloadServiceImpl;
+import dev.luin.file.client.core.service.file.AttachmentFactory;
 import dev.luin.file.client.core.service.file.FileService;
 import dev.luin.file.client.core.service.file.FileServiceImpl;
 import dev.luin.file.client.core.service.upload.UploadService;
@@ -35,6 +37,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServiceConfig
 {
+	@Value("${attachment.outputDirectory}")
+	String attachmentOutputDirectory;
+	@Value("${attachment.memoryTreshold}")
+	int attachmentMemoryTreshold;
+	@Value("${attachment.cipherTransformation}")
+	String attachmentCipherTransformation;
 	@Autowired
 	FileSystem fs;
 
@@ -57,4 +65,11 @@ public class ServiceConfig
 	{
 		return new FileServiceImpl(fs);
 	}
+
+	@Bean
+	public void ebMSAttachmentFactory()
+	{
+		AttachmentFactory.init(attachmentOutputDirectory,attachmentMemoryTreshold,attachmentCipherTransformation);
+	}
+
 }
