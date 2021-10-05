@@ -95,7 +95,7 @@ public class HttpClient
 		while (!file.isCompleted())
 		{
 			val connection = createHttpConnection(url);
-		  connection.setRequestProperty("Range","bytes=" + file.getFileLength() + "-" + file.getLength());
+		  connection.setRequestProperty("Range","bytes=" + file.getFileLength().getStringValue() + "-" + file.getLength().getStringValue());
 		  file = fs.append(file,connection.getInputStream());
 		}
 		return file;
