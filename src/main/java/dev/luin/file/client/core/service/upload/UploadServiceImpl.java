@@ -15,7 +15,9 @@
  */
 package dev.luin.file.client.core.service.upload;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -31,13 +33,16 @@ import javax.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
+import dev.luin.file.client.core.file.ContentType;
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.FileSystem;
+import dev.luin.file.client.core.file.Filename;
 import dev.luin.file.client.core.file.Url;
 import dev.luin.file.client.core.service.NotFoundException;
 import dev.luin.file.client.core.service.ServiceException;
 import dev.luin.file.client.core.service.model.File;
+import dev.luin.file.client.core.service.model.FileDataSource;
 import dev.luin.file.client.core.service.model.NewFSFileImpl;
 import dev.luin.file.client.core.service.model.NewFile;
 import dev.luin.file.client.core.service.model.UploadTask;
@@ -73,6 +78,33 @@ public class UploadServiceImpl implements UploadService
 			@Multipart("file") Attachment file) throws ServiceException
 	{
 		return uploadFile(creationUrl,new NewFile(sha256Checksum,file.getDataHandler()));
+	}
+
+	@POST
+	@Path("")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public UploadTask uploadFileFromFs(
+			@Multipart("creationUrl") String creationUrl,
+			@Multipart("fileLocation") String file) throws ServiceException
+	{
+		val dataHandler = Try.of(() ->
+		{
+			// TODO: review if all of this code belongs here
+			try {
+				val toFile = new java.io.File(file);
+				if (!toFile.exists() || !toFile.canRead())
+					throw new FileNotFoundException(file);
+				
+				val contentType = Files.probeContentType(toFile.toPath());
+				val filename = new Filename(toFile.getName());
+				val ds = new FileDataSource(toFile, filename, new ContentType(contentType == null ? "application/octet-stream" : contentType));
+
+				return new javax.activation.DataHandler(ds);
+			} catch (Exception e) {
+				throw new ServiceException(e);
+			}
+		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		return uploadFile(creationUrl,new NewFile(null, dataHandler));
 	}
 
 	@Override
