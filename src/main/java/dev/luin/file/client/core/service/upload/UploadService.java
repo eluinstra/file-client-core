@@ -36,9 +36,6 @@ public interface UploadService
 	UploadTask uploadFile(@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl, @WebParam(name = "file") @XmlElement(required = true) NewFile file) throws ServiceException;
 
 	@WebResult(name = "uploadTask")
-	UploadTask uploadFileFromFs(@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl, @WebParam(name = "fileLocation") @XmlElement(required = true) String file) throws ServiceException;
-
-	@WebResult(name = "uploadTask")
 	UploadTask getUploadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;
 
 	@WebResult(name = "uploadTask")
