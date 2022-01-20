@@ -49,6 +49,8 @@ public class ServiceConfig
 	FileSystem fs;
 	@Value("${file.share.upload.location}")
 	String shareUploadLocation;
+	@Value("${file.share.download.location}")
+	String shareDownloadLocation;
 
 	@Bean
 	@Autowired
@@ -67,7 +69,7 @@ public class ServiceConfig
 	@Bean
 	public FileService fileService()
 	{
-		return new FileServiceImpl(fs);
+		return new FileServiceImpl(fs,Paths.get(shareDownloadLocation).toAbsolutePath());
 	}
 
 	@Bean

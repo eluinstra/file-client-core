@@ -32,7 +32,10 @@ import dev.luin.file.client.core.service.model.FileInfo;
 public interface FileService
 {
 	@WebResult(name = "file")
-	File getFile(@WebParam(name = "id") @XmlElement(required = true) Long id) throws ServiceException;
+	File downloadFile(@WebParam(name = "id") @XmlElement(required = true) Long id) throws ServiceException;
+
+	@WebResult(name = "file")
+	FileInfo downloadFileToFs(@WebParam(name = "id") @XmlElement(required = true) Long id, @WebParam(name = "filename") @XmlElement(required = true) String filename) throws ServiceException;
 
 	@WebResult(name = "fileInfo")
 	FileInfo getFileInfo(@WebParam(name = "id") @XmlElement(required = true) Long id) throws ServiceException;
