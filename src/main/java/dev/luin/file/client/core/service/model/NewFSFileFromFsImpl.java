@@ -15,44 +15,69 @@
  */
 package dev.luin.file.client.core.service.model;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import javax.ws.rs.core.MediaType;
 
 import dev.luin.file.client.core.file.ContentType;
 import dev.luin.file.client.core.file.Filename;
 import dev.luin.file.client.core.file.NewFSFile;
 import dev.luin.file.client.core.file.Sha256Checksum;
+import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(staticName = "of")
-public class NewFSFileImpl implements NewFSFile
+public class NewFSFileFromFsImpl implements NewFSFile
 {
-	NewFile file;
+	@NonNull
+	NewFileFromFs file;
+	@NonNull
+	Path sharedFs;
 
 	@Override
 	public Filename getName()
 	{
-		return new Filename(file.getContent().getName());
+		return file.getName();
 	}
 
 	@Override
 	public ContentType getContentType()
 	{
-		return new ContentType(file.getContent().getContentType());
+		val f = sharedFs.resolve(file.getName().getValue());
+		val contentType = Try.of(() -> Files.probeContentType(f))
+			.getOrElse(MediaType.APPLICATION_OCTET_STREAM);
+		return new ContentType(contentType);
 	}
 
 	@Override
 	public Sha256Checksum getSha256Checksum()
 	{
-		return file.getSha256Checksum() == null ? null : new Sha256Checksum(file.getSha256Checksum());
+		return new Sha256Checksum(file.getSha256Checksum());
 	}
 
 	@Override
 	public InputStream getInputStream() throws IOException
 	{
-		return file.getContent().getInputStream();
+		val f = validateFilename(file.getName().getValue(), sharedFs);
+		return new FileInputStream(f.toFile());
 	}
+
+	public static Path validateFilename(String filename, Path sharedFs) throws IOException
+	{
+		val f = sharedFs.resolve(filename);
+		if (f.toAbsolutePath().startsWith(sharedFs))
+			return f;
+		else
+			throw new IOException("Illegal file access");
+	}
+
 }

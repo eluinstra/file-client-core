@@ -15,6 +15,8 @@
  */
 package dev.luin.file.client.core.service;
 
+import java.nio.file.Paths;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -45,12 +47,14 @@ public class ServiceConfig
 	String attachmentCipherTransformation;
 	@Autowired
 	FileSystem fs;
+	@Value("${file.share.upload.location}")
+	String shareUploadLocation;
 
 	@Bean
 	@Autowired
 	public UploadService uploadService(UploadTaskManager uploadTaskManager)
 	{
-		return new UploadServiceImpl(fs,uploadTaskManager);
+		return new UploadServiceImpl(fs,Paths.get(shareUploadLocation).toAbsolutePath(),uploadTaskManager);
 	}
 
 	@Bean

@@ -25,6 +25,7 @@ import javax.xml.ws.soap.MTOM;
 
 import dev.luin.file.client.core.service.ServiceException;
 import dev.luin.file.client.core.service.model.NewFile;
+import dev.luin.file.client.core.service.model.NewFileFromFs;
 import dev.luin.file.client.core.service.model.UploadTask;
 import dev.luin.file.client.core.upload.UploadStatus;
 
@@ -34,6 +35,9 @@ public interface UploadService
 {
 	@WebResult(name = "uploadTask")
 	UploadTask uploadFile(@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl, @WebParam(name = "file") @XmlElement(required = true) NewFile file) throws ServiceException;
+
+	@WebResult(name = "uploadTask")
+	UploadTask uploadFileFromFs(@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl, @WebParam(name = "file") @XmlElement(required = true) NewFileFromFs file) throws ServiceException;
 
 	@WebResult(name = "uploadTask")
 	UploadTask getUploadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;

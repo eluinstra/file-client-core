@@ -15,21 +15,18 @@
  */
 package dev.luin.file.client.core.service.model;
 
-import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import dev.luin.file.client.core.file.FSFile;
+import dev.luin.file.client.core.file.Filename;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @XmlRootElement(name = "file")
@@ -39,22 +36,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class File
+public class NewFileFromFs
 {
-	@XmlElement(required=true)
-	Long id;
 	@XmlElement
 	String sha256Checksum;
-	@XmlMimeType("application/octet-stream")
 	@XmlElement(required=true)
 	@NonNull
-	@ToString.Exclude
-	DataHandler content;
-
-	public File(FSFile file, DataHandler content)
-	{
-		this.id = file.getId().getValue();
-		this.sha256Checksum = file.getSha256Checksum().getValue();
-		this.content = content;
-	}
+	Filename name;
 }
