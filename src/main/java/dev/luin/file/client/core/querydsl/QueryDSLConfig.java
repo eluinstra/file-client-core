@@ -68,7 +68,6 @@ public class QueryDSLConfig
 		result.register(new DownloadStatusType(Types.TINYINT));
 		result.register(new FileIdType(Types.BIGINT));
 		result.register(new FilenameType(Types.VARBINARY));
-		result.register(new InstantType(Types.TIMESTAMP));
 		result.register(new LengthType(Types.BIGINT));
 		result.register(new Md5ChecksumType(Types.VARCHAR));
 		result.register(new PathType(Types.VARCHAR));
