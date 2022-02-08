@@ -107,7 +107,7 @@ public class UploadServiceImpl implements UploadService
 			@Multipart(value = "sha256Checksum", required = false) String sha256Checksum,
 			@Multipart("filename") String filename) throws ServiceException
 	{
-		return uploadFileFromFs(creationUrl,new NewFileFromFs(sha256Checksum,new Filename(filename)));
+		return uploadFileFromFs(creationUrl,new NewFileFromFs(sha256Checksum,filename));
 	}
 		
 	@Override

@@ -42,5 +42,5 @@ public class NewFileFromFs
 	String sha256Checksum;
 	@XmlElement(required=true)
 	@NonNull
-	Filename name;
+	String name;
 }
