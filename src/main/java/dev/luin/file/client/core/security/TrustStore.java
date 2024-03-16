@@ -22,7 +22,6 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -32,18 +31,18 @@ import lombok.Value;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TrustStore
 {
-	private static Map<String,TrustStore> trustStores = new ConcurrentHashMap<>();
+	private static Map<String, TrustStore> trustStores = new ConcurrentHashMap<>();
 	@NonNull
 	KeyStore keyStore;
 
 	public static TrustStore of(KeyStoreType type, String path, String password)
 	{
-		return trustStores.computeIfAbsent(path,k -> new TrustStore(type,k,password));
+		return trustStores.computeIfAbsent(path, k -> new TrustStore(type, k, password));
 	}
-	
+
 	private TrustStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password)
 	{
-		this.keyStore = KeyStoreUtils.loadKeyStore(type,path,password);
+		this.keyStore = KeyStoreUtils.loadKeyStore(type, path, password);
 	}
 
 	public Enumeration<String> aliases() throws KeyStoreException

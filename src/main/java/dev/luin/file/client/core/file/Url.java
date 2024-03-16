@@ -15,12 +15,11 @@
  */
 package dev.luin.file.client.core.file;
 
+import dev.luin.file.client.core.ValueObject;
+import io.vavr.control.Try;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-
-import dev.luin.file.client.core.ValueObject;
-import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -36,9 +35,10 @@ public class Url implements ValueObject<String>
 
 	public Url(String url)
 	{
-		this(Try.success(url.contains("://0.0.0.0:") ? url.replace("://0.0.0.0:","://localhost:") : url)
-				.mapTry(URL::new)
-				.getOrElseThrow(() -> new IllegalArgumentException("Url is invalid")));
+		this(
+				Try.success(url.contains("://0.0.0.0:") ? url.replace("://0.0.0.0:", "://localhost:") : url)
+						.mapTry(URL::new)
+						.getOrElseThrow(() -> new IllegalArgumentException("Url is invalid")));
 	}
 
 	public Url(URL url)

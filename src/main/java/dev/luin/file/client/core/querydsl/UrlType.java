@@ -15,13 +15,11 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.file.Url;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.file.Url;
 
 public class UrlType extends AbstractType<Url>
 {
@@ -50,6 +48,6 @@ public class UrlType extends AbstractType<Url>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Url value) throws SQLException
 	{
-		st.setString(startIndex,value != null ? value.getValue() : null);
+		st.setString(startIndex, value != null ? value.getValue() : null);
 	}
 }

@@ -35,9 +35,7 @@ public class FileId implements ValueObject<Long>
 
 	public FileId(@NonNull Long fileId)
 	{
-		value = Try.success(fileId)
-				.andThen(v -> isTrue(v >= 0))
-				.get();
+		value = Try.success(fileId).andThen(v -> isTrue(v >= 0)).get();
 	}
 
 	public String getStringValue()

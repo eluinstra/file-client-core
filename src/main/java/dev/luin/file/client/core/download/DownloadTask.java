@@ -15,14 +15,13 @@
  */
 package dev.luin.file.client.core.download;
 
-import java.time.Instant;
-
 import dev.luin.file.client.core.Retries;
 import dev.luin.file.client.core.ScheduleTime;
 import dev.luin.file.client.core.download.DownloadStatus.Status;
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.Timestamp;
 import dev.luin.file.client.core.file.Url;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -53,16 +52,32 @@ public class DownloadTask
 	{
 		val now = Instant.now();
 		val scheduleTime = new ScheduleTime(startDate != null ? startDate : now);
-		return new DownloadTask(fileId,url,new TimeFrame(startDate,endDate),new Timestamp(now),new DownloadStatus(Status.CREATED,now),scheduleTime,new Retries());
+		return new DownloadTask(
+				fileId,
+				url,
+				new TimeFrame(startDate, endDate),
+				new Timestamp(now),
+				new DownloadStatus(Status.CREATED, now),
+				scheduleTime,
+				new Retries());
 	}
 
-	public DownloadTask(FileId fileId, @NonNull Url url, Instant startDate, Instant endDate, @NonNull Timestamp timestamp, @NonNull Status status, @NonNull Instant statusTime, @NonNull ScheduleTime scheduleTime, Retries retries)
+	public DownloadTask(
+			FileId fileId,
+			@NonNull Url url,
+			Instant startDate,
+			Instant endDate,
+			@NonNull Timestamp timestamp,
+			@NonNull Status status,
+			@NonNull Instant statusTime,
+			@NonNull ScheduleTime scheduleTime,
+			Retries retries)
 	{
 		this.fileId = fileId;
 		this.url = url;
-		this.validTimeFrame = new TimeFrame(startDate,endDate);
+		this.validTimeFrame = new TimeFrame(startDate, endDate);
 		this.timestamp = timestamp;
-		this.status = new DownloadStatus(status,statusTime);
+		this.status = new DownloadStatus(status, statusTime);
 		this.scheduleTime = scheduleTime;
 		this.retries = retries;
 	}

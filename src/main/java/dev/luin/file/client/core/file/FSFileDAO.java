@@ -22,9 +22,14 @@ import lombok.NonNull;
 interface FSFileDAO
 {
 	Option<FSFile> findFile(FileId id);
+
 	Option<FSFile> findFile(Url url);
+
 	Seq<FSFile> selectFiles();
+
 	FSFile insertFile(@NonNull FSFile fsFile);
+
 	long updateFile(@NonNull FSFile fsFile);
+
 	long deleteFile(FileId id);
 }

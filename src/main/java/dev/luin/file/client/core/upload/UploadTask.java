@@ -15,14 +15,13 @@
  */
 package dev.luin.file.client.core.upload;
 
-import java.time.Instant;
-
 import dev.luin.file.client.core.Retries;
 import dev.luin.file.client.core.ScheduleTime;
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.Timestamp;
 import dev.luin.file.client.core.file.Url;
 import dev.luin.file.client.core.upload.UploadStatus.Status;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -52,15 +51,22 @@ public class UploadTask
 	static UploadTask of(FileId fileId, Url createUrl)
 	{
 		val now = Instant.now();
-		return new UploadTask(fileId,createUrl,new Timestamp(now),new UploadStatus(Status.CREATED,now),new ScheduleTime(now),new Retries());
+		return new UploadTask(fileId, createUrl, new Timestamp(now), new UploadStatus(Status.CREATED, now), new ScheduleTime(now), new Retries());
 	}
 
-	public UploadTask(FileId fileId, @NonNull Url creationUrl, @NonNull Timestamp timestamp, @NonNull Status status, @NonNull Instant statusTime, @NonNull ScheduleTime scheduleTime, Retries retries)
+	public UploadTask(
+			FileId fileId,
+			@NonNull Url creationUrl,
+			@NonNull Timestamp timestamp,
+			@NonNull Status status,
+			@NonNull Instant statusTime,
+			@NonNull ScheduleTime scheduleTime,
+			Retries retries)
 	{
 		this.fileId = fileId;
 		this.creationUrl = creationUrl;
 		this.timestamp = timestamp;
-		this.status = new UploadStatus(status,statusTime);
+		this.status = new UploadStatus(status, statusTime);
 		this.scheduleTime = scheduleTime;
 		this.retries = retries;
 	}

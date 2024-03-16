@@ -15,15 +15,13 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.file.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.file.Timestamp;
 
 class TimestampType extends AbstractType<Timestamp>
 {

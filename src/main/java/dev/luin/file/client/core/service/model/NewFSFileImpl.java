@@ -15,13 +15,12 @@
  */
 package dev.luin.file.client.core.service.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import dev.luin.file.client.core.file.ContentType;
 import dev.luin.file.client.core.file.Filename;
 import dev.luin.file.client.core.file.NewFSFile;
 import dev.luin.file.client.core.file.Sha256Checksum;
+import java.io.IOException;
+import java.io.InputStream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;

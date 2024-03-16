@@ -21,7 +21,10 @@ import java.io.InputStream;
 public interface NewFSFile
 {
 	Filename getName();
+
 	ContentType getContentType();
+
 	Sha256Checksum getSha256Checksum();
+
 	InputStream getInputStream() throws IOException;
 }

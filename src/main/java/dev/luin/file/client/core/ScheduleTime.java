@@ -17,7 +17,6 @@ package dev.luin.file.client.core;
 
 import java.time.Duration;
 import java.time.Instant;
-
 import lombok.NonNull;
 import lombok.Value;
 

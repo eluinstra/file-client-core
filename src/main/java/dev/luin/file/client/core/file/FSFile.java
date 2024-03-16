@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.Instant;
-
-import org.apache.commons.io.IOUtils;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +30,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
 import lombok.val;
+import org.apache.commons.io.IOUtils;
 
 @Builder(access = AccessLevel.PACKAGE)
 @Value
@@ -44,7 +42,7 @@ public class FSFile
 	@With
 	Url url;
 	@NonNull
-	@Getter(value=AccessLevel.PACKAGE)
+	@Getter(value = AccessLevel.PACKAGE)
 	Path path;
 	@With
 	Filename name;
@@ -84,9 +82,9 @@ public class FSFile
 		val file = getFile();
 		if (!file.exists() || isCompleted())
 			throw new FileNotFoundException(url.toString());
-		try (val output = new FileOutputStream(file,true))
+		try (val output = new FileOutputStream(file, true))
 		{
-			IOUtils.copyLarge(input,output);
+			IOUtils.copyLarge(input, output);
 			return isCompleted() ? complete() : this;
 		}
 	}
@@ -96,9 +94,7 @@ public class FSFile
 		val file = getFile();
 		if (!file.exists())// || !fsFile.isCompleted())
 			throw new FileNotFoundException(url.toString());
-		return this
-			.withSha256Checksum(Sha256Checksum.of(file))
-			.withMd5Checksum(Md5Checksum.of(file));
+		return this.withSha256Checksum(Sha256Checksum.of(file)).withMd5Checksum(Md5Checksum.of(file));
 	}
 
 	FSFile append(@NonNull final InputStream input, final long first, final long length) throws IOException
@@ -106,9 +102,9 @@ public class FSFile
 		val file = getFile();
 		if (!file.exists() || isCompleted())
 			throw new FileNotFoundException(url.toString());
-		try (val output = new FileOutputStream(file,true))
+		try (val output = new FileOutputStream(file, true))
 		{
-			IOUtils.copyLarge(input,output,first,length);
+			IOUtils.copyLarge(input, output, first, length);
 			return isCompleted() ? complete() : this;
 		}
 	}

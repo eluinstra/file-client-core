@@ -16,7 +16,6 @@
 package dev.luin.file.client.core.download;
 
 import java.time.Instant;
-
 import lombok.Value;
 import lombok.val;
 
@@ -42,7 +41,6 @@ public class TimeFrame
 	public boolean isValid()
 	{
 		val now = Instant.now();
-		return (startDate == null || startDate.compareTo(now) <= 0
-				&& endDate == null || endDate.compareTo(now) > 0);
+		return (startDate == null || startDate.compareTo(now) <= 0 && endDate == null || endDate.compareTo(now) > 0);
 	}
 }

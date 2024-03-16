@@ -15,6 +15,8 @@
  */
 package dev.luin.file.client.core.upload;
 
+import dev.luin.file.client.core.security.KeyStore;
+import dev.luin.file.client.core.security.TrustStore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -26,7 +28,6 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
@@ -36,17 +37,13 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
-
-import dev.luin.file.client.core.security.KeyStore;
-import dev.luin.file.client.core.security.TrustStore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SSLFactoryManager
@@ -62,25 +59,25 @@ public class SSLFactoryManager
 		@Override
 		public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
 		{
-			return standardKeyManager.chooseServerAlias(keyType,issuers,socket);
+			return standardKeyManager.chooseServerAlias(keyType, issuers, socket);
 		}
 
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 		{
-			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType,issuers,socket) : clientAlias;
+			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType, issuers, socket) : clientAlias;
 		}
 
 		@Override
 		public String[] getServerAliases(String keyType, Principal[] issuers)
 		{
-			return standardKeyManager.getServerAliases(keyType,issuers);
+			return standardKeyManager.getServerAliases(keyType, issuers);
 		}
 
 		@Override
 		public String[] getClientAliases(String keyType, Principal[] issuers)
 		{
-			return standardKeyManager.getClientAliases(keyType,issuers);
+			return standardKeyManager.getClientAliases(keyType, issuers);
 		}
 
 		@Override
@@ -116,7 +113,7 @@ public class SSLFactoryManager
 		@Override
 		public Socket createSocket(Socket s, InputStream consumed, boolean autoClose) throws IOException
 		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(s,consumed,autoClose);
+			val socket = (SSLSocket)sslSocketFactory.createSocket(s, consumed, autoClose);
 			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
@@ -124,7 +121,7 @@ public class SSLFactoryManager
 		@Override
 		public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException
 		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(s,host,port,autoClose);
+			val socket = (SSLSocket)sslSocketFactory.createSocket(s, host, port, autoClose);
 			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
@@ -144,7 +141,7 @@ public class SSLFactoryManager
 		@Override
 		public Socket createSocket(String host, int port) throws IOException
 		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port);
+			val socket = (SSLSocket)sslSocketFactory.createSocket(host, port);
 			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
@@ -152,7 +149,7 @@ public class SSLFactoryManager
 		@Override
 		public Socket createSocket(InetAddress host, int port) throws IOException
 		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port);
+			val socket = (SSLSocket)sslSocketFactory.createSocket(host, port);
 			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
@@ -160,7 +157,7 @@ public class SSLFactoryManager
 		@Override
 		public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException
 		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port,localHost,localPort);
+			val socket = (SSLSocket)sslSocketFactory.createSocket(host, port, localHost, localPort);
 			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
@@ -168,7 +165,7 @@ public class SSLFactoryManager
 		@Override
 		public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException
 		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(address,port,localAddress,localPort);
+			val socket = (SSLSocket)sslSocketFactory.createSocket(address, port, localAddress, localPort);
 			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
@@ -200,32 +197,31 @@ public class SSLFactoryManager
 		this.verifyHostnames = verifyHostnames;
 		this.enabledProtocols = enabledProtocols == null ? new String[]{} : enabledProtocols;
 		this.enabledCipherSuites = enabledCipherSuites == null ? new String[]{} : enabledCipherSuites;
-		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		// KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		val kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
+		kmf.init(keyStore.getKeyStore(), keyStore.getKeyPassword().toCharArray());
 
 		val keyManagers = kmf.getKeyManagers();
 		for (var i = 0; i < keyManagers.length; i++)
 			if (keyManagers[i] instanceof X509KeyManager)
-				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
+				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i], clientAlias);
 
-		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		// TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		val tmf = TrustManagerFactory.getInstance("SunX509");
 		tmf.init(trustStore.getKeyStore());
 
 		val sslContext = SSLContext.getInstance("TLS");
-		sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+		sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
-		//val engine = sslContext.createSSLEngine(hostname,port);
+		// val engine = sslContext.createSSLEngine(hostname,port);
 		val engine = sslContext.createSSLEngine();
 		engine.setUseClientMode(true);
-		//engine.setSSLParameters(createSSLParameters());
+		// engine.setSSLParameters(createSSLParameters());
 
-		//sslSocketFactory = sslContext.getSocketFactory();
-		sslSocketFactory = new SSLSocketFactoryWrapper(sslContext.getSocketFactory(),createSSLParameters());
+		// sslSocketFactory = sslContext.getSocketFactory();
+		sslSocketFactory = new SSLSocketFactoryWrapper(sslContext.getSocketFactory(), createSSLParameters());
 	}
 
-	
 	private SSLParameters createSSLParameters()
 	{
 		val result = new SSLParameters();
@@ -238,7 +234,7 @@ public class SSLFactoryManager
 
 	public HostnameVerifier getHostnameVerifier()
 	{
-		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h, s) -> true;
 	}
-	
+
 }

@@ -15,13 +15,6 @@
  */
 package dev.luin.file.client.core.service;
 
-import java.nio.file.Paths;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import dev.luin.file.client.core.download.DownloadTaskManager;
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.service.download.DownloadService;
@@ -32,8 +25,13 @@ import dev.luin.file.client.core.service.file.FileServiceImpl;
 import dev.luin.file.client.core.service.upload.UploadService;
 import dev.luin.file.client.core.service.upload.UploadServiceImpl;
 import dev.luin.file.client.core.upload.UploadTaskManager;
+import java.nio.file.Paths;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -56,26 +54,26 @@ public class ServiceConfig
 	@Autowired
 	public UploadService uploadService(UploadTaskManager uploadTaskManager)
 	{
-		return new UploadServiceImpl(fs,Paths.get(shareUploadLocation).toAbsolutePath(),uploadTaskManager);
+		return new UploadServiceImpl(fs, Paths.get(shareUploadLocation).toAbsolutePath(), uploadTaskManager);
 	}
 
 	@Bean
 	@Autowired
 	public DownloadService downloadService(DownloadTaskManager downloadTaskManager)
 	{
-		return new DownloadServiceImpl(fs,downloadTaskManager);
+		return new DownloadServiceImpl(fs, downloadTaskManager);
 	}
 
 	@Bean
 	public FileService fileService()
 	{
-		return new FileServiceImpl(fs,Paths.get(shareDownloadLocation).toAbsolutePath());
+		return new FileServiceImpl(fs, Paths.get(shareDownloadLocation).toAbsolutePath());
 	}
 
 	@Bean
 	public void ebMSAttachmentFactory()
 	{
-		AttachmentFactory.init(attachmentOutputDirectory,attachmentMemoryTreshold,attachmentCipherTransformation);
+		AttachmentFactory.init(attachmentOutputDirectory, attachmentMemoryTreshold, attachmentCipherTransformation);
 	}
 
 }

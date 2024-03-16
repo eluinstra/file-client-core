@@ -15,13 +15,11 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.file.ContentType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.file.ContentType;
 
 class ContentTypeType extends AbstractType<ContentType>
 {
@@ -50,6 +48,6 @@ class ContentTypeType extends AbstractType<ContentType>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, ContentType value) throws SQLException
 	{
-		st.setString(startIndex,value.getValue());
+		st.setString(startIndex, value.getValue());
 	}
 }

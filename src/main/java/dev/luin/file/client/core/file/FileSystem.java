@@ -15,24 +15,23 @@
  */
 package dev.luin.file.client.core.file;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @Builder
-@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class FileSystem
 {
@@ -54,9 +53,7 @@ public class FileSystem
 
 	public FSFile createNewFile(@NonNull final NewFSFile newFile) throws IOException
 	{
-		val randomFile = RandomFile.create(baseDir,filenameLength)
-				.andThenTry(f -> f.write(newFile.getInputStream()))
-				.get();
+		val randomFile = RandomFile.create(baseDir, filenameLength).andThenTry(f -> f.write(newFile.getInputStream())).get();
 		val calculatedSha256Checksum = Sha256Checksum.of(randomFile.getFile());
 		if (newFile.getSha256Checksum() == null || calculatedSha256Checksum.validate(newFile.getSha256Checksum()))
 		{
@@ -72,17 +69,20 @@ public class FileSystem
 			return fsFileDAO.insertFile(result);
 		}
 		else
-			throw new IOException("Checksum error for file " + newFile.getName() + ". Checksum of the file uploaded (" + calculatedSha256Checksum + ") is not equal to the provided checksum (" + newFile.getSha256Checksum() + ")");
+			throw new IOException(
+					"Checksum error for file "
+							+ newFile.getName()
+							+ ". Checksum of the file uploaded ("
+							+ calculatedSha256Checksum
+							+ ") is not equal to the provided checksum ("
+							+ newFile.getSha256Checksum()
+							+ ")");
 	}
-	
+
 	public FSFile createEmptyFile(@NonNull final String url) throws IOException
 	{
-		val randomFile = RandomFile.create(baseDir,filenameLength).get();
-		val result = FSFile.builder()
-				.url(new Url(url))
-				.path(randomFile.getPath())
-				.timestamp(new Timestamp())
-				.build();
+		val randomFile = RandomFile.create(baseDir, filenameLength).get();
+		val result = FSFile.builder().url(new Url(url)).path(randomFile.getPath()).timestamp(new Timestamp()).build();
 		return fsFileDAO.insertFile(result);
 	}
 
@@ -101,7 +101,7 @@ public class FileSystem
 
 	public FSFile append(@NonNull final FSFile fsFile, @NonNull final InputStream input, final long first, final long length) throws IOException
 	{
-		val result = fsFile.append(input,first,length);
+		val result = fsFile.append(input, first, length);
 		if (result.isCompleted())
 			fsFileDAO.updateFile(result);
 		return result;
@@ -109,7 +109,7 @@ public class FileSystem
 
 	public boolean deleteFile(@NonNull final FSFile fsFile, final boolean force)
 	{
-		val result = Try.of(() -> Files.deleteIfExists(fsFile.getFile().toPath())).onFailure(t -> log.error("",t));
+		val result = Try.of(() -> Files.deleteIfExists(fsFile.getFile().toPath())).onFailure(t -> log.error("", t));
 		if (force || result.isSuccess())
 			fsFileDAO.deleteFile(fsFile.getId());
 		return force || result.getOrElse(false);

@@ -15,15 +15,6 @@
  */
 package dev.luin.file.client.core.upload;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
 import dev.luin.file.client.core.security.KeyStore;
 import dev.luin.file.client.core.security.KeyStoreType;
 import dev.luin.file.client.core.security.TrustStore;
@@ -33,10 +24,17 @@ import io.tus.java.client.TusExecutor;
 import io.tus.java.client.TusURLMemoryStore;
 import io.tus.java.client.TusUpload;
 import io.tus.java.client.TusUploader;
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -52,7 +50,7 @@ public class Client extends TusClient
 		{
 			HttpsURLConnection secureConnection = (HttpsURLConnection)connection;
 			secureConnection.setSSLSocketFactory(sslSocketFactory);
-	  }
+		}
 	}
 
 	public static void main(String[] args) throws GeneralSecurityException, ProtocolException, IOException
@@ -60,10 +58,10 @@ public class Client extends TusClient
 		if (args.length == 0)
 			System.out.println("Usage: Client <file>");
 		val sslFactoryManager = SSLFactoryManager.builder()
-				.keyStore(KeyStore.of(KeyStoreType.PKCS12,"dev/luin/file/client/core/keystore.p12","password","password"))
-				.trustStore(TrustStore.of(KeyStoreType.PKCS12,"dev/luin/file/client/core/truststore.p12","password"))
+				.keyStore(KeyStore.of(KeyStoreType.PKCS12, "dev/luin/file/client/core/keystore.p12", "password", "password"))
+				.trustStore(TrustStore.of(KeyStoreType.PKCS12, "dev/luin/file/client/core/truststore.p12", "password"))
 				.enabledProtocols(new String[]{"TLSv1.2"})
-				.enabledCipherSuites(new String[]{"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"})
+				.enabledCipherSuites(new String[]{"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"})
 				.verifyHostnames(true)
 				.build();
 		val client = new Client(sslFactoryManager.getSslSocketFactory());
@@ -85,11 +83,11 @@ public class Client extends TusClient
 					long totalBytes = upload.getSize();
 					long bytesUploaded = uploader.getOffset();
 					double progress = (double)bytesUploaded / totalBytes * 100;
-					System.out.printf("Upload at %06.2f%%.\n",progress);
+					System.out.printf("Upload at %06.2f%%.\n", progress);
 				} while (uploader.uploadChunk() > -1);
 				uploader.finish();
 				System.out.println("Upload finished.");
-				System.out.format("Upload available at: %s",uploader.getUploadURL().toString());
+				System.out.format("Upload available at: %s", uploader.getUploadURL().toString());
 			}
 		};
 		executor.makeAttempts();

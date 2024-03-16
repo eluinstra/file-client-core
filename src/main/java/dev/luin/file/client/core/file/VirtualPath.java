@@ -31,9 +31,6 @@ public class VirtualPath implements ValueObject<String>
 
 	public VirtualPath(@NonNull String virtualPath)
 	{
-		value = Try.success(virtualPath)
-				.andThen(v -> inclusiveBetween(2,256,v.length()))
-				.andThen(v -> matchesPattern(v,"^/[a-zA-Z0-9]+$"))
-				.get();
+		value = Try.success(virtualPath).andThen(v -> inclusiveBetween(2, 256, v.length())).andThen(v -> matchesPattern(v, "^/[a-zA-Z0-9]+$")).get();
 	}
 }

@@ -15,12 +15,10 @@
  */
 package dev.luin.file.client.core.service.model;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import dev.luin.file.client.core.file.Filename;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +38,7 @@ public class NewFileFromFs
 {
 	@XmlElement
 	String sha256Checksum;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	String name;
 }

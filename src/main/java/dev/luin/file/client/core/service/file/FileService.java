@@ -15,27 +15,32 @@
  */
 package dev.luin.file.client.core.service.file;
 
-import java.util.List;
-
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.ws.soap.MTOM;
-
 import dev.luin.file.client.core.service.ServiceException;
 import dev.luin.file.client.core.service.model.File;
 import dev.luin.file.client.core.service.model.FileInfo;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.ws.soap.MTOM;
+import java.util.List;
 
 @MTOM(enabled = true)
-@WebService(name = "FileService", targetNamespace = "http://luin.dev/file/client/1.0", serviceName = "FileService", endpointInterface = "FileServiceSoapBinding", portName = "FileServicePort")
+@WebService(
+		name = "FileService",
+		targetNamespace = "http://luin.dev/file/client/1.0",
+		serviceName = "FileService",
+		endpointInterface = "FileServiceSoapBinding",
+		portName = "FileServicePort")
 public interface FileService
 {
 	@WebResult(name = "file")
 	File downloadFile(@WebParam(name = "id") @XmlElement(required = true) Long id) throws ServiceException;
 
 	@WebResult(name = "file")
-	FileInfo downloadFileToFs(@WebParam(name = "id") @XmlElement(required = true) Long id, @WebParam(name = "filename") @XmlElement(required = true) String filename) throws ServiceException;
+	FileInfo
+			downloadFileToFs(@WebParam(name = "id") @XmlElement(required = true) Long id, @WebParam(name = "filename") @XmlElement(required = true) String filename)
+					throws ServiceException;
 
 	@WebResult(name = "fileInfo")
 	FileInfo getFileInfo(@WebParam(name = "id") @XmlElement(required = true) Long id) throws ServiceException;

@@ -15,13 +15,11 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.file.VirtualPath;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.file.VirtualPath;
 
 class VirtualPathType extends AbstractType<VirtualPath>
 {
@@ -45,6 +43,6 @@ class VirtualPathType extends AbstractType<VirtualPath>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, VirtualPath value) throws SQLException
 	{
-		st.setString(startIndex,value.getValue());
+		st.setString(startIndex, value.getValue());
 	}
 }

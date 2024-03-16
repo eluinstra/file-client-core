@@ -15,13 +15,11 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.download.DownloadStatus.Status;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.download.DownloadStatus.Status;
 
 public class DownloadStatusType extends AbstractType<Status>
 {
@@ -45,6 +43,6 @@ public class DownloadStatusType extends AbstractType<Status>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Status value) throws SQLException
 	{
-		st.setInt(startIndex,value.ordinal());
+		st.setInt(startIndex, value.ordinal());
 	}
 }

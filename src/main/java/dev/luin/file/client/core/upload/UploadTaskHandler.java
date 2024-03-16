@@ -15,12 +15,6 @@
  */
 package dev.luin.file.client.core.upload;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.scheduling.annotation.Scheduled;
-
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.file.Url;
@@ -29,12 +23,16 @@ import io.tus.java.client.TusExecutor;
 import io.tus.java.client.TusUpload;
 import io.tus.java.client.TusUploader;
 import io.vavr.control.Try;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -60,17 +58,17 @@ public class UploadTaskHandler
 			val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
 			val client = createClient();
 			val upload = createUpload(file);
-			log.info("Uploading {}",file);
+			log.info("Uploading {}", file);
 			val uploader = client.resumeOrCreateUpload(upload);
 			do
 			{
 				if (log.isDebugEnabled())
-					log.debug("Upload {} at {}%",file,getProgress(upload,uploader));
+					log.debug("Upload {} at {}%", file, getProgress(upload, uploader));
 			} while (uploader.uploadChunk() > -1);
 			val newFile = file.withUrl(new Url(uploader.getUploadURL()));
 			fs.updateFile(newFile);
 			uploader.finish();
-			log.info("Uploaded {}",newFile);
+			log.info("Uploaded {}", newFile);
 		}
 
 		private Client createClient()
@@ -89,11 +87,11 @@ public class UploadTaskHandler
 			return upload;
 		}
 
-		private Map<String,String> createMetaData(FSFile file)
+		private Map<String, String> createMetaData(FSFile file)
 		{
-			val result = new HashMap<String,String>();
-			result.put("filename",file.getName().getValue());
-			result.put("Content-Type",file.getContentType().getValue());
+			val result = new HashMap<String, String>();
+			result.put("filename", file.getName().getValue());
+			result.put("Content-Type", file.getContentType().getValue());
 			return result;
 		}
 
@@ -117,15 +115,15 @@ public class UploadTaskHandler
 	public void run()
 	{
 		val task = uploadTaskManager.getNextTask();
-		task.map(t -> Try.of(() -> handle(t)).onFailure(e -> log.error("",e)));
+		task.map(t -> Try.of(() -> handle(t)).onFailure(e -> log.error("", e)));
 	}
 
 	private UploadTask handle(UploadTask task) throws ProtocolException, IOException
 	{
-		log.info("Start task {}",task);
-		val executor = new UploadTaskExecutor(sslFactoryManager,fs,uploadTaskManager,task);
-		val newTask = handleTask(executor,task);
-		log.info("Finished task {}\nCreated task {}",task,newTask);
+		log.info("Start task {}", task);
+		val executor = new UploadTaskExecutor(sslFactoryManager, fs, uploadTaskManager, task);
+		val newTask = handleTask(executor, task);
+		log.info("Finished task {}\nCreated task {}", task, newTask);
 		return newTask;
 	}
 
@@ -145,7 +143,7 @@ public class UploadTaskHandler
 		}
 		catch (Exception e)
 		{
-			log.error("",e);
+			log.error("", e);
 			return uploadTaskManager.createNextTask(task);
 		}
 	}

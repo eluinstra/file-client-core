@@ -24,10 +24,16 @@ import io.vavr.control.Option;
 public interface UploadTaskDAO
 {
 	Option<UploadTask> getTask(FileId fileId);
+
 	Option<UploadTask> getNextTask();
+
 	Seq<UploadTask> getTasks();
+
 	Seq<UploadTask> getTasks(List<Status> statuses);
+
 	UploadTask insert(UploadTask task);
+
 	long update(UploadTask task);
+
 	long delete(FileId fileId);
 }

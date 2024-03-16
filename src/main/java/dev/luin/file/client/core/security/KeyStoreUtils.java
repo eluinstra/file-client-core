@@ -21,11 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import lombok.var;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class KeyStoreUtils
@@ -35,7 +33,7 @@ class KeyStoreUtils
 		try (val in = getInputStream(location))
 		{
 			val keyStore = KeyStore.getInstance(type.name());
-			keyStore.load(in,password.toCharArray());
+			keyStore.load(in, password.toCharArray());
 			return keyStore;
 		}
 		catch (GeneralSecurityException | IOException e)

@@ -15,13 +15,11 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.Retries;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.Retries;
 
 class RetriesType extends AbstractType<Retries>
 {
@@ -45,6 +43,6 @@ class RetriesType extends AbstractType<Retries>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Retries value) throws SQLException
 	{
-		st.setLong(startIndex,value.getValue());
+		st.setLong(startIndex, value.getValue());
 	}
 }
