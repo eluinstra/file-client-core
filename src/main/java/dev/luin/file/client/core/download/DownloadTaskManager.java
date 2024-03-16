@@ -15,9 +15,6 @@
  */
 package dev.luin.file.client.core.download;
 
-import java.time.Duration;
-import java.time.Instant;
-
 import dev.luin.file.client.core.Retries;
 import dev.luin.file.client.core.ScheduleTime;
 import dev.luin.file.client.core.download.DownloadStatus.Status;
@@ -26,11 +23,13 @@ import dev.luin.file.client.core.file.Url;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
+import java.time.Duration;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -58,31 +57,28 @@ public class DownloadTaskManager
 
 	public DownloadTask createTask(FileId fileId, Url url)
 	{
-		return createTask(fileId,url,null,null);
+		return createTask(fileId, url, null, null);
 	}
 
 	public DownloadTask createTask(FileId fileId, Url url, Instant startDate, Instant endDate)
 	{
-		val task = DownloadTask.of(fileId,url,startDate,endDate);
+		val task = DownloadTask.of(fileId, url, startDate, endDate);
 		return downloadTaskDAO.insert(task);
 	}
 
 	public DownloadTask createNextTask(DownloadTask task)
 	{
 		val retries = task.getRetries().increment();
-		Option<ScheduleTime> nextScheduleTime = getNextScheduleTime(task,retries);
-		val result = nextScheduleTime
-				.map(t -> task
-					.withScheduleTime(t)
-					.withRetries(retries))
-					.getOrElse(task.withStatus(new DownloadStatus(Status.FAILED)));
+		Option<ScheduleTime> nextScheduleTime = getNextScheduleTime(task, retries);
+		val result = nextScheduleTime.map(t -> task.withScheduleTime(t).withRetries(retries)).getOrElse(task.withStatus(new DownloadStatus(Status.FAILED)));
 		downloadTaskDAO.update(result);
 		return result;
 	}
 
 	private Option<ScheduleTime> getNextScheduleTime(DownloadTask task, final Retries retries)
 	{
-		val result = task.getScheduleTime().plus(Duration.ofMinutes((long)(retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval));
+		val result = task.getScheduleTime()
+				.plus(Duration.ofMinutes((long)(retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval));
 		return task.getValidTimeFrame().getEndDate() != null && result.isAfter(task.getValidTimeFrame().getEndDate()) ? Option.none() : Option.of(result);
 	}
 

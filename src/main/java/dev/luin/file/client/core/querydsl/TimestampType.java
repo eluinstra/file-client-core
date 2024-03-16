@@ -15,13 +15,11 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.file.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.file.Timestamp;
 
 class TimestampType extends AbstractType<Timestamp>
 {
@@ -45,6 +43,6 @@ class TimestampType extends AbstractType<Timestamp>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Timestamp value) throws SQLException
 	{
-		st.setTimestamp(startIndex,java.sql.Timestamp.from(value.getValue()));
+		st.setTimestamp(startIndex, java.sql.Timestamp.from(value.getValue()));
 	}
 }

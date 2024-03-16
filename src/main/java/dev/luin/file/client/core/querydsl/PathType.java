@@ -15,13 +15,12 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.querydsl.sql.types.AbstractType;
 
 public class PathType extends AbstractType<Path>
 {
@@ -45,7 +44,7 @@ public class PathType extends AbstractType<Path>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Path value) throws SQLException
 	{
-		st.setString(startIndex,value.toString());
+		st.setString(startIndex, value.toString());
 	}
 
 }

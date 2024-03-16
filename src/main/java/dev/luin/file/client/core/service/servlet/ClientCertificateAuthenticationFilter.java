@@ -15,29 +15,27 @@
  */
 package dev.luin.file.client.core.service.servlet;
 
+import dev.luin.file.client.core.security.KeyStoreManager;
+import dev.luin.file.client.core.security.KeyStoreType;
+import dev.luin.file.client.core.server.ClientCertificateManager;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-
-import dev.luin.file.client.core.security.KeyStoreManager;
-import dev.luin.file.client.core.security.KeyStoreType;
-import dev.luin.file.client.core.server.ClientCertificateManager;
 import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
-@FieldDefaults(level=AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientCertificateAuthenticationFilter implements Filter
 {
 	@NonNull
@@ -51,7 +49,7 @@ public class ClientCertificateAuthenticationFilter implements Filter
 			val trustStoreType = filterConfig.getInitParameter("trustStoreType");
 			val trustStorePath = filterConfig.getInitParameter("trustStorePath");
 			val trustStorePassword = filterConfig.getInitParameter("trustStorePassword");
-			trustStore = KeyStoreManager.getKeyStore(KeyStoreType.valueOf(trustStoreType),trustStorePath,trustStorePassword);
+			trustStore = KeyStoreManager.getKeyStore(KeyStoreType.valueOf(trustStoreType), trustStorePath, trustStorePassword);
 		}
 		catch (GeneralSecurityException | IOException e)
 		{
@@ -65,8 +63,8 @@ public class ClientCertificateAuthenticationFilter implements Filter
 		try
 		{
 			val certificate = ClientCertificateManager.getCertificate();
-			if (validate(trustStore,certificate))
-				chain.doFilter(request,response);
+			if (validate(trustStore, certificate))
+				chain.doFilter(request, response);
 			else
 				((HttpServletResponse)response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}

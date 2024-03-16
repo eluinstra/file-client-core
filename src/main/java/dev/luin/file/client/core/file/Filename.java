@@ -31,9 +31,6 @@ public class Filename implements ValueObject<String>
 
 	public Filename(@NonNull final String filename)
 	{
-		value = Try.success(filename)
-				.andThenTry(v -> inclusiveBetween(0,256,v.length()))
-				.andThenTry(v -> matchesPattern(v,"^[^\\/:\\*\\?\"<>\\|]*$"))
-				.get();
+		value = Try.success(filename).andThenTry(v -> inclusiveBetween(0, 256, v.length())).andThenTry(v -> matchesPattern(v, "^[^\\/:\\*\\?\"<>\\|]*$")).get();
 	}
 }

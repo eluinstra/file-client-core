@@ -15,26 +15,9 @@
  */
 package dev.luin.file.client.core.service.upload;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.FileSystem;
-import dev.luin.file.client.core.file.Filename;
 import dev.luin.file.client.core.file.Url;
 import dev.luin.file.client.core.service.NotFoundException;
 import dev.luin.file.client.core.service.ServiceException;
@@ -46,12 +29,25 @@ import dev.luin.file.client.core.service.model.UploadTask;
 import dev.luin.file.client.core.upload.UploadStatus;
 import dev.luin.file.client.core.upload.UploadTaskManager;
 import io.vavr.control.Try;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -76,20 +72,20 @@ public class UploadServiceImpl implements UploadService
 			@Multipart(value = "sha256Checksum", required = false) String sha256Checksum,
 			@Multipart("file") Attachment file) throws ServiceException
 	{
-		return uploadFile(creationUrl,new NewFile(sha256Checksum,file.getDataHandler()));
+		return uploadFile(creationUrl, new NewFile(sha256Checksum, file.getDataHandler()));
 	}
 
 	@Override
 	public UploadTask uploadFile(String creationUrl, NewFile file) throws ServiceException
 	{
-		log.debug("uploadFile creationUrl={}, {}",creationUrl,file);
+		log.debug("uploadFile creationUrl={}, {}", creationUrl, file);
 		return Try.of(() ->
 		{
 			try
 			{
 				val fsFile = createFile(file);
-				val task = uploadTaskManager.createTask(fsFile.getId(),new Url(creationUrl));
-				log.info("Created uploadTask {}",task);
+				val task = uploadTaskManager.createTask(fsFile.getId(), new Url(creationUrl));
+				log.info("Created uploadTask {}", task);
 				return new UploadTask(task);
 			}
 			catch (Exception e)
@@ -107,20 +103,20 @@ public class UploadServiceImpl implements UploadService
 			@Multipart(value = "sha256Checksum", required = false) String sha256Checksum,
 			@Multipart("filename") String filename) throws ServiceException
 	{
-		return uploadFileFromFs(creationUrl,new NewFileFromFs(sha256Checksum,filename));
+		return uploadFileFromFs(creationUrl, new NewFileFromFs(sha256Checksum, filename));
 	}
-		
+
 	@Override
 	public UploadTask uploadFileFromFs(String creationUrl, NewFileFromFs file) throws ServiceException
 	{
-		log.debug("uploadFile creationUrl={}, {}",creationUrl,file);
+		log.debug("uploadFile creationUrl={}, {}", creationUrl, file);
 		return Try.of(() ->
 		{
 			try
 			{
 				val fsFile = createFile(file);
-				val task = uploadTaskManager.createTask(fsFile.getId(),new Url(creationUrl));
-				log.info("Created uploadTask {}",task);
+				val task = uploadTaskManager.createTask(fsFile.getId(), new Url(creationUrl));
+				log.info("Created uploadTask {}", task);
 				return new UploadTask(task);
 			}
 			catch (Exception e)
@@ -135,7 +131,7 @@ public class UploadServiceImpl implements UploadService
 	@Override
 	public UploadTask getUploadTask(@PathParam("fileId") Long fileId) throws ServiceException
 	{
-		log.debug("getUploadTask {}",fileId);
+		log.debug("getUploadTask {}", fileId);
 		return Try.of(() ->
 		{
 			val task = uploadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> TASK_NOT_FOUND_EXCEPTION);
@@ -148,10 +144,13 @@ public class UploadServiceImpl implements UploadService
 	@Override
 	public List<UploadTask> getUploadTasks(@QueryParam("status") List<UploadStatus.Status> status) throws ServiceException
 	{
-		log.debug("getUploadTasks {}",status);
-		return Try.of(() -> uploadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
-				.map(UploadTask::new)
-				.asJava()).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		log.debug("getUploadTasks {}", status);
+		return Try
+				.of(
+						() -> uploadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
+								.map(UploadTask::new)
+								.asJava())
+				.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
 	@DELETE
@@ -159,14 +158,14 @@ public class UploadServiceImpl implements UploadService
 	@Override
 	public void deleteUploadTask(@PathParam("fileId") Long fileId) throws ServiceException
 	{
-		log.debug("deleteUploadTask {}",fileId);
+		log.debug("deleteUploadTask {}", fileId);
 		Try.of(() ->
 		{
 			FileId id = new FileId(fileId);
 			val fsFile = fs.findFile(id).getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION);
 			uploadTaskManager.deleteTask(id);
-			fs.deleteFile(fsFile,true);
-			log.info("Deleted uploadTask {}",fileId);
+			fs.deleteFile(fsFile, true);
+			log.info("Deleted uploadTask {}", fileId);
 			return null;
 		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}

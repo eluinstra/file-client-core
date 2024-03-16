@@ -24,10 +24,16 @@ import io.vavr.control.Option;
 public interface DownloadTaskDAO
 {
 	Option<DownloadTask> getTask(FileId fileId);
+
 	Option<DownloadTask> getNextTask();
+
 	Seq<DownloadTask> getTasks();
+
 	Seq<DownloadTask> getTasks(List<Status> statuses);
+
 	DownloadTask insert(DownloadTask task);
+
 	long update(DownloadTask task);
+
 	long delete(FileId fileId);
 }

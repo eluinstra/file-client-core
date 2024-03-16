@@ -23,7 +23,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -33,7 +32,7 @@ import lombok.Value;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class KeyStore
 {
-	private static Map<String,KeyStore> keyStores = new ConcurrentHashMap<>();
+	private static Map<String, KeyStore> keyStores = new ConcurrentHashMap<>();
 	@NonNull
 	String path;
 	@NonNull
@@ -44,13 +43,15 @@ public class KeyStore
 
 	public static KeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword)
 	{
-		return keyStores.computeIfAbsent(path,k -> new KeyStore(type,k,password,keyPassword,null));
+		return keyStores.computeIfAbsent(path, k -> new KeyStore(type, k, password, keyPassword, null));
 	}
 
-	public static KeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, @NonNull String defaultAlias)
+	public static
+			KeyStore
+			of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, @NonNull String defaultAlias)
 	{
 		String key = path + defaultAlias;
-		return keyStores.computeIfAbsent(key,k -> new KeyStore(type,path,password,keyPassword,defaultAlias));
+		return keyStores.computeIfAbsent(key, k -> new KeyStore(type, path, password, keyPassword, defaultAlias));
 	}
 
 	private KeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias)
@@ -58,7 +59,7 @@ public class KeyStore
 		this.path = path;
 		this.keyPassword = keyPassword;
 		this.defaultAlias = defaultAlias;
-		this.keyStore = KeyStoreUtils.loadKeyStore(type,path,password);
+		this.keyStore = KeyStoreUtils.loadKeyStore(type, path, password);
 	}
 
 	public Certificate getCertificate(String alias) throws KeyStoreException
@@ -78,7 +79,7 @@ public class KeyStore
 
 	public Key getKey(String alias, char[] password) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException
 	{
-		return keyStore.getKey(alias,password);
+		return keyStore.getKey(alias, password);
 	}
 
 }

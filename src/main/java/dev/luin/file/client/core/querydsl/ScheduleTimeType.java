@@ -15,14 +15,12 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.ScheduleTime;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.ScheduleTime;
 
 class ScheduleTimeType extends AbstractType<ScheduleTime>
 {
@@ -46,6 +44,6 @@ class ScheduleTimeType extends AbstractType<ScheduleTime>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, ScheduleTime value) throws SQLException
 	{
-		st.setTimestamp(startIndex,Timestamp.from(value.getValue()));
+		st.setTimestamp(startIndex, Timestamp.from(value.getValue()));
 	}
 }

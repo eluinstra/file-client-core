@@ -15,11 +15,9 @@
  */
 package dev.luin.file.client.core.download;
 
-import java.time.Instant;
-
-import javax.xml.bind.annotation.XmlType;
-
 import dev.luin.file.client.core.ValueObject;
+import jakarta.xml.bind.annotation.XmlType;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
@@ -41,6 +39,6 @@ public class DownloadStatus implements ValueObject<DownloadStatus.Status>
 
 	public DownloadStatus(@NonNull Status status)
 	{
-		this(status,Instant.now());
+		this(status, Instant.now());
 	}
 }

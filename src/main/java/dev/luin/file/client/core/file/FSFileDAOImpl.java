@@ -15,24 +15,22 @@
  */
 package dev.luin.file.client.core.file;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.sql.SQLQueryFactory;
-
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.springframework.transaction.annotation.Transactional;
 
-@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Transactional(transactionManager = "dataSourceTransactionManager")
 class FSFileDAOImpl implements FSFileDAO
@@ -40,49 +38,41 @@ class FSFileDAOImpl implements FSFileDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QFile table = QFile.file;
-	Expression<?>[] fsFileColumns = {table.id,table.url,table.path,table.name,table.contentType,table.md5Checksum,table.sha256Checksum,table.timestamp,table.length};
-	ConstructorExpression<FSFile> fsFileProjection = Projections.constructor(FSFile.class,fsFileColumns);
+	Expression<?>[] fsFileColumns =
+			{table.id, table.url, table.path, table.name, table.contentType, table.md5Checksum, table.sha256Checksum, table.timestamp, table.length};
+	ConstructorExpression<FSFile> fsFileProjection = Projections.constructor(FSFile.class, fsFileColumns);
 
 	@Override
 	public Option<FSFile> findFile(final FileId id)
 	{
-		return Option.of(queryFactory.select(fsFileProjection)
-				.from(table)
-				.where(table.id.eq(id))
-				.fetchOne());
+		return Option.of(queryFactory.select(fsFileProjection).from(table).where(table.id.eq(id)).fetchOne());
 	}
 
 	@Override
 	public Option<FSFile> findFile(final Url url)
 	{
-		return Option.of(queryFactory.select(fsFileProjection)
-				.from(table)
-				.where(table.url.eq(url))
-				.fetchOne());
+		return Option.of(queryFactory.select(fsFileProjection).from(table).where(table.url.eq(url)).fetchOne());
 	}
 
 	@Override
 	public Seq<FSFile> selectFiles()
 	{
-		val namePath = Expressions.comparablePath(String.class,"name");
-		return List.ofAll(queryFactory.select(fsFileProjection)
-				.from(table)
-				.orderBy(namePath.asc())
-				.fetch());
+		val namePath = Expressions.comparablePath(String.class, "name");
+		return List.ofAll(queryFactory.select(fsFileProjection).from(table).orderBy(namePath.asc()).fetch());
 	}
 
 	@Override
 	public FSFile insertFile(@NonNull final FSFile fsFile)
 	{
 		val id = queryFactory.insert(table)
-				.set(table.url,fsFile.getUrl())
-				.set(table.path,fsFile.getPath())
-				.set(table.name,fsFile.getName())
-				.set(table.contentType,fsFile.getContentType())
-				.set(table.md5Checksum,fsFile.getMd5Checksum())
-				.set(table.sha256Checksum,fsFile.getSha256Checksum())
-				.set(table.timestamp,fsFile.getTimestamp())
-				.set(table.length,fsFile.getLength())
+				.set(table.url, fsFile.getUrl())
+				.set(table.path, fsFile.getPath())
+				.set(table.name, fsFile.getName())
+				.set(table.contentType, fsFile.getContentType())
+				.set(table.md5Checksum, fsFile.getMd5Checksum())
+				.set(table.sha256Checksum, fsFile.getSha256Checksum())
+				.set(table.timestamp, fsFile.getTimestamp())
+				.set(table.length, fsFile.getLength())
 				.executeWithKey(FileId.class);
 		return fsFile.withId(id);
 	}
@@ -91,12 +81,12 @@ class FSFileDAOImpl implements FSFileDAO
 	public long updateFile(@NonNull FSFile fsFile)
 	{
 		return queryFactory.update(table)
-				.set(table.url,fsFile.getUrl())
-				.set(table.name,fsFile.getName())
-				.set(table.contentType,fsFile.getContentType())
-				.set(table.md5Checksum,fsFile.getMd5Checksum())
-				.set(table.sha256Checksum,fsFile.getSha256Checksum())
-				.set(table.length,fsFile.getLength())
+				.set(table.url, fsFile.getUrl())
+				.set(table.name, fsFile.getName())
+				.set(table.contentType, fsFile.getContentType())
+				.set(table.md5Checksum, fsFile.getMd5Checksum())
+				.set(table.sha256Checksum, fsFile.getSha256Checksum())
+				.set(table.length, fsFile.getLength())
 				.where(table.id.eq(fsFile.getId()))
 				.execute();
 	}
@@ -104,8 +94,6 @@ class FSFileDAOImpl implements FSFileDAO
 	@Override
 	public long deleteFile(final FileId id)
 	{
-		return queryFactory.delete(table)
-				.where(table.id.eq(id))
-				.execute();
+		return queryFactory.delete(table).where(table.id.eq(id)).execute();
 	}
 }

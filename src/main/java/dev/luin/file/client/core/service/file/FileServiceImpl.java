@@ -15,24 +15,6 @@
  */
 package dev.luin.file.client.core.service.file;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Consumer;
-
-import javax.activation.DataHandler;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
-
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.FileSystem;
@@ -43,12 +25,27 @@ import dev.luin.file.client.core.service.model.FileDataSource;
 import dev.luin.file.client.core.service.model.FileInfo;
 import dev.luin.file.client.core.service.model.NewFSFileFromFsImpl;
 import io.vavr.control.Try;
+import jakarta.activation.DataHandler;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.apache.commons.io.IOUtils;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -74,20 +71,22 @@ public class FileServiceImpl implements FileService
 	public MultipartBody toMultipartBody(File file)
 	{
 		val attachments = new LinkedList<Attachment>();
-		attachments.add(new Attachment("sha256Checksum","text/plain",file.getSha256Checksum()));
-		attachments.add(new Attachment("file",file.getContent(),new MultivaluedHashMap<>()));
-		return new MultipartBody(attachments,true);
+		attachments.add(new Attachment("sha256Checksum", "text/plain", file.getSha256Checksum()));
+		attachments.add(new Attachment("file", file.getContent(), new MultivaluedHashMap<>()));
+		return new MultipartBody(attachments, true);
 	}
 
 	@Override
 	public File downloadFile(@PathParam("id") Long id) throws ServiceException
 	{
-		log.debug("getFile {}",id);
-		return Try.of(() -> fs.findFile(new FileId(id))
-					.filter(FSFile::isCompleted)
-					.peek(f -> log.info("Retreived file {}",f))
-					.map(f -> new File(f,new DataHandler(FileDataSource.of(f))))
-					.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION))
+		log.debug("getFile {}", id);
+		return Try
+				.of(
+						() -> fs.findFile(new FileId(id))
+								.filter(FSFile::isCompleted)
+								.peek(f -> log.info("Retreived file {}", f))
+								.map(f -> new File(f, new DataHandler(FileDataSource.of(f))))
+								.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION))
 				.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
@@ -96,21 +95,24 @@ public class FileServiceImpl implements FileService
 	@Override
 	public FileInfo downloadFileToFs(@PathParam("id") @NonNull Long id, @PathParam("filename") @NonNull String filename) throws ServiceException
 	{
-		log.debug("getFileInfo {}",id);
+		log.debug("getFileInfo {}", id);
 		java.nio.file.Path validatedFilename =
-				Try.of(() -> NewFSFileFromFsImpl.validateFilename(filename,sharedFs)).getOrElseThrow(ServiceException.defaultExceptionProvider);
-		return Try.of(() -> fs.findFile(new FileId(id))
-				.filter(FSFile::isCompleted)
-				.peek(writeToFile(validatedFilename))
-				.peek(f -> log.info("Retreived file {}",f))
-				.map(FileInfo::new)
-				.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION)).getOrElseThrow(ServiceException.defaultExceptionProvider);
+				Try.of(() -> NewFSFileFromFsImpl.validateFilename(filename, sharedFs)).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		return Try
+				.of(
+						() -> fs.findFile(new FileId(id))
+								.filter(FSFile::isCompleted)
+								.peek(writeToFile(validatedFilename))
+								.peek(f -> log.info("Retreived file {}", f))
+								.map(FileInfo::new)
+								.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION))
+				.getOrElseThrow(ServiceException.defaultExceptionProvider);
 	}
 
 	private Consumer<FSFile> writeToFile(java.nio.file.Path filename)
 	{
 		// TODO handle exceptions
-		return f -> Try.withResources(() -> new FileInputStream(f.getFile()),() -> new FileOutputStream(filename.toFile())).of(IOUtils::copyLarge);
+		return f -> Try.withResources(() -> new FileInputStream(f.getFile()), () -> new FileOutputStream(filename.toFile())).of(IOUtils::copyLarge);
 	}
 
 	@GET
@@ -118,7 +120,7 @@ public class FileServiceImpl implements FileService
 	@Override
 	public FileInfo getFileInfo(@PathParam("id") Long id) throws ServiceException
 	{
-		log.debug("getFileInfo {}",id);
+		log.debug("getFileInfo {}", id);
 		return Try.of(() ->
 		{
 			val fsFile = fs.findFile(new FileId(id));

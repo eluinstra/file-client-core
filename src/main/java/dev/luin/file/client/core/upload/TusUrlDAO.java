@@ -15,20 +15,17 @@
  */
 package dev.luin.file.client.core.upload;
 
-import java.net.URL;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import com.querydsl.sql.SQLQueryFactory;
-
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.QFile;
 import dev.luin.file.client.core.file.Url;
 import io.tus.java.client.TusURLStore;
+import java.net.URL;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.springframework.transaction.annotation.Transactional;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -41,26 +38,21 @@ public class TusUrlDAO implements TusURLStore
 	@Override
 	public void set(String id, URL url)
 	{
-		queryFactory.update(table)
-				.set(table.url,new Url(url))
-				.where(table.id.eq(new FileId(id)));
+		queryFactory.update(table).set(table.url, new Url(url)).where(table.id.eq(new FileId(id)));
 	}
 
 	@Override
 	public URL get(String id)
 	{
-		val result = queryFactory.select(table.url)
-				.from(table)
-				.where(table.id.eq(new FileId(id)))
-				.fetchOne();
+		val result = queryFactory.select(table.url).from(table).where(table.id.eq(new FileId(id))).fetchOne();
 		return result == null ? null : result.toURL();
 	}
 
 	@Override
 	public void remove(String id)
 	{
-		//TODO: replace?
-//		queryFactory.delete(table)
-//				.where(table.id.eq(new FileId(id)));
+		// TODO: replace?
+		// queryFactory.delete(table)
+		// .where(table.id.eq(new FileId(id)));
 	}
 }

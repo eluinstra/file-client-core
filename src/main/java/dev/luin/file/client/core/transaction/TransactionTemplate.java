@@ -20,6 +20,6 @@ import java.util.function.Supplier;
 public interface TransactionTemplate
 {
 	void executeTransaction(Runnable runnable);
-	
+
 	<T> T executeTransactionWithResult(Supplier<T> transaction);
 }

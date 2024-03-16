@@ -17,7 +17,6 @@ package dev.luin.file.client.core;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

@@ -16,7 +16,6 @@
 package dev.luin.file.client.core.transaction;
 
 import java.util.function.Supplier;
-
 import org.springframework.transaction.annotation.Transactional;
 
 public class DataSourceTransactionTemplate implements TransactionTemplate

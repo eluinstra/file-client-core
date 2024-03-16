@@ -15,17 +15,15 @@
  */
 package dev.luin.file.client.core.service.model;
 
-import java.time.Instant;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.jaxb.InstantAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,16 +43,16 @@ public class FileInfo
 	@NonNull
 	String url;
 	@XmlElement(required = true)
-	//@NonNull
+	// @NonNull
 	String name;
 	@XmlElement(required = true)
-	//@NonNull
+	// @NonNull
 	String contentType;
 	@XmlElement(required = true)
-	//@NonNull
+	// @NonNull
 	String md5Checksum;
 	@XmlElement(required = true)
-	//@NonNull
+	// @NonNull
 	String sha256Checksum;
 	@XmlElement(required = true)
 	@XmlJavaTypeAdapter(InstantAdapter.class)

@@ -15,14 +15,12 @@
  */
 package dev.luin.file.client.core.querydsl;
 
+import com.querydsl.sql.types.AbstractType;
+import dev.luin.file.client.core.file.Length;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.querydsl.sql.types.AbstractType;
-
-import dev.luin.file.client.core.file.Length;
 
 class LengthType extends AbstractType<Length>
 {
@@ -40,7 +38,7 @@ class LengthType extends AbstractType<Length>
 	@Override
 	public Length getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return toLength(rs.getObject(startIndex,Long.class));
+		return toLength(rs.getObject(startIndex, Long.class));
 	}
 
 	private Length toLength(Long value)
@@ -51,6 +49,6 @@ class LengthType extends AbstractType<Length>
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Length value) throws SQLException
 	{
-		st.setObject(startIndex,value.getValue(),Types.BIGINT);
+		st.setObject(startIndex, value.getValue(), Types.BIGINT);
 	}
 }

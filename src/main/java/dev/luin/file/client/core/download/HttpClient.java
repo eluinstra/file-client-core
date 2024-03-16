@@ -15,12 +15,6 @@
  */
 package dev.luin.file.client.core.download;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
 import dev.luin.file.client.core.file.ContentType;
 import dev.luin.file.client.core.file.FSFile;
 import dev.luin.file.client.core.file.FileSystem;
@@ -28,12 +22,16 @@ import dev.luin.file.client.core.file.Filename;
 import dev.luin.file.client.core.file.Length;
 import dev.luin.file.client.core.file.Url;
 import io.vavr.control.Option;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -47,15 +45,15 @@ public class HttpClient
 
 	public void download(final FSFile file, final Url url) throws IOException
 	{
-		log.info("Downloading {}",file);
+		log.info("Downloading {}", file);
 		val connection = createHttpConnection(url);
 		connection.setRequestMethod(DownloadMethod.FILE_INFO.getHttpMethod());
 		boolean isResponseSuccessful = connection.getResponseCode() / 100 == 2;
 		if (isResponseSuccessful)
 		{
-			val f = downloadFile(getFile(file,connection), url);
+			val f = downloadFile(getFile(file, connection), url);
 			if (f.isCompleted())
-				log.info("Downloaded {}",f);
+				log.info("Downloaded {}", f);
 		}
 		else
 			throw new IllegalStateException("Unexpected response: " + connection.getResponseCode());
@@ -68,7 +66,7 @@ public class HttpClient
 		{
 			HttpsURLConnection secureConnection = (HttpsURLConnection)connection;
 			secureConnection.setSSLSocketFactory(sslSocketFactory);
-	  }
+		}
 		return connection;
 	}
 
@@ -76,12 +74,8 @@ public class HttpClient
 	{
 		val contentLength = getContentLength(connection).getOrElseThrow(() -> new IllegalStateException("No Content-Length found"));
 		val contentType = connection.getContentType();
-		val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition"))
-				.flatMap(h -> h.getParams().get("filename"))
-				.getOrNull();
-		return file.withLength(new Length(contentLength))
-				.withContentType(new ContentType(contentType))
-				.withName(new Filename(filename));
+		val filename = HeaderValue.of(connection.getHeaderField("Content-Disposition")).flatMap(h -> h.getParams().get("filename")).getOrNull();
+		return file.withLength(new Length(contentLength)).withContentType(new ContentType(contentType)).withName(new Filename(filename));
 	}
 
 	private Option<Long> getContentLength(HttpURLConnection connection)
@@ -95,8 +89,8 @@ public class HttpClient
 		while (!file.isCompleted())
 		{
 			val connection = createHttpConnection(url);
-		  connection.setRequestProperty("Range","bytes=" + file.getFileLength().getStringValue() + "-" + file.getLength().getStringValue());
-		  file = fs.append(file,connection.getInputStream());
+			connection.setRequestProperty("Range", "bytes=" + file.getFileLength().getStringValue() + "-" + file.getLength().getStringValue());
+			file = fs.append(file, connection.getInputStream());
 		}
 		return file;
 	}

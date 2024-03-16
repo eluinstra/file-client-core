@@ -15,17 +15,15 @@
  */
 package dev.luin.file.client.core.service.model;
 
-import java.time.Instant;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import dev.luin.file.client.core.jaxb.InstantAdapter;
 import dev.luin.file.client.core.upload.UploadStatus.Status;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;

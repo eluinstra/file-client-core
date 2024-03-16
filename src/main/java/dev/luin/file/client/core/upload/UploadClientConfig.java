@@ -15,24 +15,21 @@
  */
 package dev.luin.file.client.core.upload;
 
-import java.security.GeneralSecurityException;
-
 import com.querydsl.sql.SQLQueryFactory;
-
+import dev.luin.file.client.core.file.FileSystem;
+import dev.luin.file.client.core.security.KeyStore;
+import dev.luin.file.client.core.security.TrustStore;
+import io.tus.java.client.TusURLStore;
+import java.security.GeneralSecurityException;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import dev.luin.file.client.core.file.FileSystem;
-import dev.luin.file.client.core.security.KeyStore;
-import dev.luin.file.client.core.security.TrustStore;
-import io.tus.java.client.TusURLStore;
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
 
 @Configuration
 @EnableScheduling
@@ -56,10 +53,10 @@ public class UploadClientConfig
 
 	@Bean
 	public UploadTaskHandler uploadTaskHandler(
-		@Autowired @Qualifier("clientKeyStore") KeyStore clientKeyStore,
-		@Autowired TrustStore trustStore,
-		@Autowired FileSystem fs,
-		@Autowired UploadTaskManager uploadTaskManager) throws GeneralSecurityException
+			@Autowired @Qualifier("clientKeyStore") KeyStore clientKeyStore,
+			@Autowired TrustStore trustStore,
+			@Autowired FileSystem fs,
+			@Autowired UploadTaskManager uploadTaskManager) throws GeneralSecurityException
 	{
 		val sslFactoryManager = SSLFactoryManager.builder()
 				.keyStore(clientKeyStore)
@@ -68,13 +65,13 @@ public class UploadClientConfig
 				.enabledCipherSuites(enabledCipherSuites)
 				.verifyHostnames(verifyHostnames)
 				.build();
-		return new UploadTaskHandler(sslFactoryManager,fs,uploadTaskManager,maxRetries);
+		return new UploadTaskHandler(sslFactoryManager, fs, uploadTaskManager, maxRetries);
 	}
 
 	@Bean
 	public UploadTaskManager uploadTaskManager(@Autowired UploadTaskDAO uploadTaskDAO, @Autowired TusURLStore tusDAO)
 	{
-		return new UploadTaskManager(uploadTaskDAO,tusDAO,retryInterval,retryMaxMultiplier);
+		return new UploadTaskManager(uploadTaskDAO, tusDAO, retryInterval, retryMaxMultiplier);
 	}
 
 	@Bean

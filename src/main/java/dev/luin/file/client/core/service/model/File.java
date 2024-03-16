@@ -15,14 +15,13 @@
  */
 package dev.luin.file.client.core.service.model;
 
-import javax.activation.DataHandler;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import dev.luin.file.client.core.file.FSFile;
+import jakarta.activation.DataHandler;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlMimeType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,12 +40,12 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class File
 {
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	Long id;
 	@XmlElement
 	String sha256Checksum;
 	@XmlMimeType("application/octet-stream")
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	@ToString.Exclude
 	DataHandler content;

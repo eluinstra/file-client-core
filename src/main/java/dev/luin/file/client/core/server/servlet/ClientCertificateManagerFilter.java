@@ -15,31 +15,28 @@
  */
 package dev.luin.file.client.core.server.servlet;
 
+import dev.luin.file.client.core.server.ClientCertificateManager;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-
-import dev.luin.file.client.core.server.ClientCertificateManager;
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
-@FieldDefaults(level=AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientCertificateManagerFilter implements Filter
 {
 	String x509CertificateHeader;
@@ -67,8 +64,10 @@ public class ClientCertificateManagerFilter implements Filter
 				val certificate = decode(((HttpServletRequest)request).getHeader(x509CertificateHeader));
 				ClientCertificateManager.setCertificate(certificate);
 			}
-			log.info("Certificate {}",ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : "not found!");
-			chain.doFilter(request,response);
+			log.info(
+					"Certificate {}",
+					ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : "not found!");
+			chain.doFilter(request, response);
 		}
 		catch (CertificateException e)
 		{

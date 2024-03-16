@@ -15,16 +15,14 @@
  */
 package dev.luin.file.client.core;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.lang3.Validate;
-
 import io.vavr.control.Try;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.Validate;
 
 //@Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -42,10 +40,7 @@ public class Retries implements ValueObject<Integer>
 
 	public Retries(@NonNull final Integer retries)
 	{
-		value = Try.success(retries)
-				.andThenTry(v -> Validate.isTrue(v.compareTo(0) >= 0))
-				.map(AtomicInteger::new)
-				.get();
+		value = Try.success(retries).andThenTry(v -> Validate.isTrue(v.compareTo(0) >= 0)).map(AtomicInteger::new).get();
 	}
 
 	public Retries increment()

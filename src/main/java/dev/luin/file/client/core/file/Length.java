@@ -15,14 +15,12 @@
  */
 package dev.luin.file.client.core.file;
 
-import java.math.BigInteger;
-
-import org.apache.commons.lang3.Validate;
-
 import dev.luin.file.client.core.ValueObject;
 import io.vavr.control.Try;
+import java.math.BigInteger;
 import lombok.NonNull;
 import lombok.Value;
+import org.apache.commons.lang3.Validate;
 
 @Value
 public class Length implements ValueObject<Long>
@@ -37,9 +35,7 @@ public class Length implements ValueObject<Long>
 
 	public Length(@NonNull final Long fileLength)
 	{
-		value = Try.success(fileLength)
-				.andThenTry(v -> Validate.isTrue(v.compareTo(0L) >= 0))
-				.get();
+		value = Try.success(fileLength).andThenTry(v -> Validate.isTrue(v.compareTo(0L) >= 0)).get();
 	}
 
 	public BigInteger toBigInteger()

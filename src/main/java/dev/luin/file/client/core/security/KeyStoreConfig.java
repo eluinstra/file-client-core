@@ -15,12 +15,11 @@
  */
 package dev.luin.file.client.core.security;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -46,12 +45,12 @@ public class KeyStoreConfig
 	@Bean
 	public TrustStore trustStore()
 	{
-		return TrustStore.of(trustStoretype,trustStorepath,trustStorepassword);
+		return TrustStore.of(trustStoretype, trustStorepath, trustStorepassword);
 	}
 
 	@Bean("clientKeyStore")
 	public KeyStore clientKeyStore()
 	{
-		return KeyStore.of(clientKeyStoreType,clientKeyStorePath,clientKeyStorePassword,clientKeyStoreKeyPassword,clientKeyStoreDefaultAlias);
+		return KeyStore.of(clientKeyStoreType, clientKeyStorePath, clientKeyStorePassword, clientKeyStoreKeyPassword, clientKeyStoreDefaultAlias);
 	}
 }

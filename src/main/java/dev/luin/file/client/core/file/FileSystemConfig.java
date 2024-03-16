@@ -16,14 +16,12 @@
 package dev.luin.file.client.core.file;
 
 import com.querydsl.sql.SQLQueryFactory;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -37,11 +35,7 @@ public class FileSystemConfig
 	@Bean
 	public FileSystem fileSystem(@Autowired FSFileDAO fsFileDAO)
 	{
-		return FileSystem.builder()
-				.fsFileDAO(fsFileDAO)
-				.baseDir(baseDir)
-				.filenameLength(filenameLength)
-				.build();
+		return FileSystem.builder().fsFileDAO(fsFileDAO).baseDir(baseDir).filenameLength(filenameLength).build();
 	}
 
 	@Bean

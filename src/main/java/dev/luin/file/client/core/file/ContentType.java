@@ -15,12 +15,11 @@
  */
 package dev.luin.file.client.core.file;
 
-import org.apache.commons.lang3.StringUtils;
-
 import dev.luin.file.client.core.ValueObject;
 import io.vavr.control.Option;
 import lombok.NonNull;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
 
 @Value
 public class ContentType implements ValueObject<String>
@@ -31,9 +30,7 @@ public class ContentType implements ValueObject<String>
 
 	public ContentType(@NonNull final String contentType)
 	{
-		value = Option.of(contentType)
-				.flatMap(this::parseValue)
-				.get();
+		value = Option.of(contentType).flatMap(this::parseValue).get();
 	}
 
 	private Option<String> parseValue(final String s)

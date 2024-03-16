@@ -15,29 +15,36 @@
  */
 package dev.luin.file.client.core.service.upload;
 
-import java.util.List;
-
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.ws.soap.MTOM;
-
 import dev.luin.file.client.core.service.ServiceException;
 import dev.luin.file.client.core.service.model.NewFile;
 import dev.luin.file.client.core.service.model.NewFileFromFs;
 import dev.luin.file.client.core.service.model.UploadTask;
 import dev.luin.file.client.core.upload.UploadStatus;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.ws.soap.MTOM;
+import java.util.List;
 
 @MTOM(enabled = true)
-@WebService(name = "UploadService", targetNamespace = "http://luin.dev/file/client/1.0", serviceName = "UploadService", endpointInterface = "UploadServiceSoapBinding", portName = "UploadServicePort")
+@WebService(
+		name = "UploadService",
+		targetNamespace = "http://luin.dev/file/client/1.0",
+		serviceName = "UploadService",
+		endpointInterface = "UploadServiceSoapBinding",
+		portName = "UploadServicePort")
 public interface UploadService
 {
 	@WebResult(name = "uploadTask")
-	UploadTask uploadFile(@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl, @WebParam(name = "file") @XmlElement(required = true) NewFile file) throws ServiceException;
+	UploadTask uploadFile(
+			@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl,
+			@WebParam(name = "file") @XmlElement(required = true) NewFile file) throws ServiceException;
 
 	@WebResult(name = "uploadTask")
-	UploadTask uploadFileFromFs(@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl, @WebParam(name = "file") @XmlElement(required = true) NewFileFromFs file) throws ServiceException;
+	UploadTask uploadFileFromFs(
+			@WebParam(name = "creationUrl") @XmlElement(required = true) String creationUrl,
+			@WebParam(name = "file") @XmlElement(required = true) NewFileFromFs file) throws ServiceException;
 
 	@WebResult(name = "uploadTask")
 	UploadTask getUploadTask(@WebParam(name = "fileId") @XmlElement(required = true) Long fileId) throws ServiceException;

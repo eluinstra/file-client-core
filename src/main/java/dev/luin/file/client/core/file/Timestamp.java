@@ -15,9 +15,8 @@
  */
 package dev.luin.file.client.core.file;
 
-import java.time.Instant;
-
 import dev.luin.file.client.core.ValueObject;
+import java.time.Instant;
 import lombok.NonNull;
 import lombok.Value;
 

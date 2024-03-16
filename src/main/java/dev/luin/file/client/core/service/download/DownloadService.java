@@ -15,27 +15,31 @@
  */
 package dev.luin.file.client.core.service.download;
 
-import java.time.Instant;
-import java.util.List;
-
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.ws.soap.MTOM;
-
 import dev.luin.file.client.core.download.DownloadStatus;
 import dev.luin.file.client.core.jaxb.InstantAdapter;
 import dev.luin.file.client.core.service.ServiceException;
 import dev.luin.file.client.core.service.model.DownloadTask;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.ws.soap.MTOM;
+import java.time.Instant;
+import java.util.List;
 
 @MTOM(enabled = true)
-@WebService(name = "DownloadService", targetNamespace = "http://luin.dev/file/client/1.0", serviceName = "DownloadService", endpointInterface = "DownloadServiceSoapBinding", portName = "DownloadServicePort")
+@WebService(
+		name = "DownloadService",
+		targetNamespace = "http://luin.dev/file/client/1.0",
+		serviceName = "DownloadService",
+		endpointInterface = "DownloadServiceSoapBinding",
+		portName = "DownloadServicePort")
 public interface DownloadService
 {
 	@WebResult(name = "downloadTask")
-	DownloadTask downloadFile(@WebParam(name = "url") @XmlElement(required = true) String url,
+	DownloadTask downloadFile(
+			@WebParam(name = "url") @XmlElement(required = true) String url,
 			@WebParam(name = "startDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant startDate,
 			@WebParam(name = "endDate") @XmlElement @XmlJavaTypeAdapter(InstantAdapter.class) Instant endDate) throws ServiceException;
 

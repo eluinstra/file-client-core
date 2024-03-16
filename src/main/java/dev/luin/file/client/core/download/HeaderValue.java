@@ -36,26 +36,24 @@ public class HeaderValue
 	@NonNull
 	String value;
 	@NonNull
-	Map<String,String> params;
+	Map<String, String> params;
 
 	public static Option<HeaderValue> of(String value)
 	{
 		val parts = value != null ? CharSeq.of(value).split(";") : List.<CharSeq>empty();
-		return parts.headOption().map(v -> new HeaderValue(v.trim().mkString(),getParams(parts.tail())));
+		return parts.headOption().map(v -> new HeaderValue(v.trim().mkString(), getParams(parts.tail())));
 	}
 
-	private static Map<String,String> getParams(Seq<CharSeq> stream)
+	private static Map<String, String> getParams(Seq<CharSeq> stream)
 	{
-		return stream.flatMap(s -> toTuple2(s,"=")).foldLeft(HashMap.empty(),(m,t) -> m.put(t));
+		return stream.flatMap(s -> toTuple2(s, "=")).foldLeft(HashMap.empty(), (m, t) -> m.put(t));
 	}
 
-	private static Option<Tuple2<String,String>> toTuple2(@NonNull CharSeq s, String splitRegEx)
+	private static Option<Tuple2<String, String>> toTuple2(@NonNull CharSeq s, String splitRegEx)
 	{
-		val parts = s.split(splitRegEx,2);
+		val parts = s.split(splitRegEx, 2);
 		return parts.headOption()
-				.map(k -> Tuple.of(
-						k.trim().mkString(),
-						parts.tail().headOption().map(v -> v.trim().mkString().replaceAll("^\"|\"$", "")).getOrNull()));
+				.map(k -> Tuple.of(k.trim().mkString(), parts.tail().headOption().map(v -> v.trim().mkString().replaceAll("^\"|\"$", "")).getOrNull()));
 	}
 
 	@Override

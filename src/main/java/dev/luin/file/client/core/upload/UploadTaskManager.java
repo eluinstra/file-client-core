@@ -15,9 +15,6 @@
  */
 package dev.luin.file.client.core.upload;
 
-import java.net.URL;
-import java.time.Duration;
-
 import dev.luin.file.client.core.file.FileId;
 import dev.luin.file.client.core.file.Url;
 import dev.luin.file.client.core.upload.UploadStatus.Status;
@@ -25,11 +22,13 @@ import io.tus.java.client.TusURLStore;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
+import java.net.URL;
+import java.time.Duration;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -59,15 +58,15 @@ public class UploadTaskManager implements TusURLStore
 
 	public UploadTask createTask(FileId fileId, Url creationUrl)
 	{
-		val task = UploadTask.of(fileId,creationUrl);
+		val task = UploadTask.of(fileId, creationUrl);
 		return uploadTaskDAO.insert(task);
 	}
 
 	public UploadTask createNextTask(UploadTask task)
 	{
 		val retries = task.getRetries().increment();
-		val result = task
-				.withScheduleTime(task.getScheduleTime().plus(Duration.ofMinutes((retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval)))
+		val result = task.withScheduleTime(
+				task.getScheduleTime().plus(Duration.ofMinutes((retries.getValue() > retryMaxMultiplier ? retryMaxMultiplier : retries.getValue()) * retryInterval)))
 				.withRetries(retries);
 		uploadTaskDAO.update(result);
 		return result;
@@ -95,13 +94,15 @@ public class UploadTaskManager implements TusURLStore
 	@Override
 	public void set(String id, URL url)
 	{
-		tusDAO.set(id,url);
+		tusDAO.set(id, url);
 	}
+
 	@Override
 	public URL get(String id)
 	{
 		return tusDAO.get(id);
 	}
+
 	@Override
 	public void remove(String id)
 	{

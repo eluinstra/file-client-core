@@ -15,20 +15,18 @@
  */
 package dev.luin.file.client.core.download;
 
-import java.io.IOException;
-
-import org.springframework.scheduling.annotation.Scheduled;
-
 import dev.luin.file.client.core.file.FileSystem;
 import io.tus.java.client.ProtocolException;
 import io.tus.java.client.TusExecutor;
 import io.vavr.control.Try;
+import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,12 +43,12 @@ public class DownloadTaskHandler
 		HttpClient client;
 		@NonNull
 		DownloadTask task;
-		
+
 		@Override
 		protected void makeAttempt() throws ProtocolException, IOException
 		{
 			val file = fs.findFile(task.getFileId()).getOrElseThrow(() -> new IllegalStateException("File " + task.getFileId() + " not found"));
-			client.download(file,task.getUrl());
+			client.download(file, task.getUrl());
 		}
 	}
 
@@ -66,15 +64,15 @@ public class DownloadTaskHandler
 	public void run()
 	{
 		val task = downloadTaskManager.getNextTask();
-		task.map(t -> Try.of(() -> handle(t)).onFailure(e -> log.error("",e)));
+		task.map(t -> Try.of(() -> handle(t)).onFailure(e -> log.error("", e)));
 	}
 
 	private DownloadTask handle(DownloadTask task) throws IOException
 	{
-		log.info("Start task {}",task);
-		val executor = new DownloadTaskExecutor(fs,client,task);
-		val newTask = handleTask(executor,task);
-		log.info("Finished task {}\nCreated task {}",task,newTask);
+		log.info("Start task {}", task);
+		val executor = new DownloadTaskExecutor(fs, client, task);
+		val newTask = handleTask(executor, task);
+		log.info("Finished task {}\nCreated task {}", task, newTask);
 		return newTask;
 	}
 
@@ -94,7 +92,7 @@ public class DownloadTaskHandler
 		}
 		catch (Exception e)
 		{
-			log.error("",e);
+			log.error("", e);
 			return downloadTaskManager.createNextTask(task);
 		}
 	}

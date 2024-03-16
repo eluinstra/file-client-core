@@ -20,10 +20,6 @@ import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 
-import java.sql.Types;
-
-import javax.sql.DataSource;
-
 import com.querydsl.sql.DB2Templates;
 import com.querydsl.sql.H2Templates;
 import com.querydsl.sql.HSQLDBTemplates;
@@ -36,14 +32,14 @@ import com.querydsl.sql.SQLTemplates;
 import com.querydsl.sql.spring.SpringConnectionProvider;
 import com.querydsl.sql.spring.SpringExceptionTranslator;
 import com.zaxxer.hikari.HikariDataSource;
-
+import java.sql.Types;
+import javax.sql.DataSource;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -51,12 +47,12 @@ public class QueryDSLConfig
 {
 	@Autowired
 	DataSource dataSource;
-	
+
 	@Bean
 	public SQLQueryFactory queryFactory()
 	{
 		val provider = new SpringConnectionProvider(dataSource);
-		return new SQLQueryFactory(querydslConfiguration(),provider);
+		return new SQLQueryFactory(querydslConfiguration(), provider);
 	}
 
 	@Bean
@@ -91,14 +87,15 @@ public class QueryDSLConfig
 	{
 		val driverClassName = ((HikariDataSource)dataSource).getDriverClassName();
 		return Match(driverClassName).of(
-				Case($(contains("db2")),o -> DB2Templates.builder().build()),
-				Case($(contains("h2")),o -> H2Templates.builder().build()),
-				Case($(contains("hsqldb")),o -> HSQLDBTemplates.builder().build()),
-				Case($(contains("mariadb","mysql")),o -> MySQLTemplates.builder().build()),
-				Case($(contains("oracle")),o -> OracleTemplates.builder().build()),
-				Case($(contains("postgresql")),o -> PostgreSQLTemplates.builder().build()),
-				Case($(contains("sqlserver")),o -> SQLServer2012Templates.builder().build()),
-				Case($(),o -> {
+				Case($(contains("db2")), o -> DB2Templates.builder().build()),
+				Case($(contains("h2")), o -> H2Templates.builder().build()),
+				Case($(contains("hsqldb")), o -> HSQLDBTemplates.builder().build()),
+				Case($(contains("mariadb", "mysql")), o -> MySQLTemplates.builder().build()),
+				Case($(contains("oracle")), o -> OracleTemplates.builder().build()),
+				Case($(contains("postgresql")), o -> PostgreSQLTemplates.builder().build()),
+				Case($(contains("sqlserver")), o -> SQLServer2012Templates.builder().build()),
+				Case($(), o ->
+				{
 					throw new IllegalArgumentException("Driver class name " + driverClassName + " not recognized!");
 				}));
 	}
