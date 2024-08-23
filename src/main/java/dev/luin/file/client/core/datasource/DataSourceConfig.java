@@ -30,6 +30,8 @@ import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -107,7 +109,7 @@ public class DataSourceConfig
 		return new HikariDataSource(config);
 	}
 
-	@Bean
+	@EventListener(ContextRefreshedEvent.class)
 	public void flyway()
 	{
 		val locations = Location.getLocation(jdbcUrl);
