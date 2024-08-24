@@ -15,7 +15,7 @@
  */
 package dev.luin.file.client.core.download;
 
-import dev.luin.file.client.core.file.RandomFile;
+import dev.luin.file.client.core.file.RandomFileGenerator;
 import dev.luin.file.client.core.security.KeyStore;
 import dev.luin.file.client.core.security.KeyStoreType;
 import dev.luin.file.client.core.security.TrustStore;
@@ -39,8 +39,7 @@ public class Client
 {
 	int chunkSize = 256;
 	@NonNull
-	String baseDir = "";
-	int filenameLength = 32;
+	RandomFileGenerator randomFileGenerator;
 	@NonNull
 	SSLSocketFactory sslSocketFactory;
 
@@ -48,6 +47,7 @@ public class Client
 	{
 		if (args.length == 0)
 			System.out.println("Usage: Client <url>");
+		val randomFileGenerator = new RandomFileGenerator("", 0, 10);
 		val sslFactoryManager = SSLFactoryManager.builder()
 				.keyStore(KeyStore.of(KeyStoreType.PKCS12, "dev/luin/file/client/core/keystore.p12", "password", "password"))
 				.trustStore(TrustStore.of(KeyStoreType.PKCS12, "dev/luin/file/client/core/truststore.p12", "password"))
@@ -55,7 +55,7 @@ public class Client
 				.enabledCipherSuites(new String[]{"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"})
 				.verifyHostnames(true)
 				.build();
-		val client = new Client(sslFactoryManager.getSslSocketFactory());
+		val client = new Client(randomFileGenerator, sslFactoryManager.getSslSocketFactory());
 		client.download(args[0]);
 	}
 
@@ -65,7 +65,7 @@ public class Client
 		var connection = createConnection(url);
 		connection.setRequestMethod("HEAD");
 		val contentLength = connection.getContentLengthLong();
-		val file = RandomFile.create(baseDir, filenameLength).map(f -> f.getPath().toFile()).get();
+		val file = randomFileGenerator.create().map(f -> f.getPath().toFile()).get();
 		long fileLength = 0;
 		while (fileLength < contentLength)
 		{

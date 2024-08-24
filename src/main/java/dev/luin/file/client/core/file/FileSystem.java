@@ -38,8 +38,7 @@ public class FileSystem
 	@NonNull
 	FSFileDAO fsFileDAO;
 	@NonNull
-	String baseDir;
-	int filenameLength;
+	RandomFileGenerator randomFileGenerator;
 
 	public Option<FSFile> findFile(final FileId id)
 	{
@@ -53,7 +52,7 @@ public class FileSystem
 
 	public FSFile createNewFile(@NonNull final NewFSFile newFile) throws IOException
 	{
-		val randomFile = RandomFile.create(baseDir, filenameLength).andThenTry(f -> f.write(newFile.getInputStream())).get();
+		val randomFile = randomFileGenerator.create().andThenTry(f -> f.write(newFile.getInputStream())).get();
 		val calculatedSha256Checksum = Sha256Checksum.of(randomFile.getFile());
 		if (newFile.getSha256Checksum() == null || calculatedSha256Checksum.validate(newFile.getSha256Checksum()))
 		{
@@ -81,7 +80,7 @@ public class FileSystem
 
 	public FSFile createEmptyFile(@NonNull final String url) throws IOException
 	{
-		val randomFile = RandomFile.create(baseDir, filenameLength).get();
+		val randomFile = randomFileGenerator.create().get();
 		val result = FSFile.builder().url(new Url(url)).path(randomFile.getPath()).timestamp(new Timestamp()).build();
 		return fsFileDAO.insertFile(result);
 	}
