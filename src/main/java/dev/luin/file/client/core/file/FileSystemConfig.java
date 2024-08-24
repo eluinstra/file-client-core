@@ -29,13 +29,15 @@ public class FileSystemConfig
 {
 	@Value("${file.baseDir}")
 	String baseDir;
+	@Value("${file.directoryDepth}")
+	int directoryDepth;
 	@Value("${file.filenameLength}")
 	int filenameLength;
 
 	@Bean
 	public FileSystem fileSystem(@Autowired FSFileDAO fsFileDAO)
 	{
-		return FileSystem.builder().fsFileDAO(fsFileDAO).baseDir(baseDir).filenameLength(filenameLength).build();
+		return FileSystem.builder().fsFileDAO(fsFileDAO).randomFileGenerator(new RandomFileGenerator(baseDir, directoryDepth, filenameLength)).build();
 	}
 
 	@Bean

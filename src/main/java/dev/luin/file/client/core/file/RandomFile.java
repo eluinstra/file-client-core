@@ -15,24 +15,16 @@
  */
 package dev.luin.file.client.core.file;
 
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
-import lombok.val;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 
 @Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RandomFile
 {
 	@NonNull
@@ -40,37 +32,7 @@ public class RandomFile
 	@NonNull
 	File file;
 
-	public static Try<RandomFile> create(@NonNull final String baseDir, final int filenameLength)
-	{
-		while (true)
-		{
-			val path = createRandomPath(baseDir, filenameLength);
-			try
-			{
-				val file = createFile(path);
-				if (file.isSingleValued())
-					return Try.success(file.get());
-			}
-			catch (IOException e)
-			{
-				return Try.failure(new IOException("Error creating file " + path, e));
-			}
-		}
-	}
-
-	private static Path createRandomPath(final String baseDir, final int filenameLength)
-	{
-		val filename = RandomStringUtils.randomNumeric(filenameLength);
-		return Paths.get(baseDir, filename);
-	}
-
-	private static Option<RandomFile> createFile(final Path path) throws IOException
-	{
-		val file = path.toFile();
-		return file.createNewFile() ? Option.some(new RandomFile(path, file)) : Option.none();
-	}
-
-	private RandomFile(final Path path)
+	public RandomFile(final Path path)
 	{
 		this.path = path;
 		file = path.toFile();

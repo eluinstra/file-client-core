@@ -19,6 +19,7 @@ import dev.luin.file.client.core.file.ContentType;
 import dev.luin.file.client.core.file.Filename;
 import dev.luin.file.client.core.file.NewFSFile;
 import dev.luin.file.client.core.file.Sha256Checksum;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import jakarta.ws.rs.core.MediaType;
 import java.io.FileInputStream;
@@ -51,7 +52,8 @@ public class NewFSFileFromFsImpl implements NewFSFile
 	public ContentType getContentType()
 	{
 		val f = sharedFs.resolve(file.getName());
-		val contentType = Try.of(() -> Files.probeContentType(f)).getOrElse(MediaType.APPLICATION_OCTET_STREAM);
+		val contentType =
+				Try.of(() -> Option.of(Files.probeContentType(f)).getOrElse(MediaType.APPLICATION_OCTET_STREAM)).getOrElseThrow(e -> new IllegalStateException(e));
 		return new ContentType(contentType);
 	}
 
