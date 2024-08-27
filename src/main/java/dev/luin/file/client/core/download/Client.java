@@ -31,7 +31,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.apache.commons.io.IOUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -74,7 +73,7 @@ public class Client
 			connection.setRequestProperty("Range", "bytes=" + file.length() + "-" + fileLength);
 			try (val output = new FileOutputStream(file, true))
 			{
-				IOUtils.copyLarge(connection.getInputStream(), output);
+				connection.getInputStream().transferTo(output);
 			}
 		}
 		System.out.println(file.getAbsolutePath());

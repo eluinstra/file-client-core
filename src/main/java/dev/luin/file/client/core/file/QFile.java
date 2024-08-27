@@ -19,9 +19,12 @@ import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadata;
+import com.querydsl.core.types.dsl.EnumPath;
 import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.sql.ColumnMetadata;
 import dev.luin.file.client.core.download.QDownloadTask;
+import dev.luin.file.client.core.file.encryption.EncryptionAlgorithm;
+import dev.luin.file.client.core.file.encryption.EncryptionSecret;
 import dev.luin.file.client.core.upload.QUploadTask;
 import jakarta.annotation.Generated;
 import java.sql.Types;
@@ -41,6 +44,10 @@ public class QFile extends com.querydsl.sql.RelationalPathBase<QFile>
 	public final SimplePath<FileId> id = createSimple("id", FileId.class);
 
 	public final SimplePath<Length> length = createSimple("length", Length.class);
+
+	public final EnumPath<EncryptionAlgorithm> encryptionAlgorithm = createEnum("enc_algorithm", EncryptionAlgorithm.class);
+
+	public final SimplePath<EncryptionSecret> encryptionSecret = createSimple("enc_secret", EncryptionSecret.class);
 
 	public final SimplePath<Md5Checksum> md5Checksum = createSimple("md5Checksum", Md5Checksum.class);
 

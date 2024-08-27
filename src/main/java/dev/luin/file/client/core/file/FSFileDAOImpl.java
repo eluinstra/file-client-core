@@ -38,8 +38,8 @@ class FSFileDAOImpl implements FSFileDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QFile table = QFile.file;
-	Expression<?>[] fsFileColumns =
-			{table.id, table.url, table.path, table.name, table.contentType, table.md5Checksum, table.sha256Checksum, table.timestamp, table.length};
+	Expression<?>[] fsFileColumns = {table.id, table.url, table.path, table.name, table.contentType, table.encryptionAlgorithm, table.encryptionSecret,
+			table.md5Checksum, table.sha256Checksum, table.timestamp, table.length};
 	ConstructorExpression<FSFile> fsFileProjection = Projections.constructor(FSFile.class, fsFileColumns);
 
 	@Override
@@ -69,6 +69,8 @@ class FSFileDAOImpl implements FSFileDAO
 				.set(table.path, fsFile.getPath())
 				.set(table.name, fsFile.getName())
 				.set(table.contentType, fsFile.getContentType())
+				.set(table.encryptionAlgorithm, fsFile.getEncryptionAlgorithm())
+				.set(table.encryptionSecret, fsFile.getEncryptionSecret())
 				.set(table.md5Checksum, fsFile.getMd5Checksum())
 				.set(table.sha256Checksum, fsFile.getSha256Checksum())
 				.set(table.timestamp, fsFile.getTimestamp())

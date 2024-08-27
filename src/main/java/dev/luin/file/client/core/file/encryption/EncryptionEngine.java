@@ -13,37 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.file.client.core.file;
+package dev.luin.file.client.core.file.encryption;
 
-import io.vavr.control.Try;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.nio.file.Path;
-import lombok.NonNull;
-import lombok.Value;
+import javax.crypto.CipherInputStream;
 
-@Value
-public class RandomFile
+public interface EncryptionEngine
 {
-	@NonNull
-	Path path;
-	@NonNull
-	File file;
+	EncryptionSecret generateSecret();
 
-	public RandomFile(final Path path)
-	{
-		this.path = path;
-		file = path.toFile();
-	}
+	CipherInputStream encryptionInputStream(InputStream in, EncryptionSecret secret);
 
-	Length getLength()
-	{
-		return new Length(file.length());
-	}
-
-	public Try<Long> write(@NonNull final InputStream input)
-	{
-		return Try.withResources(() -> new FileOutputStream(file)).of(input::transferTo);
-	}
+	CipherInputStream decryptionInputStream(InputStream in, EncryptionSecret secret);
 }

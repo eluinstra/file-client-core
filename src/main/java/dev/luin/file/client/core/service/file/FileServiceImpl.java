@@ -21,7 +21,6 @@ import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.service.NotFoundException;
 import dev.luin.file.client.core.service.ServiceException;
 import dev.luin.file.client.core.service.model.File;
-import dev.luin.file.client.core.service.model.FileDataSource;
 import dev.luin.file.client.core.service.model.FileInfo;
 import dev.luin.file.client.core.service.model.NewFSFileFromFsImpl;
 import io.vavr.control.Try;
@@ -32,18 +31,15 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
@@ -85,9 +81,14 @@ public class FileServiceImpl implements FileService
 						() -> fs.findFile(new FileId(id))
 								.filter(FSFile::isCompleted)
 								.peek(f -> log.info("Retreived file {}", f))
-								.map(f -> new File(f, new DataHandler(FileDataSource.of(f))))
+								.map(toFile())
 								.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION))
 				.getOrElseThrow(ServiceException.defaultExceptionProvider);
+	}
+
+	private Function<? super FSFile, ? extends File> toFile()
+	{
+		return f -> new File(f, new DataHandler(fs.toDecryptedDataSource(f)));
 	}
 
 	@GET
@@ -102,17 +103,11 @@ public class FileServiceImpl implements FileService
 				.of(
 						() -> fs.findFile(new FileId(id))
 								.filter(FSFile::isCompleted)
-								.peek(writeToFile(validatedFilename))
+								.peek(fs.decryptToFile(validatedFilename))
 								.peek(f -> log.info("Retreived file {}", f))
 								.map(FileInfo::new)
 								.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION))
 				.getOrElseThrow(ServiceException.defaultExceptionProvider);
-	}
-
-	private Consumer<FSFile> writeToFile(java.nio.file.Path filename)
-	{
-		// TODO handle exceptions
-		return f -> Try.withResources(() -> new FileInputStream(f.getFile()), () -> new FileOutputStream(filename.toFile())).of(IOUtils::copyLarge);
 	}
 
 	@GET

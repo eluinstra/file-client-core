@@ -15,12 +15,28 @@
  */
 package dev.luin.file.client.core.file;
 
+import dev.luin.file.client.core.file.encryption.EncryptionSecret;
+import dev.luin.file.client.core.file.encryption.EncryptionService;
+import dev.luin.file.client.core.service.model.InputStreamDataSource;
+import io.vavr.CheckedConsumer;
+import io.vavr.Function1;
+import io.vavr.Tuple;
+import io.vavr.Tuple3;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import jakarta.activation.DataSource;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.function.Consumer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +55,8 @@ public class FileSystem
 	FSFileDAO fsFileDAO;
 	@NonNull
 	RandomFileGenerator randomFileGenerator;
+	@NonNull
+	EncryptionService encryptionService;
 
 	public Option<FSFile> findFile(final FileId id)
 	{
@@ -50,32 +68,60 @@ public class FileSystem
 		return fsFileDAO.selectFiles();
 	}
 
-	public FSFile createNewFile(@NonNull final NewFSFile newFile) throws IOException
+	public FSFile createEncryptedFile(@NonNull final NewFSFile newFile) throws IOException
 	{
-		val randomFile = randomFileGenerator.create().andThenTry(f -> f.write(newFile.getInputStream())).get();
-		val calculatedSha256Checksum = Sha256Checksum.of(randomFile.getFile());
-		if (newFile.getSha256Checksum() == null || calculatedSha256Checksum.validate(newFile.getSha256Checksum()))
+		val algorithm = encryptionService.getDefaultAlgorithm();
+		val secret = encryptionService.generateSecret(algorithm);
+		return randomFileGenerator.create()
+				.flatMap(encryptFile(newFile, secret))
+				.andThenTry(validateSha256Checksum(newFile))
+				.map(
+						tuple -> FSFile.builder()
+								.path(tuple._1.getPath())
+								.name(newFile.getName())
+								.contentType(newFile.getContentType())
+								.encryptionAlgorithm(algorithm)
+								.encryptionSecret(secret)
+								.md5Checksum(new Md5Checksum(tuple._2.digest()))
+								.sha256Checksum(new Sha256Checksum(tuple._3.digest()))
+								.timestamp(new Timestamp())
+								.length(tuple._1.getLength())
+								.build())
+				.get();
+	}
+
+	private CheckedConsumer<Tuple3<RandomFile, MessageDigest, MessageDigest>> validateSha256Checksum(final NewFSFile newFile)
+	{
+		return tuple ->
 		{
-			val result = FSFile.builder()
-					.path(randomFile.getPath())
-					.name(newFile.getName())
-					.contentType(newFile.getContentType())
-					.md5Checksum(Md5Checksum.of(randomFile.getFile()))
-					.sha256Checksum(calculatedSha256Checksum)
-					.timestamp(new Timestamp())
-					.length(randomFile.getLength())
-					.build();
-			return fsFileDAO.insertFile(result);
+			val calculatedSha256Checksum = new Sha256Checksum(tuple._3.digest());
+			if (newFile.getSha256Checksum() != null && !calculatedSha256Checksum.validate(newFile.getSha256Checksum()))
+				throw new IOException(
+						"Checksum error for file "
+								+ newFile.getName()
+								+ ". Checksum of the file uploaded ("
+								+ calculatedSha256Checksum
+								+ ") is not equal to the provided checksum ("
+								+ newFile.getSha256Checksum()
+								+ ")");
+		};
+	}
+
+	private final Function1<RandomFile, Try<Tuple3<RandomFile, MessageDigest, MessageDigest>>> encryptFile(NewFSFile newFile, EncryptionSecret secret)
+	{
+		try
+		{
+			val md5 = Md5Checksum.messageDigest();
+			val sha256 = Sha256Checksum.messageDigest();
+			return file -> Try.success(file)
+					.flatMapTry(
+							f -> f.write(encryptionService.encryptionInputStream(new DigestInputStream(new DigestInputStream(newFile.getInputStream(), md5), sha256), secret))
+									.map(x -> Tuple.of(file, md5, sha256)));
 		}
-		else
-			throw new IOException(
-					"Checksum error for file "
-							+ newFile.getName()
-							+ ". Checksum of the file uploaded ("
-							+ calculatedSha256Checksum
-							+ ") is not equal to the provided checksum ("
-							+ newFile.getSha256Checksum()
-							+ ")");
+		catch (NoSuchAlgorithmException e)
+		{
+			throw new IllegalStateException(e);
+		}
 	}
 
 	public FSFile createEmptyFile(@NonNull final String url) throws IOException
@@ -112,5 +158,29 @@ public class FileSystem
 		if (force || result.isSuccess())
 			fsFileDAO.deleteFile(fsFile.getId());
 		return force || result.getOrElse(false);
+	}
+
+	public DataSource toDecryptedDataSource(FSFile f)
+	{
+		try
+		{
+			val in = encryptionService.decryptionInputStream(f.getEncryptionAlgorithm(), new FileInputStream(f.getFile()), f.getEncryptionSecret());
+			return new InputStreamDataSource(in, f.getName(), f.getContentType());
+		}
+		catch (FileNotFoundException e)
+		{
+			throw new IllegalStateException(e);
+		}
+	}
+
+	public Consumer<FSFile> decryptToFile(Path filename)
+	{
+		// TODO handle exceptions
+		return f -> Try.withResources(() -> decryptionInputStream(f), () -> new FileOutputStream(filename.toFile())).of(InputStream::transferTo);
+	}
+
+	private InputStream decryptionInputStream(FSFile f) throws FileNotFoundException
+	{
+		return encryptionService.decryptionInputStream(f.getEncryptionAlgorithm(), new FileInputStream(f.getFile()), f.getEncryptionSecret());
 	}
 }

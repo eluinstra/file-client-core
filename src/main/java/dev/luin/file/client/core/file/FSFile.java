@@ -15,6 +15,10 @@
  */
 package dev.luin.file.client.core.file;
 
+import static org.apache.commons.io.IOUtils.copyLarge;
+
+import dev.luin.file.client.core.file.encryption.EncryptionAlgorithm;
+import dev.luin.file.client.core.file.encryption.EncryptionSecret;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,7 +34,6 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
 import lombok.val;
-import org.apache.commons.io.IOUtils;
 
 @Builder(access = AccessLevel.PACKAGE)
 @Value
@@ -48,6 +51,10 @@ public class FSFile
 	Filename name;
 	@With
 	ContentType contentType;
+	@NonNull
+	EncryptionAlgorithm encryptionAlgorithm;
+	@NonNull
+	EncryptionSecret encryptionSecret;
 	@With
 	Md5Checksum md5Checksum;
 	@With
@@ -84,7 +91,7 @@ public class FSFile
 			throw new FileNotFoundException(url.toString());
 		try (val output = new FileOutputStream(file, true))
 		{
-			IOUtils.copyLarge(input, output);
+			input.transferTo(output);
 			return isCompleted() ? complete() : this;
 		}
 	}
@@ -94,7 +101,7 @@ public class FSFile
 		val file = getFile();
 		if (!file.exists())// || !fsFile.isCompleted())
 			throw new FileNotFoundException(url.toString());
-		return this.withSha256Checksum(Sha256Checksum.of(file)).withMd5Checksum(Md5Checksum.of(file));
+		return this; // TODO validate file???
 	}
 
 	FSFile append(@NonNull final InputStream input, final long first, final long length) throws IOException
@@ -104,7 +111,7 @@ public class FSFile
 			throw new FileNotFoundException(url.toString());
 		try (val output = new FileOutputStream(file, true))
 		{
-			IOUtils.copyLarge(input, output, first, length);
+			copyLarge(input, output, first, length);
 			return isCompleted() ? complete() : this;
 		}
 	}

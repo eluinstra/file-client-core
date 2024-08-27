@@ -172,12 +172,12 @@ public class UploadServiceImpl implements UploadService
 
 	private FSFile createFile(final NewFile file) throws IOException
 	{
-		return fs.createNewFile(NewFSFileImpl.of(file));
+		return fs.createEncryptedFile(NewFSFileImpl.of(file));
 	}
 
 	private FSFile createFile(final NewFileFromFs file) throws IOException
 	{
-		return fs.createNewFile(NewFSFileFromFsImpl.of(file, sharedFs));
+		return fs.createEncryptedFile(NewFSFileFromFsImpl.of(file, sharedFs));
 	}
 
 }

@@ -13,37 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.luin.file.client.core.file;
+package dev.luin.file.client.core.file.encryption;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.luin.file.client.core.ValueObject;
 import io.vavr.control.Try;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.nio.file.Path;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class RandomFile
+public class EncryptionSecret implements ValueObject<String>
 {
 	@NonNull
-	Path path;
+	byte[] key;
 	@NonNull
-	File file;
+	byte[] iv;
 
-	public RandomFile(final Path path)
+	public static EncryptionSecret create(String value)
 	{
-		this.path = path;
-		file = path.toFile();
+		return Try.of(() -> new ObjectMapper().readValue(value, EncryptionSecret.class)).get();
 	}
 
-	Length getLength()
+	@Override
+	@JsonIgnore
+	public String getValue()
 	{
-		return new Length(file.length());
-	}
-
-	public Try<Long> write(@NonNull final InputStream input)
-	{
-		return Try.withResources(() -> new FileOutputStream(file)).of(input::transferTo);
+		return Try.of(() -> new ObjectMapper().writeValueAsString(this)).get();
 	}
 }
