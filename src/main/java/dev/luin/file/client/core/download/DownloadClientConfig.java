@@ -41,11 +41,11 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DownloadClientConfig
 {
-	@Value("${https.enabledProtocols}")
+	@Value("${client.ssl.enabledProtocols}")
 	String[] enabledProtocols;
-	@Value("${https.enabledCipherSuites}")
+	@Value("${client.ssl.enabledCipherSuites}")
 	String[] enabledCipherSuites;
-	@Value("${https.verifyHostnames}")
+	@Value("${client.ssl.verifyHostnames}")
 	boolean verifyHostnames;
 	@Value("${downloadTask.retry.maxAttempts}")
 	int maxRetries;

@@ -60,8 +60,8 @@ public class Client extends TusClient
 		val sslFactoryManager = SSLFactoryManager.builder()
 				.keyStore(KeyStore.of(KeyStoreType.PKCS12, "dev/luin/file/client/core/keystore.p12", "password", "password"))
 				.trustStore(TrustStore.of(KeyStoreType.PKCS12, "dev/luin/file/client/core/truststore.p12", "password"))
-				.enabledProtocols(new String[]{"TLSv1.2"})
-				.enabledCipherSuites(new String[]{"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"})
+				.enabledProtocols(new String[]{"TLSv1.3,TLSv1.2"})
+				.enabledCipherSuites(new String[]{"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"})
 				.verifyHostnames(true)
 				.build();
 		val client = new Client(sslFactoryManager.getSslSocketFactory());

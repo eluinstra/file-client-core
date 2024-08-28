@@ -36,11 +36,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadClientConfig
 {
-	@Value("${https.enabledProtocols}")
+	@Value("${client.ssl.enabledProtocols}")
 	String[] enabledProtocols;
-	@Value("${https.enabledCipherSuites}")
+	@Value("${client.ssl.enabledCipherSuites}")
 	String[] enabledCipherSuites;
-	@Value("${https.verifyHostnames}")
+	@Value("${client.ssl.verifyHostnames}")
 	boolean verifyHostnames;
 	@Autowired
 	SQLQueryFactory queryFactory;
