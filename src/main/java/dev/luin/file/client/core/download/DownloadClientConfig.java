@@ -27,7 +27,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.security.KeyStore;
@@ -54,6 +56,12 @@ public class DownloadClientConfig
 	int retryInterval;
 	@Value("${downloadTask.retry.maxMultiplier}")
 	int retryMaxMultiplier;
+
+	@Bean
+	public TaskScheduler taskScheduler()
+	{
+		return new ConcurrentTaskScheduler();
+	}
 
 	@Bean
 	public DownloadTaskHandler downloadTaskHandler(

@@ -18,6 +18,8 @@ package dev.luin.file.client.core.querydsl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import com.querydsl.sql.types.AbstractType;
 
@@ -39,12 +41,12 @@ class TimestampType extends AbstractType<Timestamp>
 	@Override
 	public Timestamp getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return new Timestamp(rs.getTimestamp(startIndex).toInstant());
+		return new Timestamp(rs.getTimestamp(startIndex).toLocalDateTime().toInstant(ZoneOffset.UTC));
 	}
 
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, Timestamp value) throws SQLException
 	{
-		st.setTimestamp(startIndex,java.sql.Timestamp.from(value.getValue()));
+		st.setTimestamp(startIndex, java.sql.Timestamp.valueOf(LocalDateTime.ofInstant(value.getValue(), ZoneOffset.UTC)));
 	}
 }

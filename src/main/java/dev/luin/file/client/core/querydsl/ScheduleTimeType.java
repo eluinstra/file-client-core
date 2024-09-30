@@ -19,6 +19,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import com.querydsl.sql.types.AbstractType;
 
@@ -40,12 +42,12 @@ class ScheduleTimeType extends AbstractType<ScheduleTime>
 	@Override
 	public ScheduleTime getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return new ScheduleTime(rs.getTimestamp(startIndex).toInstant());
+		return new ScheduleTime(rs.getTimestamp(startIndex).toLocalDateTime().toInstant(ZoneOffset.UTC));
 	}
 
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, ScheduleTime value) throws SQLException
 	{
-		st.setTimestamp(startIndex,Timestamp.from(value.getValue()));
+		st.setTimestamp(startIndex, Timestamp.valueOf(LocalDateTime.ofInstant(value.getValue(), ZoneOffset.UTC)));
 	}
 }
