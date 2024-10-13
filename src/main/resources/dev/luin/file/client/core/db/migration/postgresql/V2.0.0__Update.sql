@@ -14,5 +14,6 @@
 -- limitations under the License.
 --
 
-ALTER TABLE fs_file ADD enc_algorithm SMALLINT 0 FALSE NOT NULL;
-ALTER TABLE fs_file ADD enc_secret TEXT NULL;
+ALTER TABLE fs_file RENAME TO file;
+
+TABLE file ADD encryption TEXT DEFAULT '{ "algorithm": "NONE" }' NOT NULL;

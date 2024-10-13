@@ -14,5 +14,6 @@
 -- limitations under the License.
 --
 
-ALTER TABLE fs_file ADD enc_algorithm TINYINT 0 FALSE NOT NULL;
-ALTER TABLE fs_file ADD enc_secret TEXT NULL;
+EXEC sp_rename 'fs_file', 'file';
+
+ALTER TABLE file ADD encryption TEXT DEFAULT '{ "algorithm": "NONE" }' NOT NULL;
