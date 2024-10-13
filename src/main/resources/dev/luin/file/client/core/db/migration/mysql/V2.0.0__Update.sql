@@ -14,5 +14,6 @@
 -- limitations under the License.
 --
 
-ALTER TABLE fs_file ADD enc_algorithm TINYINT 0 FALSE NOT NULL;
-ALTER TABLE fs_file ADD enc_secret CLOB NULL;
+RENAME TABLE fs_file TO file;
+
+ALTER TABLE file ADD encryption CLOB DEFAULT '{ "algorithm": "NONE" }' NOT NULL;
