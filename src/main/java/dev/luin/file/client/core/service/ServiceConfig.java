@@ -53,14 +53,12 @@ public class ServiceConfig
 	String shareDownloadLocation;
 
 	@Bean
-	@Autowired
 	public UploadService uploadService(UploadTaskManager uploadTaskManager)
 	{
 		return new UploadServiceImpl(fs, Paths.get(shareUploadLocation).toAbsolutePath(), uploadTaskManager);
 	}
 
 	@Bean
-	@Autowired
 	public DownloadService downloadService(DownloadTaskManager downloadTaskManager)
 	{
 		return new DownloadServiceImpl(fs, downloadTaskManager);
