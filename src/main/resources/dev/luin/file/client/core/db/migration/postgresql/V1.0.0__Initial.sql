@@ -14,7 +14,7 @@
 -- limitations under the License.
 --
 
-CREATE TABLE fs_file
+CREATE TABLE file
 (
 	id								SERIAL					PRIMARY KEY,
 	url								VARCHAR(256)		NULL,

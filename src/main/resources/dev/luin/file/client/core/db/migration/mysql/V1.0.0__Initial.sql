@@ -14,7 +14,7 @@
 -- limitations under the License.
 --
 
-CREATE TABLE fs_file
+CREATE TABLE file
 (
 	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
 	url								VARCHAR(256)		NULL,
