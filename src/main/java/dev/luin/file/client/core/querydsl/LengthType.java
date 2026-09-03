@@ -24,7 +24,7 @@ import java.sql.Types;
 
 class LengthType extends AbstractType<Length>
 {
-	public LengthType(int type)
+	LengthType(int type)
 	{
 		super(type);
 	}

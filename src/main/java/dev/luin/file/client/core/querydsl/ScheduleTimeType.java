@@ -26,7 +26,7 @@ import java.time.ZoneOffset;
 
 class ScheduleTimeType extends AbstractType<ScheduleTime>
 {
-	public ScheduleTimeType(int type)
+	ScheduleTimeType(int type)
 	{
 		super(type);
 	}

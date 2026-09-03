@@ -24,19 +24,19 @@ import lombok.val;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClientCertificateManager
 {
-	private static final ThreadLocal<X509Certificate> certificateHolder = new ThreadLocal<>();
+	private static final ThreadLocal<X509Certificate> CERTIFICATE_HOLDER = new ThreadLocal<>();
 
 	public static X509Certificate getCertificate()
 	{
-		return certificateHolder.get();
+		return CERTIFICATE_HOLDER.get();
 	}
 
 	public static void setCertificate(X509Certificate certificate)
 	{
 		if (certificate == null)
-			certificateHolder.remove();
+			CERTIFICATE_HOLDER.remove();
 		else
-			certificateHolder.set(certificate);
+			CERTIFICATE_HOLDER.set(certificate);
 	}
 
 	public static byte[] getEncodedCertificate() throws CertificateEncodingException

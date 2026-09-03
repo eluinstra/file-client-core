@@ -40,7 +40,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 public class ServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
-	public static final Function<? super Throwable, ServiceException> defaultExceptionProvider = e ->
+	public static final Function<? super Throwable, ServiceException> DEFAULT_EXCEPTION_PROVIDER = e ->
 	{
 		log.error("", e);
 		return throwRestException(

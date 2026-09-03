@@ -25,7 +25,7 @@ import java.time.ZoneOffset;
 
 class TimestampType extends AbstractType<Timestamp>
 {
-	public TimestampType(int type)
+	TimestampType(int type)
 	{
 		super(type);
 	}

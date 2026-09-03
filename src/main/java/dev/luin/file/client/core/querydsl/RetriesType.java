@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 class RetriesType extends AbstractType<Retries>
 {
-	public RetriesType(int type)
+	RetriesType(int type)
 	{
 		super(type);
 	}

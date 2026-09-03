@@ -80,7 +80,7 @@ public class DownloadServiceImpl implements DownloadService
 			{
 				throw new ServiceException(e);
 			}
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@GET
@@ -93,7 +93,7 @@ public class DownloadServiceImpl implements DownloadService
 		{
 			val task = downloadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> TASK_NOT_FOUND_EXCEPTION);
 			return new DownloadTask(task);
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@GET
@@ -107,7 +107,7 @@ public class DownloadServiceImpl implements DownloadService
 			return downloadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
 					.map(DownloadTask::new)
 					.asJava();
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@DELETE
@@ -123,7 +123,7 @@ public class DownloadServiceImpl implements DownloadService
 			fs.deleteFile(fsFile, true);
 			log.info("Deleted downloadTask {}", fileId);
 			return null;
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 }

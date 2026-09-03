@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 class FileIdType extends AbstractType<FileId>
 {
-	public FileIdType(int type)
+	FileIdType(int type)
 	{
 		super(type);
 	}

@@ -32,7 +32,7 @@ public class RandomFile
 	@NonNull
 	File file;
 
-	public RandomFile(final Path path)
+	RandomFile(final Path path)
 	{
 		this.path = path;
 		file = path.toFile();

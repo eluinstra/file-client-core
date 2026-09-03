@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService
 								.peek(f -> log.info("Retreived file {}", f))
 								.map(f -> new File(f, new DataHandler(FileDataSource.of(f))))
 								.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION))
-				.getOrElseThrow(ServiceException.defaultExceptionProvider);
+				.getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@GET
@@ -97,7 +97,7 @@ public class FileServiceImpl implements FileService
 	{
 		log.debug("getFileInfo {}", id);
 		java.nio.file.Path validatedFilename =
-				Try.of(() -> NewFSFileFromFsImpl.validateFilename(filename, sharedFs)).getOrElseThrow(ServiceException.defaultExceptionProvider);
+				Try.of(() -> NewFSFileFromFsImpl.validateFilename(filename, sharedFs)).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 		return Try
 				.of(
 						() -> fs.findFile(new FileId(id))
@@ -106,7 +106,7 @@ public class FileServiceImpl implements FileService
 								.peek(f -> log.info("Retreived file {}", f))
 								.map(FileInfo::new)
 								.getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION))
-				.getOrElseThrow(ServiceException.defaultExceptionProvider);
+				.getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	private Consumer<FSFile> writeToFile(java.nio.file.Path filename)
@@ -125,7 +125,7 @@ public class FileServiceImpl implements FileService
 		{
 			val fsFile = fs.findFile(new FileId(id));
 			return fsFile.map(f -> new FileInfo(f)).getOrElseThrow(() -> FILE_NOT_FOUND_EXCEPTION);
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@GET
@@ -138,6 +138,6 @@ public class FileServiceImpl implements FileService
 		{
 			val fsFile = fs.getFiles();
 			return fsFile.map(f -> new FileInfo(f)).asJava();
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 }

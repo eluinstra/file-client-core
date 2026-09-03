@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 class VirtualPathType extends AbstractType<VirtualPath>
 {
-	public VirtualPathType(int type)
+	VirtualPathType(int type)
 	{
 		super(type);
 	}

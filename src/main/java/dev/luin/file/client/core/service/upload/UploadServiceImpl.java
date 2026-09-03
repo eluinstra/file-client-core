@@ -92,7 +92,7 @@ public class UploadServiceImpl implements UploadService
 			{
 				throw new ServiceException(e);
 			}
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@POST
@@ -123,7 +123,7 @@ public class UploadServiceImpl implements UploadService
 			{
 				throw new ServiceException(e);
 			}
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@GET
@@ -136,7 +136,7 @@ public class UploadServiceImpl implements UploadService
 		{
 			val task = uploadTaskManager.getTask(new FileId(fileId)).getOrElseThrow(() -> TASK_NOT_FOUND_EXCEPTION);
 			return new UploadTask(task);
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@GET
@@ -150,7 +150,7 @@ public class UploadServiceImpl implements UploadService
 						() -> uploadTaskManager.getTasks(status != null ? io.vavr.collection.List.ofAll(status) : io.vavr.collection.List.empty())
 								.map(UploadTask::new)
 								.asJava())
-				.getOrElseThrow(ServiceException.defaultExceptionProvider);
+				.getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	@DELETE
@@ -167,7 +167,7 @@ public class UploadServiceImpl implements UploadService
 			fs.deleteFile(fsFile, true);
 			log.info("Deleted uploadTask {}", fileId);
 			return null;
-		}).getOrElseThrow(ServiceException.defaultExceptionProvider);
+		}).getOrElseThrow(ServiceException.DEFAULT_EXCEPTION_PROVIDER);
 	}
 
 	private FSFile createFile(final NewFile file) throws IOException

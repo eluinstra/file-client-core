@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 class ContentTypeType extends AbstractType<ContentType>
 {
-	public ContentTypeType(int type)
+	ContentTypeType(int type)
 	{
 		super(type);
 	}

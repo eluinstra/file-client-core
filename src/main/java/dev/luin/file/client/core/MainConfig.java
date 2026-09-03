@@ -38,7 +38,7 @@ public class MainConfig
 	{
 		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfig.class))
 		{
-
+			context.close();
 		}
 	}
 }
