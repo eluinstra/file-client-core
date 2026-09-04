@@ -33,6 +33,6 @@ public enum DownloadMethod
 
 	public static Option<DownloadMethod> of(String httpMethod)
 	{
-		return List.of(DownloadMethod.values()).find(m -> m.httpMethod.equals(httpMethod));
+		return List.of(values()).find(m -> m.httpMethod.equals(httpMethod));
 	}
 }

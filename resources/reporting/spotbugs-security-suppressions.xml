@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Baseline of pre-existing SpotBugs/FindSecBugs SECURITY findings accepted on 2026-09-04.
+     Each <Match> suppresses ONE accepted finding so the build gates on NEW findings only.
+     Work through these (prioritise the high-priority ones: SSRF, PATH_TRAVERSAL,
+     WEAK_MESSAGE_DIGEST_MD5, XSS_SERVLET) and delete the matching <Match> as you fix it.
+     Regenerate: mvn spotbugs:spotbugs, then re-derive matches from target/spotbugsXml.xml. -->
+<FindBugsFilter>
+<Match>
+  <Bug pattern="URLCONNECTION_SSRF_FD"/>
+  <Class name="dev.luin.file.client.core.download.Client"/>
+  <Method name="createConnection"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.download.DownloadTaskHandler"/>
+  <Method name="handle"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.download.HttpClient"/>
+  <Method name="download"/>
+</Match>
+<Match>
+  <Bug pattern="WEAK_MESSAGE_DIGEST_MD5"/>
+  <Class name="dev.luin.file.client.core.file.Md5Checksum"/>
+  <Method name="of"/>
+</Match>
+<Match>
+  <Bug pattern="PATH_TRAVERSAL_IN"/>
+  <Class name="dev.luin.file.client.core.file.RandomFileGenerator"/>
+  <Method name="createRandomFile"/>
+</Match>
+<Match>
+  <Bug pattern="URLCONNECTION_SSRF_FD"/>
+  <Class name="dev.luin.file.client.core.file.Url"/>
+  <Method name="openConnection"/>
+</Match>
+<Match>
+  <Bug pattern="PATH_TRAVERSAL_IN"/>
+  <Class name="dev.luin.file.client.core.querydsl.PathType"/>
+  <Method name="getValue"/>
+</Match>
+<Match>
+  <Bug pattern="PATH_TRAVERSAL_IN"/>
+  <Class name="dev.luin.file.client.core.security.KeyStoreManager"/>
+  <Method name="getInputStream"/>
+</Match>
+<Match>
+  <Bug pattern="PATH_TRAVERSAL_IN"/>
+  <Class name="dev.luin.file.client.core.security.KeyStoreUtils"/>
+  <Method name="getInputStream"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.server.servlet.ClientCertificateManagerFilter"/>
+  <Method name="doFilter"/>
+</Match>
+<Match>
+  <Bug pattern="SERVLET_HEADER"/>
+  <Class name="dev.luin.file.client.core.server.servlet.ClientCertificateManagerFilter"/>
+  <Method name="doFilter"/>
+</Match>
+<Match>
+  <Bug pattern="PATH_TRAVERSAL_IN"/>
+  <Class name="dev.luin.file.client.core.service.ServiceConfig"/>
+  <Method name="fileService"/>
+</Match>
+<Match>
+  <Bug pattern="PATH_TRAVERSAL_IN"/>
+  <Class name="dev.luin.file.client.core.service.ServiceConfig"/>
+  <Method name="uploadService"/>
+</Match>
+<Match>
+  <Bug pattern="SERVLET_CONTENT_TYPE"/>
+  <Class name="dev.luin.file.client.core.service.ServiceException"/>
+  <Method name="throwRestException"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="deleteDownloadTask"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="downloadFile"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="getDownloadTask"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="lambda$deleteDownloadTask$695f9ede$1"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="lambda$downloadFile$b2211ca5$1"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="deleteDownloadTask"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="downloadFile"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="getDownloadTask"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.download.DownloadServiceImpl"/>
+  <Method name="getDownloadTasks"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="downloadFile"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="downloadFileToFs"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="getFileInfo"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="lambda$downloadFile$0"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="lambda$downloadFileToFs$3"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="downloadFileRest"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="downloadFileToFs"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="getFileInfo"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.file.FileServiceImpl"/>
+  <Method name="getFiles"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="deleteUploadTask"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="getUploadTask"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="getUploadTasks"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="lambda$deleteUploadTask$695f9ede$1"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="lambda$uploadFile$b722b29e$1"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="lambda$uploadFileFromFs$a665c28c$1"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="uploadFile"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="uploadFileFromFs"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="deleteUploadTask"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="getUploadTask"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="getUploadTasks"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="uploadFile"/>
+</Match>
+<Match>
+  <Bug pattern="JAXRS_ENDPOINT"/>
+  <Class name="dev.luin.file.client.core.service.upload.UploadServiceImpl"/>
+  <Method name="uploadFileFromFs"/>
+</Match>
+<Match>
+  <Bug pattern="PATH_TRAVERSAL_IN"/>
+  <Class name="dev.luin.file.client.core.upload.Client"/>
+  <Method name="main"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.upload.UploadTaskHandler"/>
+  <Method name="handle"/>
+</Match>
+<Match>
+  <Bug pattern="CRLF_INJECTION_LOGS"/>
+  <Class name="dev.luin.file.client.core.upload.UploadTaskHandler$UploadTaskExecutor"/>
+  <Method name="makeAttempt"/>
+</Match>
+</FindBugsFilter>

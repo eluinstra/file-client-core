@@ -64,6 +64,6 @@ public class HeaderValue
 
 	public static void main(String[] args)
 	{
-		HeaderValue.of("test;a=\"b\";b=c;c").stdout();
+		of("test;a=\"b\";b=c;c").stdout();
 	}
 }

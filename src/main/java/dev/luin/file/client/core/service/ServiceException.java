@@ -37,6 +37,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 @Slf4j
 @WebFault(targetNamespace = "http://luin.dev/file/client/1.0")
 @NoArgsConstructor
+@SuppressWarnings("PMD.TooManyStaticImports")
 public class ServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
