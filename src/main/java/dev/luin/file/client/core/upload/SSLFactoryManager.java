@@ -43,9 +43,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class SSLFactoryManager
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -195,6 +197,10 @@ public class SSLFactoryManager
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
 		this.verifyHostnames = verifyHostnames;
+		if (!verifyHostnames)
+			log.warn("Hostname verification is DISABLED (verifyHostnames=false): the client will accept any server hostname. "
+					+ "This is intended for local/dev testing against locally-signed test certificates only. "
+					+ "Do NOT build a production connection with hostname verification disabled.");
 		this.enabledProtocols = enabledProtocols == null ? new String[]{} : enabledProtocols;
 		this.enabledCipherSuites = enabledCipherSuites == null ? new String[]{} : enabledCipherSuites;
 		// KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
