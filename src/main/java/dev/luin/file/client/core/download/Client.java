@@ -19,6 +19,7 @@ import dev.luin.file.client.core.file.RandomFileGenerator;
 import dev.luin.file.client.core.security.KeyStore;
 import dev.luin.file.client.core.security.KeyStoreType;
 import dev.luin.file.client.core.security.TrustStore;
+import dev.luin.file.client.core.security.UrlGuard;
 import dev.luin.file.client.core.upload.SSLFactoryManager;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -84,6 +85,7 @@ public class Client
 
 	private HttpURLConnection createConnection(final URL url) throws IOException
 	{
+		UrlGuard.validate(url);
 		val connection = (HttpURLConnection)url.openConnection();
 		if (connection instanceof HttpsURLConnection)
 		{

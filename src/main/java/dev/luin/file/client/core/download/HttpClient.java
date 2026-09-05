@@ -21,6 +21,7 @@ import dev.luin.file.client.core.file.FileSystem;
 import dev.luin.file.client.core.file.Filename;
 import dev.luin.file.client.core.file.Length;
 import dev.luin.file.client.core.file.Url;
+import dev.luin.file.client.core.security.UrlGuard;
 import io.vavr.control.Option;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -61,6 +62,7 @@ public class HttpClient
 
 	private HttpURLConnection createHttpConnection(final Url url)
 	{
+		UrlGuard.validate(url.toURL());
 		val connection = (HttpURLConnection)url.openConnection();
 		if (connection instanceof HttpsURLConnection)
 		{
